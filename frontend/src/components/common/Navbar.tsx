@@ -1,6 +1,10 @@
+// src/components/common/Navbar.tsx
+
 import { FC } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFlask } from '@fortawesome/free-solid-svg-icons';
 import { Section } from '../../types';
-import '../../styles/components/common/Navbar.css';
+import './styles/Navbar.css';
 
 interface NavbarProps {
   sections: Section[];
@@ -11,7 +15,10 @@ const Navbar: FC<NavbarProps> = ({ sections, onSectionClick }) => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <h1 className="navbar-brand">Analogy Research Group</h1>
+        <div className="navbar-brand">
+          <FontAwesomeIcon icon={faFlask} className="navbar-logo" />
+          <h1>Analogy Research Group</h1>
+        </div>
         <div className="navbar-links">
           {sections.map((section) => (
             <button

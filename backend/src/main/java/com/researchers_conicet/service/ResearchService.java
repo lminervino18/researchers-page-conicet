@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
+import org.hibernate.Hibernate;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class ResearchService {
 
     private final ResearchRepository researchRepository;
@@ -48,19 +49,17 @@ public class ResearchService {
      * @return ResearchResponseDTO containing the created research details
      * @throws IllegalArgumentException if validation fails
      */
+    @Transactional
     public ResearchResponseDTO createResearch(ResearchRequestDTO requestDTO, MultipartFile pdfFile) {
         log.info("Creating new research");
 
-        // Validate input data
         validateResearchData(requestDTO);
         validatePdfFile(pdfFile);
 
         try {
-            // Store PDF file
             String fileName = fileStorageService.storeFile(pdfFile);
             String fileUrl = fileStorageService.getFileUrl(fileName);
 
-            // Create research entity
             Research research = new Research();
             research.setResearchAbstract(requestDTO.getResearchAbstract());
             research.setPdfName(pdfFile.getOriginalFilename());
@@ -72,6 +71,10 @@ public class ResearchService {
 
             Research savedResearch = researchRepository.save(research);
             log.info("Created research with ID: {}", savedResearch.getId());
+            
+            // Initialize lazy collections explicitly
+            Hibernate.initialize(savedResearch.getAuthors());
+            Hibernate.initialize(savedResearch.getLinks());
             
             return mapToDTO(savedResearch);
         } catch (Exception e) {
@@ -90,6 +93,9 @@ public class ResearchService {
     @Transactional(readOnly = true)
     public ResearchResponseDTO getResearch(Long id) {
         Research research = findResearchById(id);
+        // Initialize lazy collections
+        Hibernate.initialize(research.getAuthors());
+        Hibernate.initialize(research.getLinks());
         return mapToDTO(research);
     }
 
@@ -102,10 +108,15 @@ public class ResearchService {
     @Transactional(readOnly = true)
     public Page<ResearchResponseDTO> getAllResearches(Pageable pageable) {
         return researchRepository.findAll(pageable)
-            .map(this::mapToDTO);
+            .map(research -> {
+                // Initialize lazy collections for each element
+                Hibernate.initialize(research.getAuthors());
+                Hibernate.initialize(research.getLinks());
+                return mapToDTO(research);
+            });
     }
 
-    /**
+        /**
      * Updates an existing research.
      * Optionally updates the PDF file if provided.
      *
@@ -116,6 +127,7 @@ public class ResearchService {
      * @throws ResourceNotFoundException if research not found
      * @throws IllegalArgumentException if validation fails
      */
+    @Transactional
     public ResearchResponseDTO updateResearch(Long id, ResearchRequestDTO requestDTO, MultipartFile pdfFile) {
         log.info("Updating research with ID: {}", id);
         
@@ -123,16 +135,13 @@ public class ResearchService {
         Research research = findResearchById(id);
 
         try {
-            // Handle PDF file update if provided
             if (pdfFile != null && !pdfFile.isEmpty()) {
                 validatePdfFile(pdfFile);
                 
-                // Delete old file if exists
                 if (research.getPdfPath() != null) {
                     fileStorageService.deleteFile(research.getPdfPath());
                 }
 
-                // Store new file
                 String fileName = fileStorageService.storeFile(pdfFile);
                 String fileUrl = fileStorageService.getFileUrl(fileName);
                 
@@ -142,13 +151,16 @@ public class ResearchService {
                 research.setPdfSize(pdfFile.getSize());
             }
 
-            // Update other fields
             research.setResearchAbstract(requestDTO.getResearchAbstract());
             research.setAuthors(requestDTO.getAuthors());
             research.setLinks(requestDTO.getLinks());
 
             Research updatedResearch = researchRepository.save(research);
             log.info("Updated research with ID: {}", id);
+            
+            // Initialize lazy collections
+            Hibernate.initialize(updatedResearch.getAuthors());
+            Hibernate.initialize(updatedResearch.getLinks());
             
             return mapToDTO(updatedResearch);
         } catch (Exception e) {
@@ -163,13 +175,13 @@ public class ResearchService {
      * @param id The research ID
      * @throws ResourceNotFoundException if research not found
      */
+    @Transactional
     public void deleteResearch(Long id) {
         log.info("Deleting research with ID: {}", id);
         
         Research research = findResearchById(id);
 
         try {
-            // Delete PDF file if exists
             if (research.getPdfPath() != null) {
                 fileStorageService.deleteFile(research.getPdfPath());
             }
@@ -183,7 +195,11 @@ public class ResearchService {
     }
 
     /**
-     * Search methods
+     * Searches researches by abstract content.
+     *
+     * @param text The search text
+     * @return List of matching ResearchResponseDTO
+     * @throws IllegalArgumentException if search text is empty
      */
     @Transactional(readOnly = true)
     public List<ResearchResponseDTO> searchByAbstract(String text) {
@@ -192,10 +208,21 @@ public class ResearchService {
         }
         return researchRepository.findByResearchAbstractContainingIgnoreCase(text)
             .stream()
-            .map(this::mapToDTO)
+            .map(research -> {
+                Hibernate.initialize(research.getAuthors());
+                Hibernate.initialize(research.getLinks());
+                return mapToDTO(research);
+            })
             .collect(Collectors.toList());
     }
 
+    /**
+     * Searches researches by author name.
+     *
+     * @param authorName The author name to search
+     * @return List of matching ResearchResponseDTO
+     * @throws IllegalArgumentException if author name is empty
+     */
     @Transactional(readOnly = true)
     public List<ResearchResponseDTO> searchByAuthor(String authorName) {
         if (!StringUtils.hasText(authorName)) {
@@ -203,10 +230,21 @@ public class ResearchService {
         }
         return researchRepository.findByAuthor(authorName)
             .stream()
-            .map(this::mapToDTO)
+            .map(research -> {
+                Hibernate.initialize(research.getAuthors());
+                Hibernate.initialize(research.getLinks());
+                return mapToDTO(research);
+            })
             .collect(Collectors.toList());
     }
 
+    /**
+     * Performs a global search across all fields.
+     *
+     * @param term The search term
+     * @return List of matching ResearchResponseDTO
+     * @throws IllegalArgumentException if search term is empty
+     */
     @Transactional(readOnly = true)
     public List<ResearchResponseDTO> searchEverywhere(String term) {
         if (!StringUtils.hasText(term)) {
@@ -214,18 +252,32 @@ public class ResearchService {
         }
         return researchRepository.searchEverywhere(term)
             .stream()
-            .map(this::mapToDTO)
+            .map(research -> {
+                Hibernate.initialize(research.getAuthors());
+                Hibernate.initialize(research.getLinks());
+                return mapToDTO(research);
+            })
             .collect(Collectors.toList());
     }
 
     /**
-     * Helper methods
+     * Helper method to find a research by ID.
+     * 
+     * @param id The research ID
+     * @return Research entity
+     * @throws ResourceNotFoundException if not found
      */
     private Research findResearchById(Long id) {
         return researchRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Research not found with id: " + id));
     }
 
+    /**
+     * Validates PDF file constraints.
+     * 
+     * @param file The PDF file to validate
+     * @throws IllegalArgumentException if validation fails
+     */
     private void validatePdfFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("PDF file is required");
@@ -234,10 +286,16 @@ public class ResearchService {
             throw new IllegalArgumentException("Only PDF files are allowed");
         }
         if (file.getSize() > MAX_PDF_SIZE) {
-            throw new IllegalArgumentException("PDF file size must not exceed 10MB");
+            throw new IllegalArgumentException("PDF file size must not exceed 25MB");
         }
     }
 
+    /**
+     * Validates research data constraints.
+     * 
+     * @param requestDTO The research data to validate
+     * @throws IllegalArgumentException if validation fails
+     */
     private void validateResearchData(ResearchRequestDTO requestDTO) {
         if (!StringUtils.hasText(requestDTO.getResearchAbstract())) {
             throw new IllegalArgumentException("Research abstract is required");
@@ -253,6 +311,12 @@ public class ResearchService {
         }
     }
 
+    /**
+     * Maps a Research entity to ResearchResponseDTO.
+     * 
+     * @param research The Research entity to map
+     * @return ResearchResponseDTO
+     */
     private ResearchResponseDTO mapToDTO(Research research) {
         ResearchResponseDTO dto = new ResearchResponseDTO();
         dto.setId(research.getId());

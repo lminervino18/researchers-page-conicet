@@ -15,9 +15,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-
+import org.springframework.core.io.InputStreamResource;
 
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -27,7 +28,16 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/researches")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
+@CrossOrigin(
+    origins = {"http://localhost:5173", "http://localhost:5174"},
+    allowedHeaders = "*",
+    exposedHeaders = {
+        HttpHeaders.CONTENT_DISPOSITION,
+        HttpHeaders.CONTENT_TYPE,
+        HttpHeaders.CONTENT_LENGTH,
+        HttpHeaders.CACHE_CONTROL
+    }
+)
 public class ResearchController {
 
     private final ResearchService researchService;
@@ -51,15 +61,7 @@ public class ResearchController {
             @RequestPart("research") @Valid ResearchRequestDTO requestDTO,
             @RequestPart("file") MultipartFile file) {
         log.info("REST request to create Research");
-        
-        // Validate PDF file
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("PDF file is required");
-        }
-        if (!MediaType.APPLICATION_PDF_VALUE.equals(file.getContentType())) {
-            throw new IllegalArgumentException("Only PDF files are allowed");
-        }
-
+        validatePdfFile(file);
         return new ResponseEntity<>(
             researchService.createResearch(requestDTO, file),
             HttpStatus.CREATED
@@ -77,11 +79,8 @@ public class ResearchController {
             @RequestPart(value = "file", required = false) MultipartFile file) {
         log.info("REST request to update Research : {}", id);
         
-        // Validate PDF file if provided
         if (file != null && !file.isEmpty()) {
-            if (!MediaType.APPLICATION_PDF_VALUE.equals(file.getContentType())) {
-                throw new IllegalArgumentException("Only PDF files are allowed");
-            }
+            validatePdfFile(file);
         }
 
         return ResponseEntity.ok(researchService.updateResearch(id, requestDTO, file));
@@ -165,7 +164,7 @@ public class ResearchController {
      * Returns the file as a downloadable attachment
      */
     @GetMapping("/download/{id}")
-    public ResponseEntity<Resource> downloadPdf(@PathVariable Long id) {
+    public ResponseEntity<InputStreamResource> downloadPdf(@PathVariable Long id) {
         try {
             ResearchResponseDTO research = researchService.getResearch(id);
             if (research.getPdfName() == null) {
@@ -178,12 +177,21 @@ public class ResearchController {
                 return ResponseEntity.notFound().build();
             }
 
+            InputStreamResource inputStreamResource = new InputStreamResource(resource.getInputStream());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, 
+                "attachment; filename=\"" + research.getPdfName() + "\"");
+            headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+            headers.add(HttpHeaders.PRAGMA, "no-cache");
+            headers.add(HttpHeaders.EXPIRES, "0");
+
             return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(resource.contentLength())
                 .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, 
-                    "attachment; filename=\"" + research.getPdfName() + "\"")
-                .body(resource);
-        } catch (Exception e) {
+                .body(inputStreamResource);
+        } catch (IOException e) {
             log.error("Error downloading PDF for research: {}", id, e);
             return ResponseEntity.internalServerError().build();
         }
@@ -194,7 +202,7 @@ public class ResearchController {
      * Returns the file for inline display
      */
     @GetMapping("/view/{id}")
-    public ResponseEntity<Resource> viewPdf(@PathVariable Long id) {
+    public ResponseEntity<InputStreamResource> viewPdf(@PathVariable Long id) {
         try {
             ResearchResponseDTO research = researchService.getResearch(id);
             if (research.getPdfName() == null) {
@@ -207,15 +215,36 @@ public class ResearchController {
                 return ResponseEntity.notFound().build();
             }
 
+            InputStreamResource inputStreamResource = new InputStreamResource(resource.getInputStream());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + research.getPdfName() + "\"");
+            headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+            headers.add(HttpHeaders.PRAGMA, "no-cache");
+            headers.add(HttpHeaders.EXPIRES, "0");
+            headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "*");
+
             return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(resource.contentLength())
                 .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, 
-                    "inline; filename=\"" + research.getPdfName() + "\"")
-                .header(HttpHeaders.CACHE_CONTROL, "max-age=3600")
-                .body(resource);
-        } catch (Exception e) {
+                .body(inputStreamResource);
+        } catch (IOException e) {
             log.error("Error viewing PDF for research: {}", id, e);
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * Validates if a file is a valid PDF
+     */
+    private void validatePdfFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("PDF file is required");
+        }
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.equals(MediaType.APPLICATION_PDF_VALUE)) {
+            throw new IllegalArgumentException("Only PDF files are allowed");
         }
     }
 }

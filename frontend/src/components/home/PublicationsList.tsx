@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Section from '../common/Section';
 import { Research } from '../../types';
 import './styles/PublicationsList.css';
+import { Link } from 'react-router-dom';
 
 interface PublicationsListProps {
   publications: Research[];
@@ -35,12 +36,12 @@ const PublicationsList: FC<PublicationsListProps> = ({ publications }) => {
                 {publication.authors.join(', ')}
               </div>
               <div className="publication-actions">
-                <button 
+                <Link 
+                  to={`/research/view/${publication.id}`}
                   className="view-btn"
-                  onClick={() => window.open(`/api/researches/view/${publication.id}`)}
                 >
                   View PDF
-                </button>
+                </Link>
               </div>
             </div>
           ))
