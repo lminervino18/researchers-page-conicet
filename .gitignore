@@ -1,0 +1,16 @@
+.vscode/         # Configuración de VSCode
+
+# Backend
+backend/target/          # Directorio de salida de Maven (compilación)
+backend/.mvn/wrapper/    # Wrapper de Maven descargado
+backend/mvnw             # Wrapper para Unix/Linux
+backend/mvnw.cmd         # Wrapper para Windows
+backend/*.log
+
+# Frontend
+frontend/node_modules/   # Dependencias de npm
+frontend/dist/           # Build del frontend
+
+# Sistema
+.env            # Variables de entorno sensibles
+.env.local      # Variables de entorno específicas de la máquina
