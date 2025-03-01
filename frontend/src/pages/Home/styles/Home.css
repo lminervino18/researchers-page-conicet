@@ -1,0 +1,13 @@
+.home-container {
+    padding-top: var(--spacing-xl); /* Espacio para el navbar fijo */
+    min-height: 100vh;
+  }
+  
+  /* Estilos específicos para cada sección si son necesarios */
+  .home-container section:nth-child(even) {
+    background-color: var(--secondary-background);
+  }
+  
+  .home-container section:nth-child(odd) {
+    background-color: var(--background-color);
+  }

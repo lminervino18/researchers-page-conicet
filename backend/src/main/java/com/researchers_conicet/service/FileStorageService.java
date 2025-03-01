@@ -52,22 +52,36 @@ public class FileStorageService {
      * @throws RuntimeException if file storage fails
      */
     public String storeFile(MultipartFile file) {
+        // Validate the file before processing
         validateFile(file);
-
+    
         try {
-            // Clean and generate unique filename
-            String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
-            String uniqueFileName = generateUniqueFileName(originalFileName);
+            // Get the original filename and ensure it's not null or empty
+            String originalFileName = file.getOriginalFilename();
+            if (originalFileName == null || originalFileName.isBlank()) {
+                throw new IllegalArgumentException("Filename cannot be null or empty");
+            }
+    
+            // Clean the filename to prevent path traversal issues
+            String cleanedFileName = StringUtils.cleanPath(originalFileName);
             
-            // Store file
+            // Generate a unique filename to prevent overwriting existing files
+            String uniqueFileName = generateUniqueFileName(cleanedFileName);
+    
+            // Define the target storage location
             Path targetLocation = this.fileStorageLocation.resolve(uniqueFileName);
+            
+            // Copy the file content to the target location, replacing if it already exists
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-
+    
             return uniqueFileName;
         } catch (IOException ex) {
-            throw new RuntimeException("Failed to store file " + file.getOriginalFilename(), ex);
+            // Handle file storage failure and include the filename in the error message (if available)
+            throw new RuntimeException("Failed to store file " + 
+                (file.getOriginalFilename() != null ? file.getOriginalFilename() : "unknown"), ex);
         }
     }
+    
 
     /**
      * Loads a file as a Resource.
@@ -132,20 +146,26 @@ public class FileStorageService {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("File cannot be empty");
         }
-
+    
         if (!ALLOWED_FILE_TYPE.equals(file.getContentType())) {
             throw new IllegalArgumentException("Only PDF files are allowed");
         }
-
+    
         if (file.getSize() > MAX_FILE_SIZE) {
             throw new IllegalArgumentException("File size cannot exceed 25MB");
         }
-
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+    
+        String originalFileName = file.getOriginalFilename();
+        if (originalFileName == null || originalFileName.isBlank()) {
+            throw new IllegalArgumentException("Filename cannot be null or empty");
+        }
+    
+        String fileName = StringUtils.cleanPath(originalFileName);
         if (fileName.contains("..")) {
             throw new IllegalArgumentException("Invalid file path sequence in filename");
         }
     }
+    
 
     /**
      * Generates a unique filename using UUID.
