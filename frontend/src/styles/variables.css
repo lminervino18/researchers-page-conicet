@@ -1,0 +1,29 @@
+:root {
+    /* Colors */
+    --primary-color: #A7C7E7; /* Pastel blue */
+    --primary-dark: #6B9AC4;
+    --primary-light: #D6E6F5;
+    --text-color: #333333;
+    --text-light: #666666;
+    --background-color: #ffffff;
+    --secondary-background: #F5F7FA;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 4rem;
+  
+    /* Container */
+    --max-width: 1200px;
+    
+    /* Typography */
+    --font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    --font-size-small: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-large: 1.25rem;
+    --font-size-xl: 1.5rem;
+    --font-size-xxl: 2rem;
+    --font-size-huge: 3rem;
+  }

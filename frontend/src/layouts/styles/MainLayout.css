@@ -1,0 +1,12 @@
+/* src/layouts/styles/MainLayout.css */
+.layout-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .main-content {
+    margin-top: 80px; /* Ajusta este valor según la altura de tu navbar */
+    padding: 2rem;
+    flex: 1;
+  }

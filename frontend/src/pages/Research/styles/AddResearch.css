@@ -1,0 +1,19 @@
+.add-research-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+  
+  .add-research-form {
+    background-color: var(--background-color);
+    padding: var(--spacing-lg);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .add-research-form h1 {
+    color: var(--primary-dark);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  /* Más estilos específicos del formulario */

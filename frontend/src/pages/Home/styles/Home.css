@@ -1,0 +1,24 @@
+
+.home-container {
+  height: 100vh;
+  overflow: hidden; /* Previene el scroll manual */
+}
+
+.publications-section {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.publications-container {
+  max-width: 1200px;
+  width: 100%;
+  padding: 2rem;
+}
+
+.error-message {
+  color: #e74c3c;
+  text-align: center;
+  margin: 1rem 0;
+}
