@@ -1,4 +1,6 @@
 .vscode/         # Configuración de VSCode
+.vscode/*
+.vscode/settings.json
 
 # Backend
 backend/target/          # Directorio de salida de Maven (compilación)
