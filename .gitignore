@@ -1,13 +1,15 @@
-.vscode/         # Configuración de VSCode
-.vscode/*
-.vscode/settings.json
+# Configuración de VSCode
+.vscode/
 
 # Backend
-backend/target/          # Directorio de salida de Maven (compilación)
-*/target/*
-backend/.mvn/wrapper/    # Wrapper de Maven descargado
-backend/mvnw             # Wrapper para Unix/Linux
-backend/mvnw.cmd         # Wrapper para Windows
+# Directorio de salida de Maven (compilación)
+backend/target/
+# Wrapper de Maven descargado
+backend/.mvn/wrapper/
+# Wrapper para Unix/Linux
+backend/mvnw
+# Wrapper para Windows
+backend/mvnw.cmd
 backend/*.log
 
 # Frontend
