@@ -2,6 +2,7 @@
 
 # Backend
 backend/target/          # Directorio de salida de Maven (compilación)
+*/target/*
 backend/.mvn/wrapper/    # Wrapper de Maven descargado
 backend/mvnw             # Wrapper para Unix/Linux
 backend/mvnw.cmd         # Wrapper para Windows
