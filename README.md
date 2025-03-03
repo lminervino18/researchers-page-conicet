@@ -39,4 +39,12 @@ This project is built using a **full-stack approach** with the following technol
 - 🏗️ **Amazon EC2** – Backend deployment
 - 🛢️ **Amazon RDS (MySQL)** – Cloud-based database storage
 
-## 📁 Project Structure
+### **Development Setup**
+
+- 🚀 **Dev Script** – Single command to launch all services
+  ```bash
+  # Give execution permissions (first time only)
+  chmod +x start-dev.sh
+
+  # Start all services (MySQL, Backend, Frontend)
+  ./start-dev.sh

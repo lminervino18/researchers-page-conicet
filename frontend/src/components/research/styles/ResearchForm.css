@@ -1,0 +1,186 @@
+/* src/components/research/styles/ResearchForm.css */
+.research-form {
+  background-color: var(--background-color);
+  padding: var(--spacing-lg);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: var(--max-width);
+  margin: 0 auto;
+  font-family: var(--font-family);
+}
+
+.form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 500;
+  color: var(--text-color);
+  font-size: var(--font-size-base);
+}
+
+.form-group textarea,
+.form-group input[type="text"],
+.form-group input[type="url"] {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--primary-light);
+  border-radius: 4px;
+  font-size: var(--font-size-base);
+  font-family: var(--font-family);
+  transition: all 0.3s ease;
+}
+
+.form-group textarea:focus,
+.form-group input[type="text"]:focus,
+.form-group input[type="url"]:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.input-with-button {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.input-with-button input {
+  flex: 1;
+}
+
+/* Estilos para botones */
+.add-button,
+.submit-btn,
+.cancel-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.add-button {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+}
+
+.submit-btn {
+  background-color: var(--primary-dark);
+  color: var(--background-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.cancel-btn {
+  background-color: var(--secondary-background);
+  color: var(--text-color);
+  border: 1px solid var(--primary-light);
+}
+
+.add-button:hover:not(:disabled),
+.submit-btn:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background-color: var(--primary-light);
+}
+
+/* Estilos para botones deshabilitados */
+.add-button:disabled,
+.submit-btn:disabled,
+.cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Spinner de carga */
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--background-color);
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--primary-light);
+  border-radius: 4px;
+  font-size: var(--font-size-small);
+}
+
+.remove-tag {
+  background: none;
+  border: none;
+  margin-left: var(--spacing-sm);
+  cursor: pointer;
+  color: var(--text-light);
+  font-size: var(--font-size-large);
+  padding: 0 var(--spacing-xs);
+}
+
+.remove-tag:hover:not(:disabled) {
+  color: var(--primary-dark);
+}
+
+.file-input-label {
+  display: inline-block;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.file-input-label:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+}
+
+.file-input {
+  display: none;
+}
+
+.file-name {
+  margin-top: var(--spacing-sm);
+  font-size: var(--font-size-small);
+  color: var(--text-light);
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: var(--spacing-sm);
+  border-radius: 4px;
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-small);
+}

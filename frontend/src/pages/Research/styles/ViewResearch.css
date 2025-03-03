@@ -1,0 +1,258 @@
+/* src/pages/research/styles/ViewResearch.css */
+.pdf-viewer-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--secondary-background);
+}
+
+.pdf-toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background-color: var(--background-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  font-family: var(--font-family);
+}
+
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.toolbar-button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: var(--font-size-base);
+  font-family: var(--font-family);
+}
+
+.toolbar-button:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.toolbar-button:disabled {
+  background-color: var(--text-light);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.page-info,
+.zoom-info {
+  font-size: var(--font-size-small);
+  color: var(--text-color);
+  min-width: 100px;
+  text-align: center;
+}
+
+.pdf-content {
+  flex: 1;
+  overflow: auto;
+  padding: var(--spacing-lg);
+  display: flex;
+  justify-content: center;
+}
+
+.pdf-loading,
+.pdf-error,
+.page-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  color: var(--text-color);
+  font-family: var(--font-family);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--primary-light);
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--spacing-md);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.retry-button {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+}
+
+.retry-button:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Estilos para el documento PDF */
+.react-pdf__Document {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.react-pdf__Page {
+  margin: var(--spacing-md) 0;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  background-color: var(--background-color);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .pdf-toolbar {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .toolbar-section {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pdf-content {
+    padding: var(--spacing-md);
+  }
+}
+
+/* Ocultar capas de texto y anotaciones */
+.react-pdf__Page__textContent {
+  display: none;
+}
+
+.react-pdf__Page__annotations {
+  display: none;
+}
+
+.pdf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background-color: var(--secondary-background);
+  border-bottom: 1px solid var(--primary-light);
+}
+
+.pdf-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-large);
+  color: var(--text-color);
+}
+
+.pdf-icon {
+  color: var(--primary-dark);
+  font-size: var(--font-size-xl);
+}
+
+.back-button,
+.download-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  transition: all 0.3s ease;
+}
+
+.back-button {
+  background-color: var(--secondary-background);
+  color: var(--text-color);
+  border: 1px solid var(--primary-light);
+}
+
+.download-button {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+}
+
+.back-button:hover {
+  background-color: var(--primary-light);
+}
+
+.download-button:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Asegúrate de que estos estilos no interfieran con los existentes */
+.pdf-viewer-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.pdf-content {
+  flex: 1;
+  overflow: auto;
+  padding: var(--spacing-md);
+}
+
+/* Estilos para los iconos */
+.fa-download,
+.fa-file-pdf,
+.fa-arrow-left {
+  font-size: var(--font-size-base);
+}
+
+/* Ajustes responsive */
+@media (max-width: 768px) {
+  .pdf-header {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .back-button,
+  .download-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+/* Modo oscuro opcional */
+@media (prefers-color-scheme: dark) {
+  .pdf-viewer-container {
+    background-color: var(--secondary-background);
+  }
+
+  .pdf-toolbar {
+    background-color: var(--text-color);
+  }
+
+  .page-info,
+  .zoom-info {
+    color: var(--background-color);
+  }
+
+  .loading-spinner {
+    border-color: var(--text-light);
+    border-top-color: var(--primary-color);
+  }
+}
