@@ -20,3 +20,5 @@ frontend/.env
 # Sistema
 .env            # Variables de entorno sensibles
 .env.local      # Variables de entorno específicas de la máquina
+
+start-dev.sh
