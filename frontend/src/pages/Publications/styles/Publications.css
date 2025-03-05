@@ -1,0 +1,83 @@
+/* src/pages/Publications/styles/Publications.css */
+.publications-container {
+    padding: var(--spacing-xl) var(--spacing-md);
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+  
+  .publications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+  }
+  
+  .publications-header h1 {
+    font-size: var(--font-size-xxl);
+    color: var(--text-color);
+  }
+  
+  .add-publication-button {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-size-base);
+    transition: background-color var(--transition-normal);
+  }
+  
+  .add-publication-button:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  .loading-state,
+  .error-state {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-light);
+  }
+  
+  .error-state {
+    color: var(--error-color);
+  }
+  
+.header-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+  }
+  
+  .search-container {
+    position: relative;
+    width: 300px;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    padding-right: calc(var(--spacing-md) * 2);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-size-base);
+  }
+  
+  .search-icon {
+    position: absolute;
+    right: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+  }
+  
+  /* Agregar a src/components/publications/styles/PublicationsList.css */
+  .download-button {
+    color: var(--success-color);
+  }
+  
+  .download-button:hover {
+    color: var(--success-color);
+  }

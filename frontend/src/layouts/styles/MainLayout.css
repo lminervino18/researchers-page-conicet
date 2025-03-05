@@ -1,12 +1,53 @@
 /* src/layouts/styles/MainLayout.css */
 .layout-container {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-family);
+}
+
+.main-content {
+  flex: 1;
+  padding-top: var(--spacing-xl); /* 4rem = 64px para el navbar */
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+}
+
+.footer {
+  background-color: var(--secondary-background);
+  padding: var(--spacing-lg) 0;
+  margin-top: auto;
+  width: 100%;
+}
+
+.footer-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  text-align: center;
+  padding: 0 var(--spacing-md);
+}
+
+.footer-content p {
+  margin: var(--spacing-sm) 0;
+  color: var(--text-light);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-base);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: calc(var(--spacing-xl) + var(--spacing-lg)); /* 6rem = 96px para navbar responsive */
   }
   
-  .main-content {
-    margin-top: 80px; /* Ajusta este valor según la altura de tu navbar */
-    padding: 2rem;
-    flex: 1;
+  .footer-content {
+    padding: 0 var(--spacing-md);
   }
+
+  .footer-content p {
+    font-size: var(--font-size-tiny);
+  }
+}

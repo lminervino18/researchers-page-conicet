@@ -16,6 +16,7 @@ backend/*.log
 frontend/node_modules/   # Dependencias de npm
 frontend/dist/           # Build del frontend
 frontend/.env
+frontend/uploads
 
 # Sistema
 .env            # Variables de entorno sensibles

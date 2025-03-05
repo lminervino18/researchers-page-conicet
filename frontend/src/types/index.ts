@@ -80,3 +80,14 @@ export interface ResearchMetadata {
   status: ResearchStatus;
   lastModified: string;
 }
+
+// src/types/member.ts
+export interface Member {
+  id: number;
+  name: string;
+  lastName: string;
+  email: string;
+  institution: string;
+  position: string;
+  imageUrl: string;
+}

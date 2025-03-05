@@ -1,121 +1,53 @@
 // src/pages/home/Home.tsx
-
-import { FC, useRef, useCallback, useEffect, useState } from 'react';
-import Section from '../../components/common/Section';
+import { FC } from 'react';
 import MainLayout from '../../layouts/MainLayout';
-import { Research, Section as SectionType } from '../../types';
-import PublicationsList from '../../components/home/PublicationsList';
-import { fetchPublications } from '../../api/research'; // Crearemos este archivo
+import landingImage from '../../assets/landing-page/landing-example.jpeg';
 import './styles/Home.css';
 
 const Home: FC = () => {
-  const [publications, setPublications] = useState<Research[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Referencias para las secciones
-  const labRef = useRef<HTMLElement>(null);
-  const membersRef = useRef<HTMLElement>(null);
-  const publicationsRef = useRef<HTMLDivElement>(null);
-  const participationRef = useRef<HTMLElement>(null);
-  const inboxRef = useRef<HTMLElement>(null);
-
-  // Función para manejar el scroll
-  const handleSectionClick = useCallback((ref: React.RefObject<HTMLElement | HTMLDivElement>) => {
-    ref.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
-
-  // Cargar publicaciones
-  useEffect(() => {
-    const loadPublications = async () => {
-      try {
-        setLoading(true);
-        const response = await fetchPublications();
-        setPublications(response.content); // Asumiendo que la respuesta tiene un campo 'content'
-        setError(null);
-      } catch (err) {
-        setError('Error al cargar las publicaciones');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPublications();
-  }, []);
-
-  // Prevenir scroll manual
-  useEffect(() => {
-    const preventDefault = (e: WheelEvent) => {
-      e.preventDefault();
-    };
-
-    document.addEventListener('wheel', preventDefault, { passive: false });
-    
-    return () => {
-      document.removeEventListener('wheel', preventDefault);
-    };
-  }, []);
-
-  const sections: Array<SectionType> = [
-    { 
-      id: 'lab', 
-      title: 'Our Lab', 
-      ref: labRef as React.RefObject<HTMLElement | HTMLDivElement>
-    },
-    { 
-      id: 'members', 
-      title: 'Members', 
-      ref: membersRef as React.RefObject<HTMLElement | HTMLDivElement>
-    },
-    { 
-      id: 'publications', 
-      title: 'Publications', 
-      ref: publicationsRef as React.RefObject<HTMLElement | HTMLDivElement>
-    },
-    { 
-      id: 'participation', 
-      title: 'Research Studies', 
-      ref: participationRef as React.RefObject<HTMLElement | HTMLDivElement>
-    },
-    { 
-      id: 'inbox', 
-      title: 'Analogie Inbox', 
-      ref: inboxRef as React.RefObject<HTMLElement | HTMLDivElement>
-    }
-  ];
-
   return (
-    <MainLayout sections={sections} onSectionClick={handleSectionClick}>
+    <MainLayout>
       <div className="home-container">
-        <Section title="Our Lab" ref={labRef}>
-          <p>Descripción del laboratorio...</p>
-        </Section>
-
-        <Section title="Members" ref={membersRef}>
-          <p>Lista de miembros...</p>
-        </Section>
-
-        <div className="publications-section" ref={publicationsRef}>
-          <div className="publications-container">
-            <h2>Publications</h2>
-            {loading ? (
-              <p>Cargando publicaciones...</p>
-            ) : error ? (
-              <p className="error-message">{error}</p>
-            ) : (
-              <PublicationsList publications={publications} />
-            )}
+        {/* Hero Section */}
+        <section className="hero-section">
+          <div className="hero-content">
+            <div className="hero-text">
+              <h1>Welcome to Analogy Research Group</h1>
+              <p className="hero-subtitle">
+                Exploring the cognitive processes of analogy and their applications in psychology
+              </p>
+            </div>
+            <div className="hero-image">
+              <img src={landingImage} alt="Research laboratory visualization" />
+            </div>
           </div>
-        </div>
+        </section>
 
-        <Section title="Participation in Research Studies" ref={participationRef}>
-          <p>Información sobre participación...</p>
-        </Section>
+        {/* Featured Research */}
+        <section className="featured-section">
+          <div className="featured-content">
+            <h2>Our Research Focus</h2>
+            <p>
+              We investigate how people understand and use analogies in reasoning, 
+              learning, and problem-solving. Our work combines cognitive psychology, 
+              experimental methods, and innovative approaches to understand these 
+              fundamental mental processes.
+            </p>
+          </div>
+        </section>
 
-        <Section title="Analogie Inbox" ref={inboxRef}>
-          <p>Información sobre Analogie Inbox...</p>
-        </Section>
+        {/* About Section */}
+        <section className="about-section">
+          <div className="about-content">
+            <h2>About Our Lab</h2>
+            <p>
+              Based at the University of Buenos Aires, our research group is dedicated to 
+              advancing our understanding of analogical reasoning and its applications. 
+              Through rigorous research and innovative methodologies, we aim to contribute 
+              to both theoretical knowledge and practical applications in cognitive psychology.
+            </p>
+          </div>
+        </section>
       </div>
     </MainLayout>
   );

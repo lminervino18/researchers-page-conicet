@@ -1,0 +1,35 @@
+/* src/components/members/styles/NavigationArrow.css */
+.nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: var(--background-color);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: var(--shadow-md);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    z-index: 1;
+  }
+  
+  .nav-arrow.left {
+    left: -20px;
+  }
+  
+  .nav-arrow.right {
+    right: -20px;
+  }
+  
+  .nav-arrow:hover:not(.disabled) {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+    transform: translateY(-50%) scale(1.1);
+  }
+  
+  .nav-arrow.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
