@@ -44,11 +44,18 @@ const MemberCarousel: FC<MemberCarouselProps> = ({ members }) => {
       />
       
       <div className="carousel-window">
-        <div 
-          className={`carousel-card ${isAnimating ? 'animating' : ''}`}
-          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-        >
-          <MemberCard member={members[currentIndex]} />
+        <div className="carousel-content">
+          {members.map((member, index) => (
+            <div 
+              key={member.id} 
+              className={`carousel-item ${index === currentIndex ? 'active' : ''}`}
+              style={{
+                transform: `translateX(${(index - currentIndex) * 100}%)`
+              }}
+            >
+              <MemberCard member={member} />
+            </div>
+          ))}
         </div>
       </div>
 
@@ -63,6 +70,13 @@ const MemberCarousel: FC<MemberCarouselProps> = ({ members }) => {
           <div 
             key={index}
             className={`indicator ${index === currentIndex ? 'active' : ''}`}
+            onClick={() => {
+              if (!isAnimating) {
+                setIsAnimating(true);
+                setCurrentIndex(index);
+                setTimeout(() => setIsAnimating(false), 500);
+              }
+            }}
           />
         ))}
       </div>

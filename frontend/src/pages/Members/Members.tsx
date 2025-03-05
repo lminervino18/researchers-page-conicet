@@ -14,7 +14,7 @@ const Members: FC = () => {
       email: 'sarah.johnson@research.edu',
       institution: 'University of Buenos Aires',
       position: 'Principal Investigator',
-      imageUrl: '/members/sarah-johnson.jpg'
+      imageUrl: '/src/assets/members/1.jpg'
     },
     {
       id: 2,
@@ -23,7 +23,7 @@ const Members: FC = () => {
       email: 'm.chen@research.edu',
       institution: 'Cognitive Science Lab',
       position: 'Senior Researcher',
-      imageUrl: '/members/michael-chen.jpg'
+      imageUrl: '/src/assets/members/2.jpg'
     },
     {
       id: 3,
@@ -32,7 +32,7 @@ const Members: FC = () => {
       email: 'l.garcia@research.edu',
       institution: 'Psychology Department',
       position: 'Research Associate',
-      imageUrl: '/members/laura-garcia.jpg'
+      imageUrl: '/src/assets/members/3.jpeg'
     }
   ];
 
