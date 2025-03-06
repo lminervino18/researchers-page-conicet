@@ -1,0 +1,153 @@
+/* src/pages/Lab/styles/Lab.css */
+.lab-container {
+    min-height: 100vh;
+    width: 100%;
+    background-color: var(--background-color);
+  }
+  
+  /* Hero Section */
+  .lab-hero {
+    width: 100%;
+    padding: var(--spacing-xl) 0;
+    background-color: var(--secondary-background);
+    text-align: center;
+  }
+  
+  .lab-hero h1 {
+    font-size: var(--font-size-huge);
+    color: var(--text-color);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .lab-hero p {
+    font-size: var(--font-size-xl);
+    color: var(--text-light);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  /* Research Areas Section */
+  .research-areas {
+    width: 100%;
+    padding: var(--spacing-xl) 0;
+  }
+  
+  .research-areas h2 {
+    text-align: center;
+    font-size: var(--font-size-xxl);
+    color: var(--text-color);
+    margin-bottom: var(--spacing-xl);
+  }
+  
+  .areas-grid {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+  }
+  
+  .area-card {
+    background-color: var(--background-color);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .area-card:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .area-card h3 {
+    font-size: var(--font-size-xl);
+    color: var(--text-color);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .area-card p {
+    color: var(--text-light);
+    line-height: var(--line-height-base);
+  }
+  
+  .area-description {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--primary-color);
+    color: var(--background-color);
+    padding: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    opacity: 0;
+    animation: fadeIn var(--transition-normal) forwards;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.95;
+    }
+  }
+  
+  /* Methodology Section */
+  .lab-methodology {
+    width: 100%;
+    padding: var(--spacing-xl) 0;
+    background-color: var(--secondary-background);
+    text-align: center;
+  }
+  
+  .lab-methodology h2 {
+    font-size: var(--font-size-xxl);
+    color: var(--text-color);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .lab-methodology p {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+    font-size: var(--font-size-large);
+    color: var(--text-light);
+    line-height: var(--line-height-base);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .areas-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .lab-hero h1 {
+      font-size: var(--font-size-xxl);
+    }
+  
+    .lab-hero p {
+      font-size: var(--font-size-large);
+    }
+  
+    .areas-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .area-card {
+      padding: var(--spacing-md);
+    }
+  
+    .area-description {
+      padding: var(--spacing-md);
+    }
+  }

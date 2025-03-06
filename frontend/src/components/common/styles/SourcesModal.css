@@ -1,0 +1,86 @@
+/* src/components/common/styles/SourcesModal.css */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: var(--z-index-modal);
+    backdrop-filter: blur(4px);
+  }
+  
+  .modal-content {
+    background-color: var(--background-color);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .modal-header {
+    position: sticky;
+    top: 0;
+    background-color: var(--background-color);
+    padding-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .modal-header h3 {
+    font-size: var(--font-size-xl);
+    color: var(--text-color);
+    margin: 0;
+  }
+  
+  .close-button {
+    background: none;
+    border: none;
+    font-size: var(--font-size-xl);
+    color: var(--text-light);
+    cursor: pointer;
+    transition: color var(--transition-normal);
+    padding: var(--spacing-sm);
+  }
+  
+  .close-button:hover {
+    color: var(--text-color);
+  }
+  
+  .sources-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sources-list li {
+    margin-bottom: var(--spacing-md);
+    word-break: break-all;
+  }
+  
+  .sources-list a {
+    color: var(--primary-dark);
+    text-decoration: none;
+    transition: color var(--transition-normal);
+  }
+  
+  .sources-list a:hover {
+    color: var(--primary-dark);
+  }
+  
+  @media (max-width: 768px) {
+    .modal-content {
+      width: 95%;
+      padding: var(--spacing-md);
+    }
+  }

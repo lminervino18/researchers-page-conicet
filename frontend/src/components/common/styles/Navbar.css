@@ -4,15 +4,15 @@
   top: 0;
   left: 0;
   right: 0;
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+  background-color: var(--background-color);
+  box-shadow: var(--shadow-md);
+  z-index: var(--z-index-fixed);
 }
 
 .navbar-container {
-  max-width: 1200px;
+  max-width: var(--max-width);
   margin: 0 auto;
-  padding: 1rem;
+  padding: var(--spacing-md);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -21,35 +21,83 @@
 .navbar-brand {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-md);
+  transition: transform var(--transition-normal);
+  cursor: pointer;
+}
+
+.navbar-brand:hover {
+  transform: scale(1.05);
 }
 
 .navbar-logo {
-  font-size: 1.5rem;
-  color: #2c3e50;
+  font-size: var(--font-size-xl);
+  color: var(--primary-color);
 }
 
 .navbar-brand h1 {
-  font-size: 1.5rem;
+  font-size: var(--font-size-xl);
   margin: 0;
-  color: #2c3e50;
+  color: var(--text-color);
+  font-family: var(--font-family);
 }
 
 .navbar-links {
   display: flex;
-  gap: 1.5rem;
+  gap: var(--spacing-lg);
 }
 
 .navbar-link {
   background: none;
   border: none;
-  color: #2c3e50;
-  font-size: 1rem;
+  color: var(--text-color);
+  font-size: var(--font-size-base);
+  font-family: var(--font-family);
   cursor: pointer;
-  padding: 0.5rem;
-  transition: color 0.3s ease;
+  padding: var(--spacing-sm);
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.navbar-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  background-color: var(--primary-color);
+  transition: all var(--transition-normal);
+  transform: translateX(-50%);
 }
 
 .navbar-link:hover {
-  color: #3498db;
+  color: var(--primary-dark);
+  transform: scale(1.05);
+}
+
+.navbar-link:hover::after {
+  width: 100%;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .navbar-container {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .navbar-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-sm);
+  }
+
+  .navbar-link {
+    font-size: var(--font-size-small);
+  }
+
+  .navbar-brand h1 {
+    font-size: var(--font-size-large);
+  }
 }

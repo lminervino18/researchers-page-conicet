@@ -1,30 +1,112 @@
+/* Import fonts and variables */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import './variables.css';
 
+/* CSS Reset - Ensures consistent styling across browsers */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* Base styles for the body element */
 body {
   font-family: var(--font-family);
   color: var(--text-color);
   background-color: var(--background-color);
-  line-height: 1.6;
+  line-height: var(--line-height-base);
+  font-size: var(--font-size-base);
 }
 
+/* Global container class - Centers content and sets max-width */
 .container {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 var(--spacing-md);
+  width: 100%;
 }
 
+/* Typography - Heading styles */
 h1, h2, h3, h4, h5, h6 {
   color: var(--text-color);
-  line-height: 1.2;
+  line-height: var(--line-height-tight);
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
 }
 
+/* Heading size hierarchy */
+h1 { font-size: var(--font-size-huge); }    /* Main titles */
+h2 { font-size: var(--font-size-xxl); }     /* Section titles */
+h3 { font-size: var(--font-size-xl); }      /* Subsection titles */
+h4 { font-size: var(--font-size-large); }   /* Card titles */
+h5 { font-size: var(--font-size-base); }    /* Small section titles */
+h6 { font-size: var(--font-size-small); }   /* Minor titles */
+
+/* Interactive elements */
+/* Base button styles - Removes default styling and adds pointer cursor */
 button {
   cursor: pointer;
+  font-family: inherit;
+  border: none;
+  background: none;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* Link styles with hover effect */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color var(--transition-normal);
+}
+
+a:hover {
+  color: var(--primary-dark);
+}
+
+/* Utility classes for text alignment */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+
+/* Accessibility - Focus styles for better keyboard navigation */
+:focus {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+  /* Adjust font sizes for mobile */
+  body {
+    font-size: calc(var(--font-size-base) * 0.95);
+  }
+
+  h1 { font-size: calc(var(--font-size-huge) * 0.8); }
+  h2 { font-size: calc(var(--font-size-xxl) * 0.8); }
+  h3 { font-size: calc(var(--font-size-xl) * 0.8); }
+
+  /* Adjust container padding for mobile */
+  .container {
+    padding: 0 var(--spacing-sm);
+  }
+}
+
+/* Print styles - Optimize for printing */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .container {
+    max-width: none;
+    padding: 0;
+  }
+
+  a {
+    text-decoration: underline;
+  }
 }

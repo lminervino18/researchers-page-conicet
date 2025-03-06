@@ -1,24 +1,205 @@
-
+/* src/pages/home/styles/Home.css */
 .home-container {
-  height: 100vh;
-  overflow: hidden; /* Previene el scroll manual */
+  min-height: 100vh;
+  background-color: var(--background-color);
+  width: 100%;
 }
 
-.publications-section {
-  height: 100vh;
+/* Hero Section */
+.hero-section {
+  min-height: 100vh;
+  width: 100%;
+  padding: var(--spacing-xl) 0;
+  background-color: var(--secondary-background);
+}
+
+.hero-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+  align-items: center;
+  height: calc(100vh - var(--spacing-xl) * 2);
+}
+
+.hero-text {
+  padding-right: var(--spacing-xl);
+}
+
+.hero-text h1 {
+  font-size: var(--font-size-huge);
+  color: var(--text-color);
+  margin-bottom: var(--spacing-md);
+  line-height: var(--line-height-tight);
+}
+
+.hero-subtitle {
+  font-size: var(--font-size-xl);
+  color: var(--text-light);
+  line-height: var(--line-height-base);
+}
+
+.hero-image {
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.publications-container {
-  max-width: 1200px;
-  width: 100%;
-  padding: 2rem;
+.hero-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
 }
 
-.error-message {
-  color: #e74c3c;
+/* Featured Section */
+.featured-section {
+  width: 100%;
+  padding: var(--spacing-xl) 0;
+}
+
+.featured-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
   text-align: center;
-  margin: 1rem 0;
+}
+
+.featured-content h2 {
+  font-size: var(--font-size-xxl);
+  color: var(--text-color);
+  margin-bottom: var(--spacing-lg);
+}
+
+.featured-content p {
+  font-size: var(--font-size-large);
+  color: var(--text-light);
+  line-height: var(--line-height-base);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Research Areas Section */
+.research-areas-section {
+  width: 100%;
+  padding: var(--spacing-xl) 0;
+  background-color: var(--secondary-background);
+}
+
+.areas-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+.areas-content h2 {
+  font-size: var(--font-size-xxl);
+  color: var(--text-color);
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.areas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.area-card {
+  background-color: var(--background-color);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-normal);
+}
+
+.area-card:hover {
+  transform: translateY(-5px);
+}
+
+.area-card h3 {
+  font-size: var(--font-size-xl);
+  color: var(--text-color);
+  margin-bottom: var(--spacing-md);
+}
+
+.area-card p {
+  color: var(--text-light);
+  line-height: var(--line-height-base);
+}
+
+/* About Section */
+.about-section {
+  width: 100%;
+  padding: var(--spacing-xl) 0;
+}
+
+.about-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+  text-align: center;
+}
+
+.about-content h2 {
+  font-size: var(--font-size-xxl);
+  color: var(--text-color);
+  margin-bottom: var(--spacing-lg);
+}
+
+.about-content p {
+  font-size: var(--font-size-large);
+  color: var(--text-light);
+  line-height: var(--line-height-base);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .hero-content {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+    height: auto;
+    padding-top: var(--spacing-xl);
+  }
+
+  .hero-text {
+    padding-right: 0;
+    text-align: center;
+  }
+
+  .areas-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-text h1 {
+    font-size: var(--font-size-xxl);
+  }
+
+  .hero-subtitle {
+    font-size: var(--font-size-large);
+  }
+
+  .featured-content p,
+  .about-content p {
+    font-size: var(--font-size-base);
+  }
+
+  .areas-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .area-card {
+    padding: var(--spacing-md);
+  }
+
+  .area-card h3 {
+    font-size: var(--font-size-large);
+  }
 }
