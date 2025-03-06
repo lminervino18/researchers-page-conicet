@@ -1,0 +1,41 @@
+/* pages/Admin/Dashboard.css */
+.dashboard-container {
+    min-height: 100vh;
+    background-color: var(--secondary-background);
+  }
+  
+  .dashboard-header {
+    background-color: var(--background-color);
+    padding: var(--spacing-md) var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .dashboard-header h1 {
+    color: var(--text-color);
+    font-size: var(--font-size-xl);
+    margin: 0;
+  }
+  
+  .logout-button {
+    background-color: var(--error-color);
+    color: var(--background-color);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+  }
+  
+  .logout-button:hover {
+    background-color: var(--error-color);
+    opacity: 0.9;
+  }
+  
+  .dashboard-content {
+    padding: var(--spacing-lg);
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
