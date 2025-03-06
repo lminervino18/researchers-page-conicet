@@ -1,8 +1,9 @@
 // src/components/publications/PublicationsList.tsx
 import { FC, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilePdf, faLink, faTimes, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faFilePdf, faLink, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { Research } from '../../types';
+import SourcesModal from '../common/SourcesModal';
 import './styles/PublicationsList.css';
 
 interface PublicationsListProps {
@@ -18,10 +19,6 @@ const PublicationsList: FC<PublicationsListProps> = ({
 }) => {
   const [activeSourcesId, setActiveSourcesId] = useState<number | null>(null);
 
-  const toggleSources = (id: number) => {
-    setActiveSourcesId(activeSourcesId === id ? null : id);
-  };
-
   return (
     <div className="publications-list">
       {publications.length === 0 ? (
@@ -30,59 +27,43 @@ const PublicationsList: FC<PublicationsListProps> = ({
         publications.map((publication) => (
           <div key={publication.id} className="publication-card">
             <div className="publication-content">
-              <p className="publication-abstract">{publication.researchAbstract}</p>
-              <p className="publication-authors">{publication.authors.join(', ')}</p>
+              <div className="publication-main">
+                <p className="publication-abstract">{publication.researchAbstract}</p>
+                <p className="publication-authors">{publication.authors.join(', ')}</p>
+              </div>
               <div className="publication-actions">
                 <button 
-                  className="action-button pdf-button"
+                  className="action-button"
                   onClick={() => onViewPdf(publication.id)}
                   title="View PDF"
                 >
                   <FontAwesomeIcon icon={faFilePdf} />
                 </button>
                 <button 
-                  className="action-button download-button"
+                  className="action-button"
                   onClick={() => onDownloadPdf(publication.id)}
                   title="Download PDF"
                 >
                   <FontAwesomeIcon icon={faDownload} />
                 </button>
                 <button 
-                  className="action-button sources-button"
-                  onClick={() => toggleSources(publication.id)}
+                  className="action-button"
+                  onClick={() => setActiveSourcesId(publication.id)}
                   title="View Sources"
                 >
                   <FontAwesomeIcon icon={faLink} />
                 </button>
               </div>
             </div>
-            
-            {activeSourcesId === publication.id && (
-              <div className="sources-modal">
-                <div className="sources-content">
-                  <div className="sources-header">
-                    <h3>Sources</h3>
-                    <button 
-                      className="close-button"
-                      onClick={() => setActiveSourcesId(null)}
-                    >
-                      <FontAwesomeIcon icon={faTimes} />
-                    </button>
-                  </div>
-                  <ul className="sources-list">
-                    {publication.links.map((source, index) => (
-                      <li key={index}>
-                        <a href={source} target="_blank" rel="noopener noreferrer">
-                          {source}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
           </div>
         ))
+      )}
+      
+      {activeSourcesId && (
+        <SourcesModal
+          sources={publications.find(p => p.id === activeSourcesId)?.links || []}
+          onClose={() => setActiveSourcesId(null)}
+        />
       )}
     </div>
   );
