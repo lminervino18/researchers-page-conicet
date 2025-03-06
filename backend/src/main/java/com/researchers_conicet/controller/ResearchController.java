@@ -58,15 +58,26 @@ public class ResearchController {
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResearchResponseDTO> createResearch(
-            @RequestPart("research") @Valid ResearchRequestDTO requestDTO,
-            @RequestPart("file") MultipartFile file) {
-        log.info("REST request to create Research");
-        validatePdfFile(file);
-        return new ResponseEntity<>(
-            researchService.createResearch(requestDTO, file),
-            HttpStatus.CREATED
-        );
+        @RequestPart("research") @Valid ResearchRequestDTO requestDTO,
+        @RequestPart(value = "file", required = false) MultipartFile file) {
+    log.info("REST request to create Research");
+    
+    // Validar que haya al menos un PDF o un link
+    if ((file == null || file.isEmpty()) && 
+        (requestDTO.getLinks() == null || requestDTO.getLinks().isEmpty())) {
+        throw new IllegalArgumentException("Either a PDF file or at least one link is required");
     }
+    
+    // Solo validamos el PDF si se proporciona uno
+    if (file != null && !file.isEmpty()) {
+        validatePdfFile(file);
+    }
+    
+    return new ResponseEntity<>(
+        researchService.createResearch(requestDTO, file),
+        HttpStatus.CREATED
+    );
+}
 
     /**
      * Updates an existing research paper
@@ -239,9 +250,7 @@ public class ResearchController {
      * Validates if a file is a valid PDF
      */
     private void validatePdfFile(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("PDF file is required");
-        }
+        // Ya no validamos si es null o está vacío aquí
         String contentType = file.getContentType();
         if (contentType == null || !contentType.equals(MediaType.APPLICATION_PDF_VALUE)) {
             throw new IllegalArgumentException("Only PDF files are allowed");

@@ -1,17 +1,9 @@
 // pages/Admin/Dashboard.tsx
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './styles/Dashboard.css';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-      navigate('/admin/login');
-    }
-  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
@@ -27,7 +19,26 @@ const Dashboard = () => {
         </button>
       </header>
       <main className="dashboard-content">
-        {/* Here you can add the dashboard content */}
+        <div className="dashboard-buttons">
+          <button 
+            onClick={() => navigate('/admin/publications')} 
+            className="dashboard-button"
+          >
+            Publications
+          </button>
+          <button 
+            onClick={() => navigate('/admin/analogies')} 
+            className="dashboard-button"
+          >
+            Analogies
+          </button>
+          <button 
+            onClick={() => navigate('/admin/experiments')} 
+            className="dashboard-button"
+          >
+            Experiments
+          </button>
+        </div>
       </main>
     </div>
   );

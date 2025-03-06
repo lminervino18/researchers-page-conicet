@@ -4,14 +4,15 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import jakarta.validation.constraints.AssertTrue;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Entity representing a research paper or publication.
- * This class maps to the 'researches' table in the database and contains
- * all information about a research paper, including its PDF file and relationships.
+ * Maps to the 'researches' table in the database.
+ * Contains all information about a research paper, including optional PDF file and required relationships.
  */
 @Entity
 @Data
@@ -27,42 +28,68 @@ public class Research {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "TEXT")
+    /**
+     * The research abstract text.
+     * Required field stored as TEXT in database.
+     */
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String researchAbstract;
 
+    /**
+     * MIME type of the PDF file.
+     * Optional field that must be 'application/pdf' if present.
+     */
     @Pattern(regexp = "application/pdf", message = "Only PDF files are allowed")
-    @Column(name = "mime_type")
+    @Column(name = "mime_type", nullable = true)
     private String mimeType;
 
-    @Column(name = "pdf_size")
+    /**
+     * Size of the PDF file in bytes.
+     * Optional field.
+     */
+    @Column(name = "pdf_size", nullable = true)
     private Long pdfSize;
 
+    /**
+     * Original name of the uploaded PDF file.
+     * Optional field with max length of 255 characters.
+     */
     @Size(max = 255, message = "File name must be less than 255 characters")
-    @Column(name = "pdf_name")
+    @Column(name = "pdf_name", nullable = true)
     private String pdfName;
 
-    @Column(name = "pdf_path")
+    /**
+     * Storage path of the PDF file.
+     * Optional field indicating where the file is stored in the system.
+     */
+    @Column(name = "pdf_path", nullable = true)
     private String pdfPath;
 
-    @Column(name = "created_at", updatable = false)
+    /**
+     * Timestamp of when the research was created.
+     * Automatically set and non-updatable.
+     */
+    @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
     /**
      * Collection of author names for this research.
-     * Stored as simple strings in a separate table.
+     * Required field stored as strings in a separate table.
+     * At least one author is required.
      */
     @ElementCollection
     @CollectionTable(
         name = "research_authors",
         joinColumns = @JoinColumn(name = "research_id")
     )
-    @Column(name = "author_name")
+    @Column(name = "author_name", nullable = false)
     private Set<String> authors = new HashSet<>();
 
     /**
      * Collection of research-related links.
-     * Stored as simple strings in a separate table.
-     * URL validation is handled in the frontend.
+     * Optional field stored as strings in a separate table.
+     * Required if no PDF file is provided.
+     * URL validation is handled in the service layer.
      */
     @ElementCollection
     @CollectionTable(
@@ -72,8 +99,24 @@ public class Research {
     @Column(name = "link")
     private Set<String> links = new HashSet<>();
 
+    /**
+     * Automatically sets creation timestamp before persisting.
+     */
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+    }
+
+    /**
+     * Validates that the research has either a PDF file or at least one link.
+     * This ensures that each research has at least one accessible resource.
+     * 
+     * @return true if the research has either a PDF or links, false otherwise
+     */
+    @AssertTrue(message = "Either a PDF file or at least one link is required")
+    private boolean isValidResource() {
+        boolean hasPdf = pdfPath != null && !pdfPath.trim().isEmpty();
+        boolean hasLinks = links != null && !links.isEmpty();
+        return hasPdf || hasLinks;
     }
 }

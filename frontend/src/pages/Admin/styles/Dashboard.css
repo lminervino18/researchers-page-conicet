@@ -1,41 +1,112 @@
 /* pages/Admin/Dashboard.css */
+
+/* Main container for the dashboard */
 .dashboard-container {
-    min-height: 100vh;
-    background-color: var(--secondary-background);
+  min-height: 100vh;
+  background-color: var(--secondary-background);
+}
+
+/* Header styling with flex layout */
+.dashboard-header {
+  background-color: var(--background-color);
+  padding: var(--spacing-md) var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Header title styling */
+.dashboard-header h1 {
+  color: var(--text-color);
+  font-size: var(--font-size-xl);
+  margin: 0;
+}
+
+/* Logout button with error color scheme */
+.logout-button {
+  background-color: var(--error-color);
+  color: var(--background-color);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+/* Hover effect for logout button */
+.logout-button:hover {
+  background-color: var(--error-color);
+  opacity: 0.9;
+}
+
+/* Main content area with max width and centered */
+.dashboard-content {
+  padding: var(--spacing-lg);
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+/* Container for dashboard action buttons */
+.dashboard-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: var(--spacing-xl); /* Large spacing between buttons */
+  margin: var(--spacing-xl) auto;
+  width: 100%; /* Full width container */
+  padding: 0 var(--spacing-lg);
+}
+
+/* Individual dashboard button styling */
+.dashboard-button {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  padding: var(--spacing-xl) var(--spacing-lg); /* Large padding for bigger buttons */
+  border: none;
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-xl); /* Larger text */
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex: 1; /* Equal width distribution */
+  max-width: 300px; /* Maximum button width */
+  min-height: 200px; /* Fixed minimum height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  box-shadow: var(--shadow-md);
+}
+
+/* Hover effect for dashboard buttons */
+.dashboard-button:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-5px); /* Slight lift effect */
+  box-shadow: var(--shadow-lg);
+}
+
+/* Responsive design for tablets */
+@media (max-width: 1024px) {
+  .dashboard-buttons {
+      gap: var(--spacing-lg); /* Reduced spacing for smaller screens */
   }
-  
-  .dashboard-header {
-    background-color: var(--background-color);
-    padding: var(--spacing-md) var(--spacing-lg);
-    box-shadow: var(--shadow-sm);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+
+  .dashboard-button {
+      padding: var(--spacing-lg);
+      min-height: 150px; /* Smaller height for tablets */
   }
-  
-  .dashboard-header h1 {
-    color: var(--text-color);
-    font-size: var(--font-size-xl);
-    margin: 0;
+}
+
+/* Responsive design for mobile devices */
+@media (max-width: 768px) {
+  .dashboard-buttons {
+      flex-direction: column; /* Stack buttons vertically */
+      align-items: center;
   }
-  
-  .logout-button {
-    background-color: var(--error-color);
-    color: var(--background-color);
-    padding: var(--spacing-sm) var(--spacing-md);
-    border: none;
-    border-radius: var(--border-radius-sm);
-    cursor: pointer;
-    transition: background-color var(--transition-fast);
+
+  .dashboard-button {
+      width: 100%;
+      max-width: 400px; /* Wider buttons on mobile */
+      min-height: 120px; /* Reduced height for mobile */
   }
-  
-  .logout-button:hover {
-    background-color: var(--error-color);
-    opacity: 0.9;
-  }
-  
-  .dashboard-content {
-    padding: var(--spacing-lg);
-    max-width: var(--max-width);
-    margin: 0 auto;
-  }
+}

@@ -1,0 +1,184 @@
+/* pages/Admin/Publications/styles/EditResearch.css */
+.edit-research-page {
+    min-height: 100vh;
+    background-color: var(--secondary-background);
+    font-family: var(--font-family);
+}
+
+.edit-research-header {
+    background-color: var(--background-color);
+    padding: var(--spacing-md) var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    position: relative;
+    min-height: 64px;
+}
+
+.edit-research-title {
+    margin: 0;
+    color: var(--text-color);
+    font-size: var(--font-size-xl);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.edit-research-back-btn {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: var(--font-size-base);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    z-index: 1;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.edit-research-back-btn:hover {
+    background-color: var(--primary-dark);
+    transform: translateX(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.edit-research-back-btn:active {
+    transform: translateX(0);
+}
+
+.edit-research-content {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.edit-research-form-wrapper {
+    width: 100%;
+    max-width: 800px;
+    background-color: var(--background-color);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.edit-research-loading-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+    width: 100%;
+}
+
+.edit-research-loading-text {
+    color: var(--text-light);
+    font-size: var(--font-size-large);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.edit-research-loading-text::after {
+    content: '';
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--primary-color);
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: editResearchSpin 1s linear infinite;
+}
+
+@keyframes editResearchSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Error styles */
+.edit-research-error {
+    background-color: var(--error-light);
+    color: var(--error-color);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-lg);
+    width: 100%;
+    text-align: center;
+    font-size: var(--font-size-base);
+}
+
+/* Success styles */
+.edit-research-success {
+    background-color: var(--success-light);
+    color: var(--success-color);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-lg);
+    width: 100%;
+    text-align: center;
+    font-size: var(--font-size-base);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .edit-research-content {
+        padding: var(--spacing-md);
+    }
+
+    .edit-research-form-wrapper {
+        padding: var(--spacing-md);
+    }
+}
+
+@media (max-width: 768px) {
+    .edit-research-header {
+        flex-direction: column;
+        align-items: center;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+        min-height: auto;
+        padding-top: var(--spacing-lg);
+        padding-bottom: var(--spacing-lg);
+    }
+
+    .edit-research-title {
+        position: static;
+        transform: none;
+        margin: var(--spacing-sm) 0;
+        font-size: var(--font-size-large);
+    }
+
+    .edit-research-back-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .edit-research-loading-text::after {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .edit-research-content {
+        padding: var(--spacing-sm);
+    }
+
+    .edit-research-form-wrapper {
+        padding: var(--spacing-sm);
+    }
+
+    .edit-research-title {
+        font-size: var(--font-size-base);
+    }
+}
