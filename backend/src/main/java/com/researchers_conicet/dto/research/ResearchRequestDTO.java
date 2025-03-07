@@ -1,4 +1,4 @@
-package com.researchers_conicet.dto;
+package com.researchers_conicet.dto.research;
 
 import lombok.Data;
 import java.util.HashSet;
