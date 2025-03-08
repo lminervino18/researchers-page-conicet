@@ -60,7 +60,7 @@ public class AnalogyController {
     /**
      * Updates an existing analogy publication
      */
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AnalogyResponseDTO> updateAnalogy(
             @PathVariable Long id,
             @RequestBody @Valid AnalogyRequestDTO requestDTO) {
