@@ -1,8 +1,8 @@
 package com.researchers_conicet.controller;
 
-import com.researchers_conicet.dto.ResearchRequestDTO;
-import com.researchers_conicet.dto.ResearchResponseDTO;
 import com.researchers_conicet.service.ResearchService;
+import com.researchers_conicet.dto.research.ResearchRequestDTO;
+import com.researchers_conicet.dto.research.ResearchResponseDTO;
 import com.researchers_conicet.service.FileStorageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
