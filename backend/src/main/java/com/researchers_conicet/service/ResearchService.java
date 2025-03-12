@@ -1,9 +1,9 @@
 package com.researchers_conicet.service;
 
+import com.researchers_conicet.dto.research.ResearchRequestDTO;
+import com.researchers_conicet.dto.research.ResearchResponseDTO;
 import com.researchers_conicet.entity.Research;
 import com.researchers_conicet.repository.ResearchRepository;
-import com.researchers_conicet.dto.ResearchRequestDTO;
-import com.researchers_conicet.dto.ResearchResponseDTO;
 import com.researchers_conicet.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
