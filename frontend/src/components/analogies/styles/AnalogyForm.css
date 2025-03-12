@@ -1,0 +1,229 @@
+/* src/components/analogy/styles/AnalogyForm.css */
+.analogy-form {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+    background-color: var(--background-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .error-message {
+    background-color: var(--error-light);
+    color: var(--error-color);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-base);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .form-group {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .form-group label {
+    display: block;
+    color: var(--text-color);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .form-group textarea,
+  .form-group input {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    transition: all var(--transition-fast);
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
+  
+  .form-group textarea.error,
+  .form-group input.error {
+    border-color: var(--error-color);
+    background-color: var(--error-light);
+  }
+  
+  .form-group textarea {
+    min-height: 150px;
+    resize: vertical;
+  }
+  
+  .form-group textarea:focus,
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-light);
+  }
+  
+  .input-with-button {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .input-with-button input {
+    flex: 1;
+  }
+  
+  .add-button {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: var(--font-size-base);
+    min-width: 100px;
+  }
+  
+  .add-button:hover:not(:disabled) {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .add-button:disabled {
+    background-color: var(--disabled-color);
+    color: var(--disabled-text);
+    cursor: not-allowed;
+  }
+  
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+  }
+  
+  .tag {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-full);
+    font-size: var(--font-size-small);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  
+  .remove-tag {
+    background: none;
+    border: none;
+    color: var(--primary-dark);
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+    font-size: var(--font-size-base);
+    line-height: 1;
+  }
+  
+  .remove-tag:hover:not(:disabled) {
+    background-color: var(--primary-dark);
+    color: var(--background-color);
+  }
+  
+  .remove-tag:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-xl);
+  }
+  
+  .submit-btn,
+  .cancel-btn {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    flex: 1;
+    max-width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .submit-btn {
+    background-color: var(--success-color);
+    color: var(--background-color);
+  }
+  
+  .submit-btn:hover:not(:disabled) {
+    background-color: var(--success-color);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .cancel-btn {
+    background-color: var(--text-light);
+    color: var(--background-color);
+  }
+  
+  .cancel-btn:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+  
+  .required {
+    color: var(--error-color);
+    margin-left: var(--spacing-xs);
+  }
+  
+  .help-text {
+    font-size: var(--font-size-tiny);
+    color: var(--text-light);
+    margin-left: var(--spacing-sm);
+  }
+  
+  .validation-message {
+    color: var(--error-color);
+    font-size: var(--font-size-small);
+    margin-top: var(--spacing-xs);
+  }
+  
+  .loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--background-color);
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .analogy-form {
+      padding: var(--spacing-md);
+    }
+  
+    .form-actions {
+      flex-direction: column;
+    }
+  
+    .submit-btn,
+    .cancel-btn {
+      max-width: 100%;
+    }
+  }

@@ -1,7 +1,7 @@
 // pages/Research/AddResearch.tsx
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ResearchForm from '../../../components/research/ResearchForm';
+import ResearchForm from '../../../components/publications/ResearchForm';
 import { createResearch } from '../../../api/research';
 import { ResearchDTO } from '../../../types';
 import './styles/AddResearch.css';

@@ -1,7 +1,7 @@
 // pages/Admin/Publications/EditResearch.tsx
 import { FC, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import ResearchForm from '../../../components/research/ResearchForm';
+import ResearchForm from '../../../components/publications/ResearchForm';
 import { getResearchById, updateResearch } from '../../../api/research';
 import { Research, ResearchDTO } from '../../../types';
 import './styles/EditResearch.css';

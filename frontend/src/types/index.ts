@@ -91,3 +91,54 @@ export interface Member {
   position: string;
   imageUrl: string;
 }
+
+// Main interface for analogy data
+export interface Analogy {
+  id: number; // Unique identifier for the analogy
+  title: string; // Title of the analogy
+  content?: string; // Optional content or description of the analogy
+  createdAt: string; // Timestamp of when the analogy was created
+  authors: string[]; // List of authors associated with the analogy
+  links: string[]; // List of related links for the analogy
+}
+
+// DTO for creating/updating an analogy
+export interface AnalogyDTO {
+  title: string; // Title of the analogy (required)
+  content?: string; // Optional content or description
+  authors: string[]; // List of authors
+  links: string[]; // List of related links
+}
+
+// Generic interface for API responses
+export interface ApiResponse<T> {
+  success: boolean; // Indicates if the API request was successful
+  data: T; // The data returned from the API
+  message?: string; // Optional message from the API
+}
+
+// Interface for loading state
+export interface LoadingState {
+  isLoading: boolean; // Indicates if a request is currently loading
+  error: string | null; // Error message if the request failed
+}
+
+// Interface for analogy search filters
+export interface AnalogyFilters {
+  searchTerm?: string; // Optional search term for filtering analogies
+  startDate?: string; // Optional start date for filtering
+  endDate?: string; // Optional end date for filtering
+  author?: string; // Optional author name for filtering
+}
+
+// Interface for pagination parameters
+export interface PaginationParams {
+  page: number; // Current page number
+  limit: number; // Number of items per page
+  total: number; // Total number of items available
+}
+
+// Interface for paginated API responses
+export interface PaginatedResponse<T> extends ApiResponse<T> {
+  pagination: PaginationParams; // Pagination details
+}
