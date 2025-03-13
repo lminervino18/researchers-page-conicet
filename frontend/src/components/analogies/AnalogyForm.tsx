@@ -11,7 +11,7 @@ interface AnalogyFormProps {
 
 interface AnalogyDTO {
   title: string;
-  content?: string;
+  content: string;
   authors: string[];
   links: string[];
 }
@@ -19,7 +19,7 @@ interface AnalogyDTO {
 interface Analogy {
   id: number;
   title: string;
-  content?: string;
+  content: string;
   authors: string[];
   links: string[];
 }
@@ -92,7 +92,6 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
     e.preventDefault();
     setInternalError(null);
 
-    // Mark all fields as touched
     setTouched({
       title: true,
       content: true,
@@ -100,9 +99,18 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
       links: true
     });
 
-    // Validations
     if (!formData.title.trim()) {
       setInternalError('Title is required');
+      return;
+    }
+
+    if (!formData.content.trim()) {
+      setInternalError('Content is required');
+      return;
+    }
+
+    if (formData.authors.length === 0) {
+      setInternalError('At least one author is required');
       return;
     }
 
@@ -150,7 +158,9 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
       </div>
 
       <div className="form-group">
-        <label htmlFor="content">Content</label>
+        <label htmlFor="content">
+          Content <span className="required">*</span>
+        </label>
         <textarea
           id="content"
           name="content"
@@ -165,7 +175,11 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
           onBlur={() => setTouched(prev => ({ ...prev, content: true }))}
           disabled={isSubmitting}
           placeholder="Enter analogy content"
+          className={touched.content && !formData.content.trim() ? 'error' : ''}
         />
+        {touched.content && !formData.content.trim() && (
+          <div className="validation-message">Content is required</div>
+        )}
       </div>
 
       <div className="form-group">
@@ -258,6 +272,11 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
             </span>
           ))}
         </div>
+        {formData.links.length > 0 && (
+          <div className="help-text">
+            The first link will be displayed in the publication preview.
+          </div>
+        )}
       </div>
 
       <div className="form-actions">

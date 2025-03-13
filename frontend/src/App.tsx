@@ -13,6 +13,8 @@ import Dashboard from "./pages/Admin/Dashboard";
 import AdminPublications from "./pages/Admin/Publications/AdminPublications";
 import AdminAnalogies from "./pages/Admin/Analogies/AdminAnalogies";
 import AdminExperiments from "./pages/Admin/Experiments/AdminExperiments";
+import AddAnalogy  from "./pages/Admin/Analogies/AddAnalogy";
+import EditAnalogy from "./pages/Admin/Analogies/EditAnalogy";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -74,6 +76,22 @@ const App = () => {
           element={
             <ProtectedRoute>
               <AdminAnalogies />
+            </ProtectedRoute>
+          } 
+        />
+         <Route 
+          path="/admin/analogies/add" 
+          element={
+            <ProtectedRoute>
+              <AddAnalogy />
+            </ProtectedRoute>
+          } 
+        />
+         <Route 
+          path="/admin/analogies/edit/:id" 
+          element={
+            <ProtectedRoute>
+              <EditAnalogy />
             </ProtectedRoute>
           } 
         />

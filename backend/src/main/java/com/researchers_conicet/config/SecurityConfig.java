@@ -24,7 +24,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configure(http))
             .authorizeHttpRequests(auth -> auth
                 // Public routes
-                .requestMatchers("/api/researches/**").permitAll()  // Agregamos esta línea
+                .requestMatchers("/api/analogies/**").permitAll()
+                .requestMatchers("/api/researches/**").permitAll()  
                 .requestMatchers("/api/members/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
