@@ -30,26 +30,30 @@ const PublicationsList: FC<PublicationsListProps> = ({
               <div className="publication-main">
                 <p className="publication-abstract">{publication.researchAbstract}</p>
                 <p className="publication-authors">{publication.authors.join(', ')}</p>
+                {publication.links.length > 0 }
               </div>
               <div className="publication-actions">
                 <button 
-                  className="action-button"
+                  className={`action-button ${!publication.pdfPath ? 'disabled' : ''}`}
                   onClick={() => onViewPdf(publication.id)}
-                  title="View PDF"
+                  title={publication.pdfPath ? "View PDF" : "No PDF available"}
+                  disabled={!publication.pdfPath}
                 >
                   <FontAwesomeIcon icon={faFilePdf} />
                 </button>
                 <button 
-                  className="action-button"
+                  className={`action-button ${!publication.pdfPath ? 'disabled' : ''}`}
                   onClick={() => onDownloadPdf(publication.id)}
-                  title="Download PDF"
+                  title={publication.pdfPath ? "Download PDF" : "No PDF available"}
+                  disabled={!publication.pdfPath}
                 >
                   <FontAwesomeIcon icon={faDownload} />
                 </button>
                 <button 
-                  className="action-button"
+                  className={`action-button ${!publication.links.length ? 'disabled' : ''}`}
                   onClick={() => setActiveSourcesId(publication.id)}
-                  title="View Sources"
+                  title={publication.links.length ? "View Sources" : "No sources available"}
+                  disabled={!publication.links.length}
                 >
                   <FontAwesomeIcon icon={faLink} />
                 </button>

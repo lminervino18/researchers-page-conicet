@@ -1,12 +1,11 @@
 // src/pages/Publications/Publications.tsx
 import { FC, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import MainLayout from '../../layouts/MainLayout';
 import PublicationsList from '../../components/publications/PublicationsList';
 import { Research } from '../../types';
-import { fetchPublications, viewPdf, downloadPdf } from '../../api/research';
+import { getAllResearches, viewPdf, downloadPdf } from '../../api/research';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import './styles/Publications.css';
 
 const Publications: FC = () => {
@@ -14,12 +13,11 @@ const Publications: FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const navigate = useNavigate();
 
   const loadPublications = async () => {
     try {
       setLoading(true);
-      const response = await fetchPublications();
+      const response = await getAllResearches();
       setPublications(response.content);
       setError(null);
     } catch (err) {
@@ -41,6 +39,7 @@ const Publications: FC = () => {
       window.open(pdfUrl, '_blank');
     } catch (err) {
       console.error('Error viewing PDF:', err);
+      setError('Failed to open PDF');
     }
   };
 
@@ -57,8 +56,15 @@ const Publications: FC = () => {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error('Error downloading PDF:', err);
+      setError('Failed to download PDF');
     }
   };
+
+  // Filtrar publicaciones basado en la búsqueda
+  const filteredPublications = publications.filter(pub => 
+    pub.researchAbstract.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    pub.authors.some(author => author.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   return (
     <MainLayout>
@@ -76,12 +82,6 @@ const Publications: FC = () => {
               />
               <FontAwesomeIcon icon={faSearch} className="search-icon" />
             </div>
-            <button 
-              className="add-publication-button"
-              onClick={() => navigate('/research/add')}
-            >
-              <FontAwesomeIcon icon={faPlus} /> Add Research
-            </button>
           </div>
         </div>
 
@@ -91,7 +91,7 @@ const Publications: FC = () => {
           <div className="error-state">{error}</div>
         ) : (
           <PublicationsList 
-            publications={publications}
+            publications={filteredPublications}
             onViewPdf={handlePdfView}
             onDownloadPdf={handlePdfDownload}
           />

@@ -1,0 +1,79 @@
+/* pages/Admin/Login.css */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--secondary-background);
+    padding: var(--spacing-md);
+  }
+  
+  .login-card {
+    background-color: var(--background-color);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .login-card h2 {
+    color: var(--text-color);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+    font-size: var(--font-size-xl);
+  }
+  
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+  
+  .form-group label {
+    color: var(--text-color);
+    font-size: var(--font-size-small);
+  }
+  
+  .form-group input {
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-base);
+    transition: border-color var(--transition-fast);
+  }
+  
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+  }
+  
+  .login-button {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+  }
+  
+  .login-button:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  .error-message {
+    background-color: var(--error-light);
+    color: var(--error-color);
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-small);
+  }
