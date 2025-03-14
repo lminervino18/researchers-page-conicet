@@ -22,4 +22,6 @@ frontend/uploads
 .env            # Variables de entorno sensibles
 .env.local      # Variables de entorno específicas de la máquina
 
+# Scripts
 start-dev.sh
+test-endpoints.sh
