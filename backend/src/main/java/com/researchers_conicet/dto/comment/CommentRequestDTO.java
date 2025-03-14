@@ -13,5 +13,5 @@ public class CommentRequestDTO {
 
     private String content;
     
-    private Long parentID;
+    private Long parentId;
 }

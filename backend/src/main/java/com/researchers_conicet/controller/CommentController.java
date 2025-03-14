@@ -62,7 +62,7 @@ public class CommentController {
     /**
      * Updates an existing comment publication
      */
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "{analogyId}/comments/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommentResponseDTO> updateComment(
             @PathVariable Long id,
             @RequestBody @Valid CommentRequestDTO requestDTO) {
@@ -74,7 +74,7 @@ public class CommentController {
     /**
      * Retrieves an specific comment publication by ID
      */
-    @GetMapping("/{id}")
+    @GetMapping("{analogyId}/comments/{id}")
     public ResponseEntity<CommentResponseDTO> getComment(@PathVariable Long id) {
         log.info("REST request to get Comment : {}", id);
         return ResponseEntity.ok(commentService.getComment(id));
@@ -107,7 +107,7 @@ public class CommentController {
     /**
      * Deletes an comment publication
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{analogyId}/comments/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
         log.info("REST request to delete Comment : {}", id);
         commentService.deleteComment(id);
@@ -117,7 +117,7 @@ public class CommentController {
     /**
      * Searches comments by user name
      */
-    @GetMapping("/{analogyId}/comments/search")
+    @GetMapping(value = "/{analogyId}/comments/search", params = "userName")
     public ResponseEntity<List<CommentResponseDTO>> searchByUser(
             @PathVariable Long analogyId,
             @RequestParam String userName) {
@@ -128,7 +128,7 @@ public class CommentController {
     /**
      * Searches comments which content contains a specific keyword
      */
-    @GetMapping("/{analogyId}/comments/search")
+    @GetMapping(value = "/{analogyId}/comments/search", params = "term")
     public ResponseEntity<List<CommentResponseDTO>> searchEverywhere(
             @PathVariable Long analogyId,
             @RequestParam String term) {

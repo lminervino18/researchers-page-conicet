@@ -11,12 +11,12 @@ import com.researchers_conicet.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -50,16 +50,15 @@ public class CommentService {
     public CommentResponseDTO createComment(CommentRequestDTO requestDTO, Long analogyId) {
         log.info("Creating new comment");
 
-        Pair<Analogy, Comment> validationResult = validateCommentData(requestDTO, analogyId);
-        Analogy analogy = validationResult.getFirst();
-        Comment parent = validationResult.getSecond();
+        Analogy analogy = validateCommentData(requestDTO, analogyId);
+        Optional<Comment> optParent = getParentById(requestDTO.getParentId(), analogyId);
 
         try {
 
             Comment comment = new Comment();
             comment.setUserName(requestDTO.getUserName());
             comment.setContent(requestDTO.getContent());
-            comment.setParent(parent);
+            optParent.ifPresent(parent -> comment.setParent(parent));
             comment.setAnalogy(analogy);
 
             Comment savedComment = commentRepository.save(comment);
@@ -113,14 +112,15 @@ public class CommentService {
         log.info("Updating comment with ID: {}", id);
         
         Comment comment = findCommentById(id);
-        
-        Pair<Analogy, Comment> validationResult= validateCommentData(requestDTO, comment.getAnalogy().getId());
-        Comment parent = validationResult.getSecond();
+        Long analogyId = comment.getAnalogy().getId();
+
+        validateCommentData(requestDTO, analogyId);
+        Optional<Comment> optParent = getParentById(requestDTO.getParentId(), analogyId);
 
         try {
             comment.setUserName(requestDTO.getUserName());
             comment.setContent(requestDTO.getContent());
-            comment.setParent(parent);
+            optParent.ifPresent(parent -> comment.setParent(parent));
 
             Comment updatedComment = commentRepository.save(comment);
             log.info("Updated comment with ID: {}", id);
@@ -207,6 +207,20 @@ public class CommentService {
             .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + id));
     }
 
+    private Optional<Comment> getParentById(Long parentId, Long analogyId) {
+        Comment parent = null;
+            
+        if (parentId != null) {
+            parent = commentRepository.findByIdAndAnalogyId(parentId, analogyId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    String.format("Parent comment (ID: %d) not found for Analogy (ID: %d)",
+                    parentId, analogyId)
+                ));
+        }
+
+        return Optional.ofNullable(parent);
+    }
+
     /**
      * Validates comment data constraints.
      * 
@@ -214,8 +228,7 @@ public class CommentService {
      * @param analogyId The ID of the analogy commented
      * @throws IllegalArgumentException if validation fails
      */
-    @SuppressWarnings("null")
-    private Pair<Analogy, Comment> validateCommentData(CommentRequestDTO requestDTO, Long analogyId) {
+    private Analogy validateCommentData(CommentRequestDTO requestDTO, Long analogyId) {
         if (!StringUtils.hasText(requestDTO.getUserName())) {
             throw new IllegalArgumentException("Comment user name is required");
         }
@@ -226,19 +239,7 @@ public class CommentService {
         Analogy analogy = analogyRepository.findById(analogyId)
         .orElseThrow(() -> new ResourceNotFoundException("Analogy not found with ID: " + analogyId));
 
-        Comment parent = null;
-        Long parentId = requestDTO.getParentID();
-
-        if (parentId != null) {
-            parent = commentRepository.findByIdAndAnalogyId(parentId, analogyId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                    String.format("Parent comment (ID: %d) not found for Analogy (ID: %d)",
-                    parentId, analogyId)
-                ));
-        }
-    
-
-        return Pair.of(analogy, parent);
+        return analogy;
     }
 
     /**
