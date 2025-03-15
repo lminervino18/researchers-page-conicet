@@ -1,87 +1,47 @@
 // src/components/members/MemberCarousel.tsx
 import { FC, useState } from 'react';
-import { Member } from '../../types/index';
+import { Author } from '../../api/authors';
 import MemberCard from './MemberCard';
-import NavigationArrow from '../common/NavigationArrow';
 import './styles/MemberCarousel.css';
 
 interface MemberCarouselProps {
-  members: Member[];
+  members: Author[];
 }
 
 const MemberCarousel: FC<MemberCarouselProps> = ({ members }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
 
   const handlePrevious = () => {
-    if (isAnimating) return;
-    
-    setIsAnimating(true);
-    setCurrentIndex((prev) => 
-      prev === 0 ? members.length - 1 : prev - 1
-    );
-    
-    setTimeout(() => setIsAnimating(false), 500);
+    setCurrentIndex(prev => (prev === 0 ? members.length - 1 : prev - 1));
   };
 
   const handleNext = () => {
-    if (isAnimating) return;
-    
-    setIsAnimating(true);
-    setCurrentIndex((prev) => 
-      prev === members.length - 1 ? 0 : prev + 1
-    );
-    
-    setTimeout(() => setIsAnimating(false), 500);
+    setCurrentIndex(prev => (prev + 1) % members.length);
   };
 
   return (
     <div className="carousel-container">
-      <NavigationArrow 
-        direction="left" 
-        onClick={handlePrevious}
-        disabled={isAnimating}
-      />
-      
+      <button className="carousel-arrow prev" onClick={handlePrevious}>
+        {"<"}
+      </button>
       <div className="carousel-window">
-        <div className="carousel-content">
-          {members.map((member, index) => (
-            <div 
-              key={member.id} 
-              className={`carousel-item ${index === currentIndex ? 'active' : ''}`}
-              style={{
-                transform: `translateX(${(index - currentIndex) * 100}%)`
-              }}
-            >
+        <div
+          className="carousel-content"
+          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        >
+          {members.map((member) => (
+            <div key={member.id} className="carousel-item">
               <MemberCard member={member} />
             </div>
           ))}
         </div>
       </div>
-
-      <NavigationArrow 
-        direction="right" 
-        onClick={handleNext}
-        disabled={isAnimating}
-      />
-      
-      <div className="carousel-indicators">
-        {members.map((_, index) => (
-          <div 
-            key={index}
-            className={`indicator ${index === currentIndex ? 'active' : ''}`}
-            onClick={() => {
-              if (!isAnimating) {
-                setIsAnimating(true);
-                setCurrentIndex(index);
-                setTimeout(() => setIsAnimating(false), 500);
-              }
-            }}
-          />
-        ))}
-      </div>
+      <button className="carousel-arrow next" onClick={handleNext}>
+        {">"}
+      </button>
     </div>
   );
+
 };
 
 export default MemberCarousel;

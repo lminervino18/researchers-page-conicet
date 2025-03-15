@@ -1,7 +1,7 @@
-// src/components/research/ResearchForm.tsx
 import { FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ResearchDTO, Research } from '../../types';
+import { authors as authorsList } from '../../api/authors';
 import './styles/ResearchForm.css';
 
 interface ResearchFormProps {
@@ -21,7 +21,6 @@ const ResearchForm: FC<ResearchFormProps> = ({
 }) => {
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [authorInput, setAuthorInput] = useState('');
   const [linkInput, setLinkInput] = useState('');
   const [internalError, setInternalError] = useState<string | null>(null);
   const [touched, setTouched] = useState({
@@ -30,7 +29,7 @@ const ResearchForm: FC<ResearchFormProps> = ({
     links: false,
     file: false
   });
-  
+
   const [formData, setFormData] = useState<ResearchDTO>({
     researchAbstract: '',
     authors: [],
@@ -53,20 +52,9 @@ const ResearchForm: FC<ResearchFormProps> = ({
     }
   }, [initialData]);
 
-  const handleAddAuthor = () => {
-    if (authorInput.trim()) {
-      setFormData((prev: ResearchDTO) => ({
-        ...prev,
-        authors: [...prev.authors, authorInput.trim()]
-      }));
-      setAuthorInput('');
-      setTouched(prev => ({ ...prev, authors: true }));
-    }
-  };
-
   const handleAddLink = () => {
     if (linkInput.trim()) {
-      setFormData((prev: ResearchDTO) => ({
+      setFormData(prev => ({
         ...prev,
         links: [...prev.links, linkInput.trim()]
       }));
@@ -75,19 +63,21 @@ const ResearchForm: FC<ResearchFormProps> = ({
     }
   };
 
+  const toggleAuthorSelection = (authorFullName: string) => {
+    setFormData(prev => ({
+      ...prev,
+      authors: prev.authors.includes(authorFullName)
+        ? prev.authors.filter(a => a !== authorFullName)
+        : [...prev.authors, authorFullName]
+    }));
+    setTouched(prev => ({ ...prev, authors: true }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setInternalError(null);
-    
-    // Mark all fields as touched
-    setTouched({
-      abstract: true,
-      authors: true,
-      links: true,
-      file: true
-    });
+    setTouched({ abstract: true, authors: true, links: true, file: true });
 
-    // Validations
     if (!formData.researchAbstract.trim()) {
       setInternalError('Abstract is required');
       return;
@@ -110,16 +100,14 @@ const ResearchForm: FC<ResearchFormProps> = ({
     }
   };
 
-  const handleCancel = () => {
-    navigate(-1);
-  };
+  const handleCancel = () => navigate(-1);
 
   const error = externalError || internalError;
 
   return (
     <form onSubmit={handleSubmit} className="research-form">
       {error && <div className="error-message">{error}</div>}
-      
+
       <div className="form-group">
         <label htmlFor="abstract">
           Abstract <span className="required">*</span>
@@ -129,16 +117,11 @@ const ResearchForm: FC<ResearchFormProps> = ({
           name="abstract"
           value={formData.researchAbstract}
           onChange={(e) => {
-            setFormData(prev => ({
-              ...prev,
-              researchAbstract: e.target.value
-            }));
+            setFormData(prev => ({ ...prev, researchAbstract: e.target.value }));
             setTouched(prev => ({ ...prev, abstract: true }));
           }}
-          onBlur={() => setTouched(prev => ({ ...prev, abstract: true }))}
           disabled={isSubmitting}
           placeholder="Enter research abstract"
-          className={touched.abstract && !formData.researchAbstract.trim() ? 'error' : ''}
         />
         {touched.abstract && !formData.researchAbstract.trim() && (
           <div className="validation-message">Abstract is required</div>
@@ -150,54 +133,28 @@ const ResearchForm: FC<ResearchFormProps> = ({
           Authors <span className="required">*</span>
           <span className="help-text">(At least one author is required)</span>
         </label>
-        <div className="input-with-button">
-          <input
-            type="text"
-            name="author"
-            value={authorInput}
-            onChange={(e) => setAuthorInput(e.target.value)}
-            placeholder="Add author"
-            disabled={isSubmitting}
-          />
-          <button 
-            type="button" 
-            onClick={handleAddAuthor}
-            disabled={isSubmitting || !authorInput.trim()}
-            className="add-button"
-          >
-            Add
-          </button>
+        <div className="author-selector">
+          {authorsList.map(author => {
+            const authorFullName = `${author.firstName} ${author.lastName}`;
+            return (
+              <div
+                key={author.id}
+                className={`author-option ${formData.authors.includes(authorFullName) ? 'selected' : ''}`}
+                onClick={() => toggleAuthorSelection(authorFullName)}
+              >
+                <img src={author.imageUrl} alt={authorFullName} className="author-option-img"/>
+                <span>{authorFullName}</span>
+              </div>
+            );
+          })}
         </div>
         {touched.authors && formData.authors.length === 0 && (
-          <div className="validation-message">Please add at least one author</div>
+          <div className="validation-message">At least one author is required</div>
         )}
-        <div className="tags">
-          {formData.authors.map((author, index) => (
-            <span key={index} className="tag">
-              {author}
-              <button
-                type="button"
-                onClick={() => {
-                  setFormData(prev => ({
-                    ...prev,
-                    authors: prev.authors.filter((_, i) => i !== index)
-                  }));
-                  setTouched(prev => ({ ...prev, authors: true }));
-                }}
-                disabled={isSubmitting || formData.authors.length === 1}
-                className="remove-tag"
-                title={formData.authors.length === 1 ? "At least one author is required" : "Remove author"}
-              >
-                ×
-              </button>
-            </span>
-          ))}
-        </div>
       </div>
 
       <div className="form-group">
-        <label>
-          Links
+        <label>Links
           <span className="help-text">
             {!isEditing && !selectedFile ? '(Required if no PDF is uploaded)' : '(Optional)'}
           </span>
@@ -205,18 +162,12 @@ const ResearchForm: FC<ResearchFormProps> = ({
         <div className="input-with-button">
           <input
             type="url"
-            name="link"
             value={linkInput}
             onChange={(e) => setLinkInput(e.target.value)}
             placeholder="https://"
             disabled={isSubmitting}
           />
-          <button 
-            type="button" 
-            onClick={handleAddLink}
-            disabled={isSubmitting || !linkInput.trim()}
-            className="add-button"
-          >
+          <button type="button" onClick={handleAddLink} disabled={isSubmitting || !linkInput.trim()} className="add-button">
             Add
           </button>
         </div>
@@ -231,11 +182,8 @@ const ResearchForm: FC<ResearchFormProps> = ({
                     ...prev,
                     links: prev.links.filter((_, i) => i !== index)
                   }));
-                  setTouched(prev => ({ ...prev, links: true }));
                 }}
-                disabled={isSubmitting || (!selectedFile && formData.links.length === 1)}
                 className="remove-tag"
-                title={!selectedFile && formData.links.length === 1 ? "Either a PDF or at least one link is required" : "Remove link"}
               >
                 ×
               </button>
@@ -264,21 +212,12 @@ const ResearchForm: FC<ResearchFormProps> = ({
             disabled={isSubmitting}
           />
         </label>
-        {selectedFile && (
-          <div className="file-name">
-            Selected file: {selectedFile.name}
-          </div>
-        )}
-        {touched.file && !isEditing && !selectedFile && formData.links.length === 0 && (
-          <div className="validation-message">
-            Either upload a PDF file or add at least one link
-          </div>
-        )}
+        {selectedFile && <div className="file-name">Selected file: {selectedFile.name}</div>}
       </div>
 
       <div className="form-actions">
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className={`submit-btn ${isSubmitting ? 'loading' : ''}`}
           disabled={isSubmitting}
         >
@@ -291,8 +230,8 @@ const ResearchForm: FC<ResearchFormProps> = ({
             isEditing ? 'Update Research' : 'Submit Research'
           )}
         </button>
-        <button 
-          type="button" 
+        <button
+          type="button"
           onClick={handleCancel}
           className="cancel-btn"
           disabled={isSubmitting}

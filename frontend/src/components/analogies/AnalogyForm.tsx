@@ -1,5 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authors, Author } from '../../api/authors';
+import './styles/AnalogyForm.css';
 
 interface AnalogyFormProps {
   onSubmit: (data: AnalogyDTO, id?: number) => Promise<void>;
@@ -12,7 +14,7 @@ interface AnalogyFormProps {
 interface AnalogyDTO {
   title: string;
   content: string;
-  authors: string[];
+  authors: string[]; // Solo nombre y apellido
   links: string[];
 }
 
@@ -32,7 +34,6 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
   isEditing = false
 }) => {
   const navigate = useNavigate();
-  const [authorInput, setAuthorInput] = useState('');
   const [linkInput, setLinkInput] = useState('');
   const [internalError, setInternalError] = useState<string | null>(null);
   const [touched, setTouched] = useState({
@@ -65,17 +66,6 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
       });
     }
   }, [initialData]);
-
-  const handleAddAuthor = () => {
-    if (authorInput.trim()) {
-      setFormData((prev: AnalogyDTO) => ({
-        ...prev,
-        authors: [...prev.authors, authorInput.trim()]
-      }));
-      setAuthorInput('');
-      setTouched(prev => ({ ...prev, authors: true }));
-    }
-  };
 
   const handleAddLink = () => {
     if (linkInput.trim()) {
@@ -127,6 +117,17 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
 
   const error = externalError || internalError;
 
+  const toggleAuthorSelection = (author: Author) => {
+    const authorName = `${author.firstName} ${author.lastName}`;
+    setFormData(prev => ({
+      ...prev,
+      authors: prev.authors.includes(authorName)
+        ? prev.authors.filter(a => a !== authorName)
+        : [...prev.authors, authorName]
+    }));
+    setTouched(prev => ({ ...prev, authors: true }));
+  };
+
   return (
     <form onSubmit={handleSubmit} className="analogy-form">
       {error && <div className="error-message">{error}</div>}
@@ -141,10 +142,7 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
           type="text"
           value={formData.title}
           onChange={(e) => {
-            setFormData(prev => ({
-              ...prev,
-              title: e.target.value
-            }));
+            setFormData(prev => ({ ...prev, title: e.target.value }));
             setTouched(prev => ({ ...prev, title: true }));
           }}
           onBlur={() => setTouched(prev => ({ ...prev, title: true }))}
@@ -166,10 +164,7 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
           name="content"
           value={formData.content}
           onChange={(e) => {
-            setFormData(prev => ({
-              ...prev,
-              content: e.target.value
-            }));
+            setFormData(prev => ({ ...prev, content: e.target.value }));
             setTouched(prev => ({ ...prev, content: true }));
           }}
           onBlur={() => setTouched(prev => ({ ...prev, content: true }))}
@@ -183,55 +178,26 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
       </div>
 
       <div className="form-group">
-        <label>
-          Authors
-        </label>
-        <div className="input-with-button">
-          <input
-            type="text"
-            name="author"
-            value={authorInput}
-            onChange={(e) => setAuthorInput(e.target.value)}
-            placeholder="Add author"
-            disabled={isSubmitting}
-          />
-          <button
-            type="button"
-            onClick={handleAddAuthor}
-            disabled={isSubmitting || !authorInput.trim()}
-            className="add-button"
-          >
-            Add
-          </button>
-        </div>
-        <div className="tags">
-          {formData.authors.map((author, index) => (
-            <span key={index} className="tag">
-              {author}
-              <button
-                type="button"
-                onClick={() => {
-                  setFormData(prev => ({
-                    ...prev,
-                    authors: prev.authors.filter((_, i) => i !== index)
-                  }));
-                  setTouched(prev => ({ ...prev, authors: true }));
-                }}
-                disabled={isSubmitting}
-                className="remove-tag"
-                title="Remove author"
-              >
-                ×
-              </button>
-            </span>
+        <label>Authors <span className="required">*</span></label>
+        <div className="author-selector">
+          {authors.map(author => (
+            <div
+              key={author.id}
+              className={`author-option ${formData.authors.includes(`${author.firstName} ${author.lastName}`) ? 'selected' : ''}`}
+              onClick={() => toggleAuthorSelection(author)}
+            >
+              <img src={author.imageUrl} alt={`${author.firstName} ${author.lastName}`} />
+              <span>{author.firstName} {author.lastName}</span>
+            </div>
           ))}
         </div>
+        {touched.authors && formData.authors.length === 0 && (
+          <div className="validation-message">At least one author is required</div>
+        )}
       </div>
 
       <div className="form-group">
-        <label>
-          Links
-        </label>
+        <label>Links</label>
         <div className="input-with-button">
           <input
             type="url"
@@ -241,12 +207,7 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
             placeholder="https://"
             disabled={isSubmitting}
           />
-          <button
-            type="button"
-            onClick={handleAddLink}
-            disabled={isSubmitting || !linkInput.trim()}
-            className="add-button"
-          >
+          <button type="button" onClick={handleAddLink} disabled={isSubmitting || !linkInput.trim()} className="add-button">
             Add
           </button>
         </div>
@@ -257,49 +218,26 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
               <button
                 type="button"
                 onClick={() => {
-                  setFormData(prev => ({
-                    ...prev,
-                    links: prev.links.filter((_, i) => i !== index)
-                  }));
+                  setFormData(prev => ({ ...prev, links: prev.links.filter((_, i) => i !== index) }));
                   setTouched(prev => ({ ...prev, links: true }));
                 }}
                 disabled={isSubmitting}
                 className="remove-tag"
                 title="Remove link"
-              >
-                ×
-              </button>
+              >×</button>
             </span>
           ))}
         </div>
         {formData.links.length > 0 && (
-          <div className="help-text">
-            The first link will be displayed in the publication preview.
-          </div>
+          <div className="help-text">The first link will be displayed in the publication preview.</div>
         )}
       </div>
 
       <div className="form-actions">
-        <button
-          type="submit"
-          className={`submit-btn ${isSubmitting ? 'loading' : ''}`}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <>
-              {isEditing ? 'Updating...' : 'Submitting...'}
-              <span className="loading-spinner"></span>
-            </>
-          ) : (
-            isEditing ? 'Update Analogy' : 'Submit Analogy'
-          )}
+        <button type="submit" className={`submit-btn ${isSubmitting ? 'loading' : ''}`} disabled={isSubmitting}>
+          {isSubmitting ? (isEditing ? 'Updating...' : 'Submitting...') : (isEditing ? 'Update Analogy' : 'Submit Analogy')}
         </button>
-        <button
-          type="button"
-          onClick={handleCancel}
-          className="cancel-btn"
-          disabled={isSubmitting}
-        >
+        <button type="button" onClick={handleCancel} className="cancel-btn" disabled={isSubmitting}>
           Cancel
         </button>
       </div>

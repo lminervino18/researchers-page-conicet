@@ -81,16 +81,6 @@ export interface ResearchMetadata {
   lastModified: string;
 }
 
-// src/types/member.ts
-export interface Member {
-  id: number;
-  name: string;
-  lastName: string;
-  email: string;
-  institution: string;
-  position: string;
-  imageUrl: string;
-}
 
 // Main interface for analogy data
 export interface Analogy {

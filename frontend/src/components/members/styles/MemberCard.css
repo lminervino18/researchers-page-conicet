@@ -1,58 +1,69 @@
-/* src/components/members/styles/MemberCard.css */
+/* MemberCard.css */
 .member-card {
-    background-color: var(--background-color);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .member-image {
-    width: 100%;
-    height: 60%;
-    overflow: hidden;
-  }
-  
-  .member-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .member-info {
-    padding: var(--spacing-lg);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
-  }
-  
-  .member-info h2 {
-    font-size: var(--font-size-xl);
-    color: var(--text-color);
-    margin-bottom: var(--spacing-sm);
-  }
-  
-  .member-position {
-    font-size: var(--font-size-large);
-    color: var(--primary-color);
-  }
-  
-  .member-institution {
-    font-size: var(--font-size-base);
-    color: var(--text-light);
-  }
-  
-  .member-email {
-    color: var(--primary-color);
-    text-decoration: none;
-    transition: color var(--transition-normal);
-    margin-top: auto;
-  }
-  
-  .member-email:hover {
-    color: var(--primary-dark);
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centrado horizontal claramente definido */
+  box-shadow: var(--shadow-md);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  width: 100%;
+  max-width: 800px;
+  background-color: var(--background-color);
+  padding: var(--spacing-lg);
+  gap: var(--spacing-lg);
+}
+
+.member-image {
+  width: 200px; /* tamaño claramente mayor */
+  height: 200px; 
+  flex-shrink: 0;
+}
+
+.member-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--border-radius-full); /* círculo perfecto */
+  border: 3px solid var(--primary-light);
+}
+
+.member-info {
+  flex: 1;
+  text-align: center; /* Centrado de la información */
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding-left: var(--spacing-lg);
+}
+
+.member-info h2 {
+  font-size: var(--font-size-xl);
+  color: var(--text-color);
+  margin-bottom: var(--spacing-xs);
+}
+
+.member-position {
+  font-size: var(--font-size-large);
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+.member-institution,
+.member-age {
+  font-size: var(--font-size-base);
+  color: var(--text-light);
+}
+
+.member-email {
+  font-size: var(--font-size-base);
+  color: var(--primary-dark);
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: var(--spacing-sm);
+  transition: color var(--transition-fast);
+}
+
+.member-email:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
