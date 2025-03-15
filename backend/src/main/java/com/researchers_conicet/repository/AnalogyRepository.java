@@ -49,7 +49,7 @@ public interface AnalogyRepository extends JpaRepository<Analogy, Long> {
      * Finds all analogies created today
      * Uses database's current date for comparison
      */
-    @Query("SELECT r FROM Analogy r WHERE DATE(r.createdAt) = CURRENT_DATE")
+    @Query("SELECT a FROM Analogy a WHERE DATE(a.createdAt) = CURRENT_DATE")
     List<Analogy> findTodayAnalogies();
 
     /**
@@ -105,5 +105,5 @@ public interface AnalogyRepository extends JpaRepository<Analogy, Long> {
      */
     @Query("SELECT a FROM Analogy a " +
            "WHERE LOWER(a.title) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    Page<Analogy> findByKeywordInAbstract(@Param("keyword") String keyword, Pageable pageable);
+    Page<Analogy> findByKeywordInTitle(@Param("keyword") String keyword, Pageable pageable);
 }

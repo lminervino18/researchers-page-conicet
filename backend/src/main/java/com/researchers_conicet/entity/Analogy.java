@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Entity representing a analogy paper or publication.
+ * Entity representing an analogy publication.
  * This class maps to the 'analogies' table in the database and contains
  * all information about an analogy box, including it’s relationships.
  */
