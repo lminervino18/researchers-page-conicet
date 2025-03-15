@@ -54,20 +54,24 @@ public class ResearchService {
         log.info("Creating new research");
 
         validateResearchData(requestDTO);
-        validatePdfFile(pdfFile);
 
         try {
-            String fileName = fileStorageService.storeFile(pdfFile);
-            String fileUrl = fileStorageService.getFileUrl(fileName);
-
             Research research = new Research();
             research.setResearchAbstract(requestDTO.getResearchAbstract());
-            research.setPdfName(pdfFile.getOriginalFilename());
-            research.setPdfPath(fileUrl);
-            research.setMimeType(pdfFile.getContentType());
-            research.setPdfSize(pdfFile.getSize());
             research.setAuthors(requestDTO.getAuthors());
             research.setLinks(requestDTO.getLinks());
+
+            // Solo procesamos el archivo si se proporciona uno
+            if (pdfFile != null && !pdfFile.isEmpty()) {
+                validatePdfFile(pdfFile);
+                String fileName = fileStorageService.storeFile(pdfFile);
+                String fileUrl = fileStorageService.getFileUrl(fileName);
+
+                research.setPdfName(pdfFile.getOriginalFilename());
+                research.setPdfPath(fileUrl);
+                research.setMimeType(pdfFile.getContentType());
+                research.setPdfSize(pdfFile.getSize());
+            }
 
             Research savedResearch = researchRepository.save(research);
             log.info("Created research with ID: {}", savedResearch.getId());
@@ -176,21 +180,34 @@ public class ResearchService {
      * @throws ResourceNotFoundException if research not found
      */
     @Transactional
+    
     public void deleteResearch(Long id) {
         log.info("Deleting research with ID: {}", id);
         
         Research research = findResearchById(id);
-
+    
         try {
-            if (research.getPdfPath() != null) {
-                fileStorageService.deleteFile(research.getPdfPath());
+            // First try to delete the PDF file if it exists
+            if (research.getPdfName() != null) {  // Cambiado de getPdfPath a getPdfName
+                try {
+                    fileStorageService.deleteFile(research.getPdfName());  // Usar getPdfName en lugar de getPdfPath
+                    log.info("Successfully deleted PDF file: {} for research ID: {}", 
+                        research.getPdfName(), id);
+                } catch (Exception e) {
+                    // Log the error but continue with research deletion
+                    log.warn("Could not delete PDF file: {} for research ID: {}. Error: {}", 
+                        research.getPdfName(), id, e.getMessage());
+                }
             }
-
+    
+            // Then delete the research from database
             researchRepository.delete(research);
-            log.info("Deleted research with ID: {}", id);
+            log.info("Successfully deleted research with ID: {}", id);
+            
         } catch (Exception e) {
-            log.error("Error deleting research with ID: {}", id, e);
-            throw new RuntimeException("Failed to delete research", e);
+            log.error("Failed to delete research with ID: {}. Error: {}", 
+                id, e.getMessage(), e);
+            throw new RuntimeException("Failed to delete research: " + e.getMessage());
         }
     }
 
@@ -279,9 +296,7 @@ public class ResearchService {
      * @throws IllegalArgumentException if validation fails
      */
     private void validatePdfFile(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("PDF file is required");
-        }
+        // Solo validamos el tipo y tamaño del archivo, no si es requerido
         if (!"application/pdf".equals(file.getContentType())) {
             throw new IllegalArgumentException("Only PDF files are allowed");
         }

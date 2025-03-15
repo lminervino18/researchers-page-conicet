@@ -1,0 +1,226 @@
+/* src/pages/Admin/Analogies/styles/EditAnalogy.css */
+.edit-analogy-page {
+    min-height: 100vh;
+    background-color: var(--secondary-background);
+    font-family: var(--font-family);
+  }
+  
+  .edit-analogy-header {
+    background-color: var(--background-color);
+    padding: var(--spacing-md) var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    position: relative;
+    min-height: 64px;
+  }
+  
+  .edit-analogy-title {
+    margin: 0;
+    color: var(--text-color);
+    font-size: var(--font-size-xl);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    white-space: nowrap;
+  }
+  
+  .edit-analogy-back-btn {
+    background-color: var(--text-light);
+    color: var(--background-color);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: var(--font-size-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    min-width: 120px;
+  }
+  
+  .edit-analogy-back-btn:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+  }
+  
+  .edit-analogy-content {
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .edit-analogy-form-wrapper {
+    width: 100%;
+    max-width: 800px;
+    background-color: var(--background-color);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .edit-analogy-loading-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+  
+  .edit-analogy-loading-text {
+    font-size: var(--font-size-large);
+    color: var(--text-light);
+  }
+  
+  .error-message {
+    background-color: var(--error-light);
+    color: var(--error-color);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-lg);
+    width: 100%;
+    text-align: center;
+    font-size: var(--font-size-base);
+  }
+  
+  .no-analogies {
+    text-align: center;
+    color: var(--text-light);
+    font-size: var(--font-size-base);
+  }
+  
+  .loading {
+    font-size: var(--font-size-large);
+    color: var(--text-light);
+    text-align: center;
+  }
+  
+  .admin-analogies-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    width: 100%;
+  }
+  
+  .admin-analogy-card {
+    background-color: var(--background-color);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: var(--spacing-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .analogy-info {
+    flex: 1;
+  }
+  
+  .analogy-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .analogy-authors,
+  .analogy-links {
+    font-size: var(--font-size-small);
+    color: var(--text-light);
+  }
+  
+  .analogy-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+  }
+  
+  .action-button {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  
+  .action-button:hover:not(:disabled) {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .action-button.disabled {
+    background-color: var(--disabled-color);
+    color: var(--disabled-text);
+    cursor: not-allowed;
+  }
+  
+  .delete-confirm {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .confirm-button {
+    background-color: var(--error-color);
+    color: var(--background-color);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  
+  .confirm-button:hover {
+    background-color: var(--error-dark);
+  }
+  
+  .cancel-button {
+    background-color: var(--text-light);
+    color: var(--background-color);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  
+  .cancel-button:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+  }
+  
+  .action-button {
+    background: none;
+    border: none;
+    color: var(--primary-dark);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: var(--border-radius-md);
+    transition: all var(--transition-fast);
+  }
+  
+  .action-button:hover:not(.disabled) {
+    background-color: var(--primary-light);
+    transform: translateY(-1px);
+  }
+  
+  .action-button.delete {
+    color: var(--error-color);
+  }
+  
+  .action-button.delete:hover:not(:disabled) {
+    background-color: var(--error-color);
+    color: var(--background-color);
+  }
+  
+  .action-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
