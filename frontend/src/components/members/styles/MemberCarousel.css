@@ -1,64 +1,63 @@
-/* src/components/members/styles/MemberCarousel.css */
 .carousel-container {
   position: relative;
   width: 100%;
-  max-width: 600px;
+  max-width: 900px;
   margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: var(--spacing-xl) 0;
 }
 
 .carousel-window {
   overflow: hidden;
-  position: relative;
   width: 100%;
-  aspect-ratio: 1;
 }
 
 .carousel-content {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  display: flex;
+  transition: transform var(--transition-normal);
 }
 
 .carousel-item {
+  min-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-arrow {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  transition: transform var(--transition-normal) ease-in-out;
-}
-
-.carousel-item.active {
-  z-index: 1;
-}
-
-.carousel-indicators {
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: var(--primary-color);
+  color: var(--text-on-primary);
+  border: none;
+  border-radius: var(--border-radius-full);
+  cursor: pointer;
+  font-size: var(--font-size-xl);
+  width: 50px;
+  height: 50px;
+  box-shadow: var(--shadow-md);
   display: flex;
   justify-content: center;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-md);
+  align-items: center;
 }
 
-.indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--text-light);
-  transition: background-color var(--transition-normal);
-  cursor: pointer;
+.carousel-arrow.prev {
+  left: -60px;
 }
 
-.indicator.active {
-  background-color: var(--primary-color);
+.carousel-arrow.next {
+  right: -60px;
 }
 
-@media (max-width: 768px) {
-  .carousel-container {
-    padding: var(--spacing-lg) 0;
+@media (max-width: 1024px) {
+  .carousel-arrow.prev {
+    left: 10px;
   }
-  
-  .carousel-window {
-    aspect-ratio: 4/5;
+
+  .carousel-arrow.next {
+    right: 10px;
   }
 }

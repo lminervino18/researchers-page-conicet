@@ -1,32 +1,39 @@
-/* src/pages/Members/styles/Members.css */
 .members-container {
-    min-height: 100vh;
-    width: 100%;
-    background-color: var(--background-color);
-  }
-  
-  .members-hero {
-    width: 100%;
-    padding: var(--spacing-xl) 0;
-    background-color: var(--secondary-background);
-    text-align: center;
-  }
-  
-  .members-hero h1 {
-    font-size: var(--font-size-huge);
-    color: var(--text-color);
-    margin-bottom: var(--spacing-md);
-  }
-  
-  .members-hero p {
-    font-size: var(--font-size-xl);
-    color: var(--text-light);
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  
-  .members-carousel-section {
-    padding: var(--spacing-xl) 0;
-    max-width: var(--max-width);
-    margin: 0 auto;
-  }
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--background-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.members-hero {
+  width: 100%;
+  padding: var(--spacing-xl) var(--container-padding);
+  background-color: var(--secondary-background);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-xl);
+}
+
+.members-hero h1 {
+  font-size: var(--font-size-huge);
+  color: black;
+  margin-bottom: var(--spacing-md);
+}
+
+.members-hero p {
+  font-size: var(--font-size-xl);
+  color: var(--text-light);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.members-carousel-section {
+  width: 100%;
+  max-width: var(--max-width);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  display: flex;
+  justify-content: center;
+}

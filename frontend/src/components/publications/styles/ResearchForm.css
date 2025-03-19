@@ -242,6 +242,45 @@
   animation: spin 1s linear infinite;
 }
 
+.author-selector {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-md);
+}
+
+.author-option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-full);
+  border: 2px solid var(--primary-light);
+  background: var(--background-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text-color);
+}
+
+.author-option-img {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--border-radius-full);
+  border: 2px solid var(--primary-color);
+  object-fit: cover;
+}
+
+.author-option.selected {
+  background-color: var(--primary-light);
+  border-color: var(--primary-color);
+  color: var(--primary-dark);
+}
+
+.author-option:hover:not(.selected) {
+  background-color: var(--hover-color);
+}
+
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
