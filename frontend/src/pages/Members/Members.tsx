@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import MainLayout from '../../layouts/MainLayout';
-import MemberCarousel from '../../components/members/MemberCarousel';
+import MemberGrid from '../../components/members/MemberGrid';
 import { authors } from '../../api/authors';
 import './styles/Members.css';
 
@@ -15,8 +15,8 @@ const Members: FC = () => {
           </p>
         </section>
 
-        <section className="members-carousel-section">
-          <MemberCarousel members={authors} />
+        <section className="members-grid-section">
+          <MemberGrid members={authors} />
         </section>
       </div>
     </MainLayout>

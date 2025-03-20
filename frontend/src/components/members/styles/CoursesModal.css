@@ -1,0 +1,97 @@
+.courses-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1100;
+  }
+  
+  .courses-modal {
+    background-color: var(--background-color);
+    border-radius: var(--border-radius-lg);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .courses-modal-close {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    background: none;
+    border: none;
+    font-size: var(--font-size-huge);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+  }
+  
+  .courses-modal-close:hover {
+    color: var(--primary-color);
+  }
+  
+  .courses-modal-content {
+    padding: var(--spacing-xl);
+  }
+  
+  .courses-modal-content h2 {
+    font-size: var(--font-size-huge);
+    color: var(--text-color);
+    margin-bottom: var(--spacing-sm);
+    text-align: center;
+  }
+  
+  .courses-modal-content h3 {
+    font-size: var(--font-size-xl);
+    color: var(--primary-dark);
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .courses-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .course-item {
+    background-color: var(--secondary-background);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    transition: background-color var(--transition-fast);
+  }
+  
+  .course-item:hover {
+    background-color: color-mix(in srgb, var(--secondary-background) 90%, var(--primary-light));
+  }
+  
+  .course-details h4 {
+    font-size: var(--font-size-large);
+    color: var(--text-color);
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .course-details p {
+    font-size: var(--font-size-base);
+    color: var(--text-light);
+  }
+  
+  .course-year {
+    margin-left: var(--spacing-sm);
+    color: var(--primary-dark);
+    font-weight: 500;
+  }
+  
+  .no-courses {
+    text-align: center;
+    color: var(--text-light);
+    font-style: italic;
+  }
