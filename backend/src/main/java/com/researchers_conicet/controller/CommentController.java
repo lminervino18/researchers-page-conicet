@@ -126,6 +126,17 @@ public class CommentController {
     }
 
     /**
+     * Searches comments by email
+     */
+    @GetMapping(value = "/{analogyId}/comments/search", params = "email")
+    public ResponseEntity<List<CommentResponseDTO>> searchByEmail(
+            @PathVariable Long analogyId,
+            @RequestParam String email) {
+        log.info("REST request to search Comments by email: {}", email);
+        return ResponseEntity.ok(commentService.searchByEmail(email, analogyId));
+    }
+
+    /**
      * Searches comments which content contains a specific keyword
      */
     @GetMapping(value = "/{analogyId}/comments/search", params = "term")
@@ -134,5 +145,15 @@ public class CommentController {
             @RequestParam String term) {
         log.info("REST request to search Comments everywhere: {}", term);
         return ResponseEntity.ok(commentService.searchEverywhere(term, analogyId));
+    }
+
+    /**
+     * Verifies if an email is authorized to comment
+     */
+    @GetMapping("/{analogyId}/comments/verify-email")
+    public ResponseEntity<Boolean> verifyEmailAuthorization(
+            @RequestParam String email) {
+        log.info("REST request to verify email authorization: {}", email);
+        return ResponseEntity.ok(commentService.isEmailAuthorizedToComment(email));
     }
 }

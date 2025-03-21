@@ -62,6 +62,21 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handles UnauthorizedCommentException
+     * Triggered when an email is not authorized to comment
+     * Returns HTTP 403 FORBIDDEN
+     */
+    @ExceptionHandler(UnauthorizedCommentException.class)
+    public ResponseEntity<ApiError> handleUnauthorizedCommentException(UnauthorizedCommentException ex) {
+        ApiError error = new ApiError(
+            HttpStatus.FORBIDDEN.value(),
+            "Commenting Not Allowed: " + ex.getMessage(),
+            LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
+    /**
      * Handles all other unhandled exceptions
      * Acts as a catch-all for unexpected errors
      * Returns HTTP 500 INTERNAL_SERVER_ERROR
