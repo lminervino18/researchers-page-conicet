@@ -15,26 +15,27 @@ const MemberDetailModal: FC<MemberDetailModalProps> = ({ member, onClose }) => {
 
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === 'Escape' && !showCoursesModal && !showPublicationsModal) {
         onClose();
       }
     };
-
+  
     const handleClickOutside = (event: MouseEvent) => {
       const modal = document.querySelector('.member-detail-modal');
-      if (modal && !modal.contains(event.target as Node)) {
+      if (modal && !modal.contains(event.target as Node) && 
+          !showCoursesModal && !showPublicationsModal) {
         onClose();
       }
     };
-
+  
     document.addEventListener('keydown', handleEscapeKey);
     document.addEventListener('mousedown', handleClickOutside);
-
+  
     return () => {
       document.removeEventListener('keydown', handleEscapeKey);
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [onClose]);
+  }, [onClose, showCoursesModal, showPublicationsModal]);
 
   const handleViewCourses = () => {
     setShowCoursesModal(true);

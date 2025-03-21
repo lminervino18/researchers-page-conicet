@@ -14,17 +14,17 @@ const CoursesModal: FC<CoursesModalProps> = ({ member, onClose }) => {
         onClose();
       }
     };
-
+  
     const handleClickOutside = (event: MouseEvent) => {
       const modal = document.querySelector('.courses-modal');
       if (modal && !modal.contains(event.target as Node)) {
-        onClose();
+        onClose(); 
       }
     };
-
+  
     document.addEventListener('keydown', handleEscapeKey);
     document.addEventListener('mousedown', handleClickOutside);
-
+  
     return () => {
       document.removeEventListener('keydown', handleEscapeKey);
       document.removeEventListener('mousedown', handleClickOutside);
@@ -38,7 +38,7 @@ const CoursesModal: FC<CoursesModalProps> = ({ member, onClose }) => {
           &times;
         </button>
         <div className="courses-modal-content">
-          <h2>Courses and Training</h2>
+          <h2>Courses Taught</h2>
           <h3>{member.firstName} {member.lastName}</h3>
           
           {member.courses.length > 0 ? (

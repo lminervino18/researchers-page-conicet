@@ -37,7 +37,7 @@
   --container-padding: 1rem;
 
   /* Typography */
-  --font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  --font-family: 'Libre Baskerville', 'Merriweather', Georgia, serif;
   --font-size-tiny: 0.75rem;    /* 12px */
   --font-size-small: 0.875rem;   /* 14px */
   --font-size-base: 1rem;        /* 16px */

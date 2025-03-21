@@ -32,20 +32,20 @@ const PublicationsModal: FC<PublicationsModalProps> = ({ authorName, onClose }) 
 
     const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onClose();
+        onClose(); // Solo cierra este modal
       }
     };
-
+  
     const handleClickOutside = (event: MouseEvent) => {
       const modal = document.querySelector('.publications-modal');
       if (modal && !modal.contains(event.target as Node)) {
         onClose();
       }
     };
-
+  
     document.addEventListener('keydown', handleEscapeKey);
     document.addEventListener('mousedown', handleClickOutside);
-
+  
     return () => {
       document.removeEventListener('keydown', handleEscapeKey);
       document.removeEventListener('mousedown', handleClickOutside);
@@ -84,7 +84,7 @@ const PublicationsModal: FC<PublicationsModalProps> = ({ authorName, onClose }) 
           &times;
         </button>
         <div className="publications-modal-content">
-          <h2>Publications by {authorName}</h2>
+          <h2>Publications of {authorName}</h2>
           
           {isLoading ? (
             <p className="loading-message">Loading publications...</p>
