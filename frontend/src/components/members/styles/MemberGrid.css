@@ -1,0 +1,25 @@
+.member-grid-container {
+    width: 100%;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+  }
+  
+  .member-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+    width: 100%;
+  }
+  
+  @media (max-width: 1200px) {
+    .member-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .member-grid {
+      grid-template-columns: 1fr;
+    }
+  }

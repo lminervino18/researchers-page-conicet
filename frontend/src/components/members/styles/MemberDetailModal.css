@@ -1,0 +1,124 @@
+.member-detail-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .member-detail-modal {
+    background-color: var(--background-color);
+    border-radius: var(--border-radius-lg);
+    width: 90%;
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .member-detail-modal-close {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    background: none;
+    border: none;
+    font-size: var(--font-size-huge);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+  }
+  
+  .member-detail-modal-close:hover {
+    color: var(--primary-color);
+  }
+  
+  .member-detail-content {
+    display: flex;
+    padding: var(--spacing-xl);
+    gap: var(--spacing-xl);
+  }
+  
+  .member-detail-image {
+    flex: 0 0 300px;
+  }
+  
+  .member-detail-image img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: var(--border-radius-lg);
+  }
+  
+  .member-detail-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .member-detail-info h2 {
+    font-size: var(--font-size-huge);
+    color: var(--text-color);
+  }
+  
+  .member-detail-position {
+    font-size: var(--font-size-large);
+    color: var(--primary-dark);
+    font-weight: 600;
+  }
+  
+  .member-detail-metadata {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    color: var(--text-light);
+  }
+  
+  .member-detail-description {
+    margin-top: var(--spacing-md);
+  }
+  
+  .member-detail-description h3 {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-color);
+  }
+  
+  .member-detail-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+  }
+  
+  .member-detail-courses-btn,
+  .member-detail-publications-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--primary-color);
+    color: var(--text-on-primary);
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+  }
+  
+  .member-detail-courses-btn:hover,
+  .member-detail-publications-btn:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  @media (max-width: 768px) {
+    .member-detail-content {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .member-detail-image {
+      flex: 0 0 250px;
+    }
+  }

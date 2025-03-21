@@ -29,7 +29,7 @@
   margin: 0 auto;
 }
 
-.members-carousel-section {
+.members-grid-section {
   width: 100%;
   max-width: var(--max-width);
   padding: var(--spacing-lg);
