@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 
 /**
  * Service class for managing Analogy entities.
- * Handles business logic, file storage, and data transformation.
- * Provides CRUD operations and search functionality for analogy papers.
+ * Handles business logic, data transformation, and CRUD operations.
+ * Provides functionality for analogy management and support system.
  */
 @Slf4j
 @Service
@@ -27,12 +27,33 @@ import java.util.stream.Collectors;
 public class AnalogyService {
 
     private final AnalogyRepository analogyRepository;
+    private final EmailVerificationService emailVerificationService;
 
     private static final int MAX_AUTHORS = 10;
     private static final int MAX_LINKS = 5;
 
-    public AnalogyService(AnalogyRepository analogyRepository) {
+    /**
+     * Constructor for dependency injection
+     * 
+     * @param analogyRepository Repository for analogy database operations
+     * @param emailVerificationService Service for email verification
+     */
+    public AnalogyService(
+        AnalogyRepository analogyRepository,
+        EmailVerificationService emailVerificationService
+    ) {
         this.analogyRepository = analogyRepository;
+        this.emailVerificationService = emailVerificationService;
+    }
+
+    /**
+     * Utility method to check email verification status
+     * 
+     * @param email Email to verify
+     * @return true if email is registered, false otherwise
+     */
+    public boolean isEmailVerified(String email) {
+        return emailVerificationService.isEmailRegistered(email);
     }
 
     /**
@@ -50,12 +71,13 @@ public class AnalogyService {
         validateAnalogyData(requestDTO);
 
         try {
-
             Analogy analogy = new Analogy();
             analogy.setTitle(requestDTO.getTitle());
             analogy.setContent(requestDTO.getContent());
             analogy.setAuthors(requestDTO.getAuthors());
             analogy.setLinks(requestDTO.getLinks());
+            // Initialize support count to 0
+            analogy.setSupportCount(0);
 
             Analogy savedAnalogy = analogyRepository.save(analogy);
             log.info("Created analogy with ID: {}", savedAnalogy.getId());
@@ -104,7 +126,7 @@ public class AnalogyService {
             });
     }
 
-    /**
+        /**
      * Updates an existing analogy.
      *
      * @param id The analogy ID
@@ -227,7 +249,102 @@ public class AnalogyService {
             .collect(Collectors.toList());
     }
 
+        /**
+     * Adds support to an analogy
+     * 
+     * @param analogyId The ID of the analogy to support
+     * @param email The email of the user giving support
+     * @return Updated AnalogyResponseDTO
+     * @throws ResourceNotFoundException if analogy not found
+     * @throws IllegalArgumentException if email is invalid
+     */
+    @Transactional
+    public AnalogyResponseDTO addSupport(Long analogyId, String email) {
+        log.info("Adding support to analogy with ID: {}", analogyId);
+
+        // Validate email input
+        if (!StringUtils.hasText(email)) {
+            throw new IllegalArgumentException("Email is required");
+        }
+
+        // Verify email is registered in the system
+        if (!emailVerificationService.isEmailRegistered(email)) {
+            throw new IllegalArgumentException("Email is not registered");
+        }
+
+        // Find the analogy
+        Analogy analogy = findAnalogyById(analogyId);
+
+        // Check if email has already supported
+        if (analogy.getSupportEmails().contains(email)) {
+            log.warn("Email {} has already supported this analogy", email);
+            return mapToDTO(analogy);
+        }
+
+        try {
+            // Add email to support emails
+            analogy.getSupportEmails().add(email);
+            
+            // Increment support count
+            analogy.setSupportCount(analogy.getSupportCount() + 1);
+
+            // Save updated analogy
+            Analogy updatedAnalogy = analogyRepository.save(analogy);
+            log.info("Added support to analogy with ID: {}", analogyId);
+
+            return mapToDTO(updatedAnalogy);
+        } catch (Exception e) {
+            log.error("Error adding support to analogy with ID: {}", analogyId, e);
+            throw new RuntimeException("Failed to add support to analogy", e);
+        }
+    }
+
     /**
+     * Removes support from an analogy
+     * 
+     * @param analogyId The ID of the analogy to remove support from
+     * @param email The email of the user removing support
+     * @return Updated AnalogyResponseDTO
+     * @throws ResourceNotFoundException if analogy not found
+     * @throws IllegalArgumentException if email is invalid
+     */
+    @Transactional
+    public AnalogyResponseDTO removeSupport(Long analogyId, String email) {
+        log.info("Removing support from analogy with ID: {}", analogyId);
+
+        // Validate email input
+        if (!StringUtils.hasText(email)) {
+            throw new IllegalArgumentException("Email is required");
+        }
+
+        // Find the analogy
+        Analogy analogy = findAnalogyById(analogyId);
+
+        // Check if email has supported
+        if (!analogy.getSupportEmails().contains(email)) {
+            log.warn("Email {} has not supported this analogy", email);
+            return mapToDTO(analogy);
+        }
+
+        try {
+            // Remove email from support emails
+            analogy.getSupportEmails().remove(email);
+            
+            // Decrement support count (ensure it doesn't go below 0)
+            analogy.setSupportCount(Math.max(0, analogy.getSupportCount() - 1));
+
+            // Save updated analogy
+            Analogy updatedAnalogy = analogyRepository.save(analogy);
+            log.info("Removed support from analogy with ID: {}", analogyId);
+
+            return mapToDTO(updatedAnalogy);
+        } catch (Exception e) {
+            log.error("Error removing support from analogy with ID: {}", analogyId, e);
+            throw new RuntimeException("Failed to remove support from analogy", e);
+        }
+    }
+
+        /**
      * Helper method to find a analogy by ID.
      * 
      * @param id The analogy ID
@@ -277,6 +394,7 @@ public class AnalogyService {
         dto.setCreatedAt(analogy.getCreatedAt());
         dto.setAuthors(analogy.getAuthors());
         dto.setLinks(analogy.getLinks());
+        dto.setSupportCount(analogy.getSupportCount());
         return dto;
     }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * Repository interface for Analogy entity.
- * Extends JpaRepository to inherit basic CRUD operations.
+ * Extends JpaRepository to inherit basic CRUD operations and provides custom query methods.
  */
 @Repository
 public interface AnalogyRepository extends JpaRepository<Analogy, Long> {
@@ -106,4 +106,27 @@ public interface AnalogyRepository extends JpaRepository<Analogy, Long> {
     @Query("SELECT a FROM Analogy a " +
            "WHERE LOWER(a.title) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Analogy> findByKeywordInTitle(@Param("keyword") String keyword, Pageable pageable);
+
+    /**
+     * Finds analogies with support count greater than a specified threshold
+     * Useful for finding popular analogies
+     */
+    List<Analogy> findBySupportCountGreaterThan(Integer supportCount);
+
+    /**
+     * Finds analogies sorted by support count in descending order
+     * Useful for displaying most supported analogies
+     */
+    @Query("SELECT a FROM Analogy a ORDER BY a.supportCount DESC")
+    List<Analogy> findMostSupportedAnalogies(Pageable pageable);
+
+    /**
+     * Checks if an email has already supported a specific analogy
+     */
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END " +
+           "FROM Analogy a JOIN a.supportEmails email WHERE a.id = :analogyId AND email = :emailToCheck")
+    boolean hasEmailSupportedAnalogy(
+        @Param("analogyId") Long analogyId, 
+        @Param("emailToCheck") String emailToCheck
+    );
 }

@@ -18,7 +18,7 @@ import java.util.List;
 
 /**
  * REST Controller for managing analogy publications.
- * Provides endpoints for CRUD operations, searches, and file handling.
+ * Provides endpoints for CRUD operations, searches, support management, and file handling.
  */
 @Slf4j
 @RestController
@@ -140,5 +140,48 @@ public class AnalogyController {
             @RequestParam String query) {
         log.info("REST request to search Analogies everywhere: {}", query);
         return ResponseEntity.ok(analogyService.searchEverywhere(query));
+    }
+
+    /**
+     * Adds support to an analogy
+     * 
+     * @param analogyId ID of the analogy to support
+     * @param email Email of the user giving support
+     * @return Updated analogy with support information
+     */
+    @PostMapping("/{id}/support")
+    public ResponseEntity<AnalogyResponseDTO> addSupport(
+            @PathVariable("id") Long analogyId,
+            @RequestParam String email) {
+        log.info("REST request to add support to Analogy: {}", analogyId);
+        return ResponseEntity.ok(analogyService.addSupport(analogyId, email));
+    }
+
+    /**
+     * Removes support from an analogy
+     * 
+     * @param analogyId ID of the analogy to remove support from
+     * @param email Email of the user removing support
+     * @return Updated analogy with support information
+     */
+    @DeleteMapping("/{id}/support")
+    public ResponseEntity<AnalogyResponseDTO> removeSupport(
+            @PathVariable("id") Long analogyId,
+            @RequestParam String email) {
+        log.info("REST request to remove support from Analogy: {}", analogyId);
+        return ResponseEntity.ok(analogyService.removeSupport(analogyId, email));
+    }
+
+    /**
+     * Checks if an email is verified
+     * 
+     * @param email Email to verify
+     * @return Boolean indicating if email is verified
+     */
+    @GetMapping("/verify-email")
+    public ResponseEntity<Boolean> verifyEmail(
+            @RequestParam String email) {
+        log.info("REST request to verify email: {}", email);
+        return ResponseEntity.ok(analogyService.isEmailVerified(email));
     }
 }
