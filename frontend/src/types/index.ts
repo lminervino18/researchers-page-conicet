@@ -133,6 +133,15 @@ export interface AnalogyFilters extends BaseSearchFilters {
   author?: string;
 }
 
+export interface Comment {
+  id: number;
+  content: string;
+  userName: string;
+  email: string;
+  createdAt: string;
+  analogyId: number;
+}
+
 // Utility Types
 
 // Nullable type

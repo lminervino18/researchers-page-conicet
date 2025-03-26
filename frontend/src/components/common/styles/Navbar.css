@@ -14,8 +14,9 @@
   margin: 0 auto;
   padding: var(--spacing-md);
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start; /* Align items to the left */
   align-items: center;
+  gap: var(--spacing-lg); /* Add spacing between brand and links */
 }
 
 .navbar-brand {
@@ -44,7 +45,7 @@
 
 .navbar-links {
   display: flex;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl); /* Increase spacing between sections */
 }
 
 .navbar-link {

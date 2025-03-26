@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,6 +26,15 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      */
     Optional<Comment> findByIdAndAnalogyId(Long id, Long analogyId);
     
+    /**
+     * Returns a paginated list of comments associated with a specific analogy.
+     *
+     * @param analogyId the ID of the analogy
+     * @param pageable  the pagination information
+     * @return a paginated list of comments belonging to the specified analogy
+     */
+    Page<Comment> findByAnalogyId(Long analogyId, Pageable pageable);
+
     /**
      * Returns all comments associated with a specific analogy.
      *

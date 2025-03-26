@@ -16,6 +16,7 @@ import AdminExperiments from "./pages/Admin/Experiments/AdminExperiments";
 import AddAnalogy  from "./pages/Admin/Analogies/AddAnalogy";
 import EditAnalogy from "./pages/Admin/Analogies/EditAnalogy";
 import AdminEmails from "./pages/Admin/Emails/AdminEmails";
+import AnalogiesDetail from './pages/Inbox/AnalogiesDetail';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -37,7 +38,8 @@ const App = () => {
         <Route path="/publications" element={<Publications />} />
         <Route path="/participation" element={<Participation />} />
         <Route path="/inbox" element={<Inbox />} />
-        
+        <Route path="/analogies/:id" element={<AnalogiesDetail />} />
+
         {/* Admin Routes */}
         <Route path="/admin/login" element={<Login />} />
         <Route 

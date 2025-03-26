@@ -24,10 +24,12 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class CommentService {
 
+    // Repositories and services used by this service
     private final CommentRepository commentRepository;
     private final AnalogyRepository analogyRepository;
     private final EmailVerificationService emailVerificationService;
 
+    // Constructor to inject dependencies
     public CommentService(
         CommentRepository commentRepository, 
         AnalogyRepository analogyRepository,
@@ -38,19 +40,26 @@ public class CommentService {
         this.emailVerificationService = emailVerificationService;
     }
 
+    /**
+     * Creates a new comment for a given analogy.
+     * Validates the email, analogy, and optional parent comment before saving.
+     */
     @Transactional
     public CommentResponseDTO createComment(CommentRequestDTO requestDTO, Long analogyId) {
         log.info("Creating new comment");
 
+        // Check if the email is registered
         if (!emailVerificationService.isEmailRegistered(requestDTO.getEmail())) {
             log.warn("Attempt to comment with unregistered email: {}", requestDTO.getEmail());
             throw new UnauthorizedCommentException("Email is not registered for commenting");
         }
 
+        // Validate analogy and comment data
         Analogy analogy = validateCommentData(requestDTO, analogyId);
         Optional<Comment> optParent = getParentById(requestDTO.getParentId(), analogyId);
 
         try {
+            // Create and save the comment
             Comment comment = new Comment();
             comment.setUserName(requestDTO.getUserName());
             comment.setContent(requestDTO.getContent());
@@ -68,18 +77,28 @@ public class CommentService {
         }
     }
 
+    /**
+     * Retrieves a comment by its ID.
+     */
     @Transactional(readOnly = true)
     public CommentResponseDTO getComment(Long id) {
         Comment comment = findCommentById(id);
         return mapToDTO(comment);
     }
 
+    /**
+     * Retrieves all comments with pagination.
+     */
     @Transactional(readOnly = true)
     public Page<CommentResponseDTO> getAllComments(Pageable pageable) {
         return commentRepository.findAll(pageable)
             .map(this::mapToDTO);
     }
 
+    /**
+     * Updates an existing comment by its ID.
+     * Validates the email, analogy, and optional parent comment before saving.
+     */
     @Transactional
     public CommentResponseDTO updateComment(Long id, CommentRequestDTO requestDTO) {
         log.info("Updating comment with ID: {}", id);
@@ -106,6 +125,9 @@ public class CommentService {
         }
     }
 
+    /**
+     * Deletes a comment by its ID.
+     */
     @Transactional
     public void deleteComment(Long id) {
         log.info("Deleting comment with ID: {}", id);
@@ -121,6 +143,9 @@ public class CommentService {
         }
     }
 
+    /**
+     * Searches for comments by user name and analogy ID.
+     */
     @Transactional(readOnly = true)
     public List<CommentResponseDTO> searchByUserName(String userName, Long analogyId) {
         if (!StringUtils.hasText(userName)) {
@@ -132,6 +157,9 @@ public class CommentService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Searches for comments by a term in the content and analogy ID.
+     */
     @Transactional(readOnly = true)
     public List<CommentResponseDTO> searchEverywhere(String term, Long analogyId) {
         if (!StringUtils.hasText(term)) {
@@ -143,6 +171,9 @@ public class CommentService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Searches for comments by email and analogy ID.
+     */
     @Transactional(readOnly = true)
     public List<CommentResponseDTO> searchByEmail(String email, Long analogyId) {
         if (!StringUtils.hasText(email)) {
@@ -154,6 +185,9 @@ public class CommentService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Checks if an email is authorized to comment.
+     */
     @Transactional(readOnly = true)
     public boolean isEmailAuthorizedToComment(String email) {
         if (!StringUtils.hasText(email)) {
@@ -162,11 +196,17 @@ public class CommentService {
         return commentRepository.isEmailAuthorizedToComment(email);
     }
 
+    /**
+     * Finds a comment by its ID.
+     */
     private Comment findCommentById(Long id) {
         return commentRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + id));
     }
 
+    /**
+     * Retrieves the parent comment by its ID and analogy ID.
+     */
     private Optional<Comment> getParentById(Long parentId, Long analogyId) {
         Comment parent = null;
             
@@ -181,6 +221,9 @@ public class CommentService {
         return Optional.ofNullable(parent);
     }
 
+    /**
+     * Validates the data for a comment and ensures the analogy exists.
+     */
     private Analogy validateCommentData(CommentRequestDTO requestDTO, Long analogyId) {
         if (!StringUtils.hasText(requestDTO.getUserName())) {
             throw new IllegalArgumentException("Comment user name is required");
@@ -192,12 +235,16 @@ public class CommentService {
             throw new IllegalArgumentException("Email is required");
         }
 
+        // Ensure the analogy exists
         Analogy analogy = analogyRepository.findById(analogyId)
         .orElseThrow(() -> new ResourceNotFoundException("Analogy not found with ID: " + analogyId));
 
         return analogy;
     }
 
+    /**
+     * Maps a Comment entity to a CommentResponseDTO.
+     */
     private CommentResponseDTO mapToDTO(Comment comment) {
         CommentResponseDTO dto = new CommentResponseDTO();
         dto.setId(comment.getId());
@@ -210,4 +257,17 @@ public class CommentService {
         dto.setParentId((parent != null)? parent.getId() : null);
         return dto;
     }
+
+    /**
+     * Retrieves comments by analogy ID with pagination.
+     */
+    @Transactional(readOnly = true)
+    public Page<CommentResponseDTO> getCommentsByAnalogy(Long analogyId, Pageable pageable) {
+        analogyRepository.findById(analogyId)
+            .orElseThrow(() -> new ResourceNotFoundException("Analogy not found with ID: " + analogyId));
+
+        return commentRepository.findByAnalogyId(analogyId, pageable)
+            .map(this::mapToDTO);
+    }
+
 }

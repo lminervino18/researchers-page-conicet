@@ -24,13 +24,14 @@ const AdminEmails: React.FC = () => {
   // State for email search
   const [searchTerm, setSearchTerm] = useState<string>('');
 
-  // Fetch existing emails
   const fetchEmails = async () => {
     try {
       setLoading(true);
-      const registeredEmails = await getAllRegisteredEmails();
-      // Sort emails in reverse order (newest first)
-      setEmails(registeredEmails.reverse());
+      const registeredEmails: string[] = await getAllRegisteredEmails();
+      
+      // Opción 1: Usar spread operator (recomendado)
+      setEmails([...registeredEmails].reverse());
+  
       setLoading(false);
     } catch (error) {
       console.error('Error fetching emails:', error);

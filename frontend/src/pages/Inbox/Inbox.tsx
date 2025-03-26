@@ -1,8 +1,7 @@
-// src/pages/Inbox/Inbox.tsx
 import { FC, useState, useEffect } from 'react';
 import MainLayout from '../../layouts/MainLayout';
 import AnalogiesList from '../../components/analogies/AnalogiesList';
-import { Analogy } from '../../types';
+import { Analogy, PaginatedResponse } from '../../types';
 import { getAllAnalogies } from '../../api/Analogy';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
@@ -17,8 +16,16 @@ const Inbox: FC = () => {
   const loadAnalogies = async () => {
     try {
       setLoading(true);
-      const response = await getAllAnalogies();
-      setAnalogies(response.content);
+      const response: PaginatedResponse<Analogy[]> = await getAllAnalogies();
+      
+      // Flatten the array if needed
+      const extractedAnalogies = Array.isArray(response.content)
+        ? response.content.flat()
+        : Array.isArray(response.data)
+          ? response.data.flat()
+          : [];
+  
+      setAnalogies(extractedAnalogies);
       setError(null);
     } catch (err) {
       setError('Error loading analogies');

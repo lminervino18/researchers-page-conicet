@@ -5,12 +5,17 @@ import {
   ApiResponse, 
   PaginatedResponse,
   AnalogyFilters
-} from '../types/index'; // Adjust the import path as needed
+} from '../types/index';
 
-// Define the base URL for the API
+// Base URL for the Analogies API
 const API_BASE_URL = 'http://localhost:8080/api/analogies';
 
-// Get all analogies with pagination
+/**
+ * Fetch all analogies with pagination
+ * @param page - Page number (default: 0)
+ * @param size - Number of items per page (default: 10)
+ * @returns Paginated response of analogies
+ */
 export const getAllAnalogies = async (
   page = 0, 
   size = 10
@@ -31,7 +36,11 @@ export const getAllAnalogies = async (
   }
 };
 
-// Search analogies
+/**
+ * Search analogies globally
+ * @param query - Search term
+ * @returns API response with matching analogies
+ */
 export const searchAnalogies = async (
   query: string
 ): Promise<ApiResponse<Analogy[]>> => {
@@ -46,12 +55,16 @@ export const searchAnalogies = async (
   }
 };
 
-// Get single analogy by ID
+/**
+ * Fetch a single analogy by its ID
+ * @param id - Analogy identifier
+ * @returns API response with the analogy
+ */
 export const getAnalogyById = async (
   id: number
-): Promise<ApiResponse<Analogy>> => {
+): Promise<Analogy> => {
   try {
-    const response = await axios.get<ApiResponse<Analogy>>(`${API_BASE_URL}/${id}`);
+    const response = await axios.get<Analogy>(`${API_BASE_URL}/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching analogy:', error);
@@ -59,7 +72,12 @@ export const getAnalogyById = async (
   }
 };
 
-// Create new analogy
+
+/**
+ * Create a new analogy
+ * @param data - Analogy data transfer object
+ * @returns API response with the created analogy
+ */
 export const createAnalogy = async (
   data: AnalogyDTO
 ): Promise<ApiResponse<Analogy>> => {
@@ -76,7 +94,12 @@ export const createAnalogy = async (
   }
 };
 
-// Update existing analogy
+/**
+ * Update an existing analogy
+ * @param id - Analogy identifier
+ * @param data - Updated analogy data
+ * @returns API response with the updated analogy
+ */
 export const updateAnalogy = async (
   id: number, 
   data: AnalogyDTO
@@ -94,7 +117,11 @@ export const updateAnalogy = async (
   }
 };
 
-// Delete analogy
+/**
+ * Delete an analogy
+ * @param id - Analogy identifier
+ * @throws Error if deletion fails
+ */
 export const deleteAnalogy = async (id: number): Promise<void> => {
   try {
     await axios.delete(`${API_BASE_URL}/${id}`);
@@ -110,7 +137,11 @@ export const deleteAnalogy = async (id: number): Promise<void> => {
   }
 };
 
-// Search by title
+/**
+ * Search analogies by title
+ * @param query - Search term for title
+ * @returns API response with matching analogies
+ */
 export const searchByTitle = async (
   query: string
 ): Promise<ApiResponse<Analogy[]>> => {
@@ -125,7 +156,11 @@ export const searchByTitle = async (
   }
 };
 
-// Search by author
+/**
+ * Search analogies by author name
+ * @param name - Author name to search for
+ * @returns API response with matching analogies
+ */
 export const searchByAuthor = async (
   name: string
 ): Promise<ApiResponse<Analogy[]>> => {
@@ -140,7 +175,11 @@ export const searchByAuthor = async (
   }
 };
 
-// Advanced search with filters
+/**
+ * Advanced search with multiple filters
+ * @param filters - Search filters
+ * @returns Paginated response with filtered analogies
+ */
 export const searchWithFilters = async (
   filters: AnalogyFilters
 ): Promise<PaginatedResponse<Analogy[]>> => {
@@ -155,6 +194,78 @@ export const searchWithFilters = async (
   }
 };
 
+/**
+ * Add support to an analogy
+ * @param analogyId - Analogy identifier
+ * @param email - User email providing support
+ * @returns API response with updated analogy
+ */
+export const addSupport = async (
+  analogyId: number, 
+  email: string
+): Promise<ApiResponse<Analogy>> => {
+  try {
+    const response = await axios.post<ApiResponse<Analogy>>(
+      `${API_BASE_URL}/${analogyId}/support`, 
+      null, 
+      {
+        params: { email }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error adding support:', error);
+    throw error;
+  }
+};
+
+/**
+ * Remove support from an analogy
+ * @param analogyId - Analogy identifier
+ * @param email - User email removing support
+ * @returns API response with updated analogy
+ */
+export const removeSupport = async (
+  analogyId: number, 
+  email: string
+): Promise<ApiResponse<Analogy>> => {
+  try {
+    const response = await axios.delete<ApiResponse<Analogy>>(
+      `${API_BASE_URL}/${analogyId}/support`, 
+      {
+        params: { email }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error removing support:', error);
+    throw error;
+  }
+};
+
+/**
+ * Verify if an email is verified
+ * @param email - Email to verify
+ * @returns Boolean indicating email verification status
+ */
+export const verifyEmail = async (
+  email: string
+): Promise<boolean> => {
+  try {
+    const response = await axios.get<boolean>(
+      `${API_BASE_URL}/verify-email`, 
+      {
+        params: { email }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error verifying email:', error);
+    throw error;
+  }
+};
+
+// Default export with all methods
 export default {
   getAllAnalogies,
   searchAnalogies,
@@ -164,5 +275,8 @@ export default {
   deleteAnalogy,
   searchByTitle,
   searchByAuthor,
-  searchWithFilters
+  searchWithFilters,
+  addSupport,
+  removeSupport,
+  verifyEmail
 };

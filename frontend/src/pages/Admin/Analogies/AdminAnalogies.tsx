@@ -183,7 +183,7 @@ const AnalogiesListItem: React.FC<AnalogiesListItemProps> = React.memo(({
 }) => (
   <div className="admin-analogy-card">
     <div className="analogy-info">
-      <p className="analogy-title">{analogy.title}</p>
+      <p className="analogy-admin-title">{analogy.title}</p>
       <p className="analogy-authors">
         Authors: {analogy.authors.join(', ')}
       </p>
