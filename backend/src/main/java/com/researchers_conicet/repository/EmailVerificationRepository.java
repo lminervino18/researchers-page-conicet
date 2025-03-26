@@ -2,8 +2,13 @@ package com.researchers_conicet.repository;
 
 import com.researchers_conicet.entity.EmailVerification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.lang.NonNull;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -39,4 +44,30 @@ public interface EmailVerificationRepository extends JpaRepository<EmailVerifica
      * @return Number of entries for the email
      */
     long countByEmail(String email);
+
+    /**
+     * Retrieves all registered emails
+     *
+     * @return Non-null List of all email verification entries
+     */
+    @NonNull
+    List<EmailVerification> findAll();
+
+    /**
+     * Deletes all email verification entries
+     */
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM EmailVerification")
+    void deleteAllEmails();
+
+    /**
+     * Deletes multiple emails by their email addresses
+     *
+     * @param emails List of email addresses to delete
+     */
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM EmailVerification e WHERE e.email IN :emails")
+    void deleteMultipleEmails(List<String> emails);
 }

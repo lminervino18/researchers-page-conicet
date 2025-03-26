@@ -3,7 +3,7 @@ import { FC, useState, useEffect } from 'react';
 import MainLayout from '../../layouts/MainLayout';
 import AnalogiesList from '../../components/analogies/AnalogiesList';
 import { Analogy } from '../../types';
-import { getAllAnalogies } from '../../api/analogy';
+import { getAllAnalogies } from '../../api/Analogy';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import './styles/Inbox.css';

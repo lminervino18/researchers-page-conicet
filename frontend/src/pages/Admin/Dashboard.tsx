@@ -1,4 +1,3 @@
-// pages/Admin/Dashboard.tsx
 import { useNavigate } from 'react-router-dom';
 import './styles/Dashboard.css';
 
@@ -37,6 +36,12 @@ const Dashboard = () => {
             className="dashboard-button"
           >
             Experiments
+          </button>
+          <button 
+            onClick={() => navigate('/admin/emails')} 
+            className="dashboard-button"
+          >
+            Email Management
           </button>
         </div>
       </main>

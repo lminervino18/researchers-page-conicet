@@ -3,7 +3,7 @@ import { FC, useState, useEffect } from 'react';
 import MainLayout from '../../layouts/MainLayout';
 import PublicationsList from '../../components/publications/PublicationsList';
 import { Research } from '../../types';
-import { getAllResearches, viewPdf, downloadPdf } from '../../api/research';
+import { getAllResearches, viewPdf, downloadPdf } from '../../api/Research';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import './styles/Publications.css';

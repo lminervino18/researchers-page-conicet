@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Analogy } from '../../types';
-import { authors as authorsList } from '../../api/authors';
+import { authors as authorsList } from '../../api/Authors';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLink, faComment, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 import { faYoutube, faFacebook, faTiktok } from '@fortawesome/free-brands-svg-icons';
@@ -99,9 +99,9 @@ const getPreviewImage = (link: string) => {
 };
 
 const getYoutubeId = (url: string) => {
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const regExp = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
-  return match && match[2].length === 11 ? match[2] : null;
+  return match && match[1].length === 11 ? match[1] : null;
 };
 
 export default AnalogiesList;

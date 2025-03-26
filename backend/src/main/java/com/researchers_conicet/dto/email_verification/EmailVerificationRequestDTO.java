@@ -6,7 +6,8 @@ import lombok.Data;
 
 @Data
 public class EmailVerificationRequestDTO {
-    @Email(message = "Invalid email format")
-    @NotBlank(message = "Email is required")
+    @NotBlank(message = "Email cannot be blank")
+    @Email(message = "Invalid email format", 
+           regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
     private String email;
 }

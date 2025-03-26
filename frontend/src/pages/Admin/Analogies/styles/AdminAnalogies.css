@@ -1,0 +1,61 @@
+@import '../../styles/AdminCommonStyles.css';
+
+.admin-analogies-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.admin-analogy-card {
+    background-color: var(--background-color);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-lg);
+    transition: all var(--transition-fast);
+}
+
+.admin-analogy-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.analogy-info {
+    flex: 1;
+    max-width: 70%;
+}
+
+.analogy-title {
+    color: var(--text-color);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    font-weight: bold;
+}
+
+.analogy-authors {
+    color: var(--text-light);
+    font-size: var(--font-size-small);
+    margin-bottom: var(--spacing-xs);
+}
+
+.analogy-links {
+    color: var(--text-light);
+    font-size: var(--font-size-small);
+}
+
+.no-analogies {
+    text-align: center;
+    color: var(--text-light);
+    padding: var(--spacing-xl);
+    font-size: var(--font-size-large);
+}
+
+.analogy-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
