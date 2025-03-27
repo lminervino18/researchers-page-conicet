@@ -218,5 +218,5 @@ export default {
   searchCommentsByUserName,
   searchCommentsByEmail,
   searchCommentsEverywhere,
-  verifyEmailAuthorization
+  verifyEmailAuthorization,
 };

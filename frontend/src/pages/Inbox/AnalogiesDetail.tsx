@@ -3,61 +3,34 @@ import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '../../layouts/MainLayout';
 import { Analogy, Comment, PaginatedResponse } from '../../types';
 import { 
-  getAnalogyById, 
-  addSupport, 
-  getSupportCount  // Import new support count function
+  getAnalogyById,  
 } from '../../api/Analogy';
-import { getCommentsByAnalogy, createComment } from '../../api/Comment';
+import { getCommentsByAnalogy, createComment, deleteComment } from '../../api/Comment';
 import { authors as authorsList } from '../../api/Authors';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faThumbsUp, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
-import CommentSection from './CommentSection';
-import LoginModal from './LoginModal';
+import CommentSection from '../../components/analogies/CommentSection';
+import LoginModal from '../../components/analogies/LoginModal';
 import { useAuth } from '../../hooks/useAuth';
 import './styles/AnalogiesDetail.css';
+import SupportAnalogyButton from '../../components/analogies/SupportAnalogyButton';
 
-/**
- * Detailed view component for an individual analogy
- * Provides comprehensive information and interaction capabilities
- */
 const AnalogiesDetail: React.FC = () => {
-  // Extract analogy ID from URL parameters
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, login } = useAuth();
 
-  // State management for component data and UI
   const [analogy, setAnalogy] = useState<Analogy | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [supportCount, setSupportCount] = useState(0);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginPurpose, setLoginPurpose] = useState<'support' | 'comment' | null>(null);
   const [pendingComment, setPendingComment] = useState<string | null>(null);
 
-  /**
-   * Fetches the current support count for an analogy
-   * Updates the supportCount state
-   * 
-   * @param analogyId - ID of the analogy to fetch support count
-   */
-  const fetchSupportCount = async (analogyId: number) => {
-    try {
-      const count = await getSupportCount(analogyId);
-      setSupportCount(count);
-    } catch (error) {
-      console.error('Error fetching support count:', error);
-    }
-  };
-
-  /**
-   * Fetch analogy details and comments on component mount or page change
-   * Handles data loading, error management, and pagination
-   */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -68,7 +41,6 @@ const AnalogiesDetail: React.FC = () => {
           throw new Error('Invalid analogy ID');
         }
 
-        // Fetch analogy details
         const analogyResponse = await getAnalogyById(Number(id));
 
         if (!analogyResponse) {
@@ -77,31 +49,10 @@ const AnalogiesDetail: React.FC = () => {
 
         setAnalogy(analogyResponse);
         
-        // Fetch support count
-        await fetchSupportCount(analogyResponse.id);
-
-        // Fetch comments
         const commentsResponse: PaginatedResponse<Comment[]> = await getCommentsByAnalogy(
           analogyResponse.id,
           page
         );
-
-        // Extract and validate comments
-        const extractComments = (data: unknown): Comment[] => {
-          if (Array.isArray(data)) {
-            return data.filter(isValidComment);
-          }
-
-          if (data && typeof data === 'object' && 'content' in data) {
-            const contentData = (data as { content?: unknown }).content;
-
-            if (Array.isArray(contentData)) {
-              return contentData.filter(isValidComment);
-            }
-          }
-
-          return [];
-        };
 
         const extractedComments = extractComments(
           commentsResponse.data ||
@@ -109,19 +60,16 @@ const AnalogiesDetail: React.FC = () => {
           []
         );
 
-        // Update comments state with pagination support
         setComments(prevComments =>
           page === 0
             ? extractedComments
             : [...prevComments, ...extractedComments]
         );
 
-        // Determine if more comments are available
         setHasMore(extractedComments.length === 10);
       } catch (error) {
         console.error('Error fetching data:', error);
 
-        // Handle and display errors
         if (axios.isAxiosError(error)) {
           setError(
             error.response?.data?.message ||
@@ -139,12 +87,6 @@ const AnalogiesDetail: React.FC = () => {
     fetchData();
   }, [id, page]);
 
-  /**
-   * Validates comment structure
-   * 
-   * @param comment - Unknown object to validate
-   * @returns Boolean indicating if object is a valid comment
-   */
   const isValidComment = (comment: unknown): comment is Comment => {
     return (
       typeof comment === 'object' &&
@@ -160,48 +102,28 @@ const AnalogiesDetail: React.FC = () => {
     );
   };
 
-  /**
-   * Retrieves author data based on name
-   * 
-   * @param authorName - Full name of the author
-   * @returns Author data or undefined
-   */
+  const extractComments = (data: unknown): Comment[] => {
+    if (Array.isArray(data)) {
+      return data.filter(isValidComment);
+    }
+
+    if (data && typeof data === 'object' && 'content' in data) {
+      const contentData = (data as { content?: unknown }).content;
+
+      if (Array.isArray(contentData)) {
+        return contentData.filter(isValidComment);
+      }
+    }
+
+    return [];
+  };
+
   const getAuthorData = (authorName: string) => {
     return authorsList.find(
       author => `${author.firstName} ${author.lastName}` === authorName
     );
   };
 
-  /**
-   * Handles adding support to an analogy
-   * Requires user authentication
-   */
-  const handleAddSupport = async () => {
-    if (!user) {
-      setLoginPurpose('support');
-      setIsLoginModalOpen(true);
-      return;
-    }
-
-    if (!analogy) return;
-
-    try {
-      const response = await addSupport(analogy.id, user.email);
-      if (response.data) {
-        // Refresh support count after adding support
-        await fetchSupportCount(analogy.id);
-      }
-    } catch (error) {
-      console.error('Error adding support:', error);
-    }
-  };
-
-  /**
-   * Handles comment submission
-   * Requires user authentication
-   * 
-   * @param commentContent - Text content of the comment
-   */
   const handleSubmitComment = async (commentContent: string) => {
     if (!user) {
       setLoginPurpose('comment');
@@ -229,44 +151,27 @@ const AnalogiesDetail: React.FC = () => {
     }
   };
 
-  /**
-   * Handles user login process
-   * Completes pending support or comment action
-   * 
-   * @param username - User's username
-   * @param email - User's email
-   */
   const handleLogin = (username: string, email: string) => {
     login(username, email);
     setIsLoginModalOpen(false);
 
     if (loginPurpose === 'support') {
-      handleAddSupport();
+      // Support logic now handled by SupportAnalogyButton
     } else if (loginPurpose === 'comment' && pendingComment) {
       handleSubmitComment(pendingComment);
       setPendingComment(null);
     }
   };
 
-  /**
-   * Loads more comments for pagination
-   */
   const loadMoreComments = () => {
     setPage(prevPage => prevPage + 1);
   };
 
-  /**
-   * Converts YouTube URL to embeddable iframe URL
-   * 
-   * @param url - YouTube video URL
-   * @returns Embeddable URL or null
-   */
   const getYoutubeEmbedUrl = (url: string) => {
     const videoId = url.split('v=')[1]?.split('&')[0];
     return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
   };
 
-  // Render loading state
   if (loading) {
     return (
       <div className="loading-container">
@@ -276,7 +181,6 @@ const AnalogiesDetail: React.FC = () => {
     );
   }
 
-  // Render error state
   if (error) {
     return (
       <div className="error-container">
@@ -286,7 +190,6 @@ const AnalogiesDetail: React.FC = () => {
     );
   }
 
-  // Render not found state
   if (!analogy) {
     return (
       <div className="error-container">
@@ -296,7 +199,6 @@ const AnalogiesDetail: React.FC = () => {
     );
   }
 
-  // Main render
   return (
     <MainLayout>
       <LoginModal 
@@ -379,21 +281,28 @@ const AnalogiesDetail: React.FC = () => {
 
           <div className="interaction-section">
             <div className="support-section">
-              <button
-                className="support-btn"
-                onClick={handleAddSupport}
-              >
-                <FontAwesomeIcon icon={faThumbsUp} /> Support
-              </button>
-              <span className="support-count">{supportCount} Supports</span>
+              <SupportAnalogyButton 
+                analogyId={analogy.id}
+                userEmail={user?.email}
+                onLoginRequired={() => {
+                  setLoginPurpose('support');
+                  setIsLoginModalOpen(true);
+                }}
+              />
             </div>
-
             <CommentSection 
               comments={comments}
               loading={loading}
               hasMore={hasMore}
+              analogyId={analogy.id}
               onSubmitComment={handleSubmitComment}
               onLoadMoreComments={loadMoreComments}
+              onDeleteComment={(commentId) => {
+                setComments(prevComments => 
+                  prevComments.filter(comment => comment.id !== commentId)
+                );
+                return deleteComment(analogy.id, commentId);
+              }}
             />
           </div>
         </div>

@@ -133,6 +133,8 @@ export interface AnalogyFilters extends BaseSearchFilters {
   author?: string;
 }
 
+// En tu archivo de tipos
+
 export interface Comment {
   id: number;
   content: string;
@@ -140,8 +142,21 @@ export interface Comment {
   email: string;
   createdAt: string;
   analogyId: number;
+  parentId?: number; 
 }
 
+export interface CommentRequestDTO {
+  content: string;
+  userName: string;
+  email: string;
+  analogyId: number;
+  parentId?: number; 
+}
+
+export interface CommentResponseDTO extends Comment {
+  children?: Comment[]; 
+  childrenCount?: number;
+}
 // Utility Types
 
 // Nullable type

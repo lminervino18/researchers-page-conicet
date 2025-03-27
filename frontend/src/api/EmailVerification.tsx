@@ -155,6 +155,28 @@ export const checkEmailsRegistration = async (emails: string[]): Promise<EmailRe
   }
 };
 
+/**
+ * Verify if an email is verified
+ * @param email - Email to verify
+ * @returns Boolean indicating email verification status
+ */
+export const verifyEmail = async (
+  email: string
+): Promise<boolean> => {
+  try {
+    const response = await axios.get<boolean>(
+      `${API_BASE_URL}/verify-email`, 
+      {
+        params: { email }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error verifying email:', error);
+    throw error;
+  }
+};
+
 export default {
   checkEmailRegistration,
   registerEmail,

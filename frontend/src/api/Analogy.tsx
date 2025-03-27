@@ -243,27 +243,7 @@ export const removeSupport = async (
   }
 };
 
-/**
- * Verify if an email is verified
- * @param email - Email to verify
- * @returns Boolean indicating email verification status
- */
-export const verifyEmail = async (
-  email: string
-): Promise<boolean> => {
-  try {
-    const response = await axios.get<boolean>(
-      `${API_BASE_URL}/verify-email`, 
-      {
-        params: { email }
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error('Error verifying email:', error);
-    throw error;
-  }
-};
+
 
 /**
  * Get support count for an analogy
@@ -284,6 +264,32 @@ export const getSupportCount = async (
   }
 };
 
+
+
+
+/**
+ * Check if a user has supported an analogy
+ * @param analogyId - Analogy identifier
+ * @param email - User email to check
+ * @returns Boolean indicating support status
+ */
+export const checkUserSupport = async (
+  analogyId: number, 
+  email: string
+): Promise<boolean> => {
+  try {
+    const response = await axios.get<boolean>(
+      `${API_BASE_URL}/${analogyId}/has-supported`, 
+      {
+        params: { email }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error checking user support:', error);
+    throw error;
+  }
+};
 // Default export with all methods
 export default {
   getAllAnalogies,
@@ -297,6 +303,5 @@ export default {
   searchWithFilters,
   addSupport,
   removeSupport,
-  verifyEmail,
   getSupportCount
 };

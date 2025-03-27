@@ -54,7 +54,7 @@ public class Analogy {
      * Collection of author names for this analogy.
      * Stored as simple strings in a separate table.
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "analogy_authors",
         joinColumns = @JoinColumn(name = "analogy_id")
@@ -67,7 +67,7 @@ public class Analogy {
      * Stored as simple strings in a separate table.
      * URL validation is handled in the frontend.
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "analogy_links",
         joinColumns = @JoinColumn(name = "analogy_id")
@@ -79,7 +79,7 @@ public class Analogy {
      * Collection of emails that have supported this analogy.
      * Prevents multiple supports from the same email.
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "analogy_supports",
         joinColumns = @JoinColumn(name = "analogy_id"),
