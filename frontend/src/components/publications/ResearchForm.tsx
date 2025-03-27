@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ResearchDTO, Research } from '../../types';
-import { authors as authorsList } from '../../api/authors';
+import { authors as authorsList } from '../../api/Authors';
 import './styles/ResearchForm.css';
 
 interface ResearchFormProps {

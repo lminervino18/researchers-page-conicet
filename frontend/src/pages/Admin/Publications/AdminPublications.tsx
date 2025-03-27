@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilePdf, faEdit, faDownload, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Research } from '../../../types';
-import { getAllResearches, deleteResearch, viewPdf, downloadPdf } from '../../../api/research';
+import { getAllResearches, deleteResearch, viewPdf, downloadPdf } from '../../../api/Research';
 import './styles/AdminPublications.css';
 
 const AdminPublications = () => {

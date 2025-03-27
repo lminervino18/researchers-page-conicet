@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { Author } from '../../api/authors';
+import { Author } from '../../api/Authors';
 import MemberGridItem from './MemberGridItem';
 import MemberDetailModal from './MemberDetailModal';
 import './styles/MemberGrid.css';

@@ -2,7 +2,7 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ResearchForm from '../../../components/publications/ResearchForm';
-import { createResearch } from '../../../api/research';
+import { createResearch } from '../../../api/Research';
 import { ResearchDTO } from '../../../types';
 import './styles/AddResearch.css';
 

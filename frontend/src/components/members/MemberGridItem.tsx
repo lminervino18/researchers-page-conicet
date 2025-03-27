@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Author } from '../../api/authors';
+import { Author } from '../../api/Authors';
 import './styles/MemberGridItem.css';
 
 interface MemberGridItemProps {

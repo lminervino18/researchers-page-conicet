@@ -1,0 +1,203 @@
+/* AdminCommonStyles.css */
+.admin-page-container {
+    min-height: 100vh;
+    background-color: var(--secondary-background);
+    font-family: var(--font-family);
+}
+
+.admin-page-content {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+}
+
+/* Header styling */
+.admin-page-header {
+    background-color: var(--background-color);
+    padding: var(--spacing-md) var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.admin-page-header h1 {
+    margin: 0;
+    color: var(--text-color);
+    font-size: var(--font-size-xl);
+    text-align: center;
+}
+
+/* Button styles */
+.back-button,
+.add-button {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: var(--font-size-base);
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+.back-button {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+}
+
+.add-button {
+    background-color: var(--success-color);
+    color: var(--background-color);
+}
+
+.back-button:hover,
+.add-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Action Buttons */
+.action-button {
+    background: none;
+    border: none;
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    color: var(--text-light);
+    font-size: var(--font-size-large);
+}
+
+.action-button:hover {
+    color: var(--primary-color);
+}
+
+.action-button.delete:hover {
+    color: var(--error-color);
+}
+
+/* Delete Confirmation */
+.delete-confirm {
+    background-color: var(--error-light);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.delete-confirm p {
+    margin: 0;
+    color: var(--error-color);
+    font-size: var(--font-size-small);
+    font-weight: 500;
+}
+
+.confirm-button,
+.cancel-button {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-size: var(--font-size-small);
+    transition: all var(--transition-fast);
+}
+
+.confirm-button {
+    background-color: var(--error-color);
+    color: var(--background-color);
+}
+
+.cancel-button {
+    background-color: var(--text-light);
+    color: var(--background-color);
+}
+
+.confirm-button:hover,
+.cancel-button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Loading and Error States */
+.loading {
+    text-align: center;
+    color: var(--text-light);
+    padding: var(--spacing-xl);
+    font-size: var(--font-size-large);
+}
+
+.error-message {
+    background-color: var(--error-light);
+    color: var(--error-color);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+    font-size: var(--font-size-base);
+}
+
+/* Action Button Improvements */
+.action-button[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: var(--text-color);
+    color: var(--background-color);
+    font-size: var(--font-size-tiny);
+    border-radius: var(--border-radius-sm);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: var(--z-index-tooltip);
+}
+
+.action-button svg {
+    width: 1.2em;
+    height: 1.2em;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+    .admin-page-content {
+        padding: var(--spacing-md);
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-page-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+    }
+
+    .admin-page-header h1 {
+        order: -1;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .back-button,
+    .add-button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-page-header h1 {
+        font-size: var(--font-size-large);
+    }
+
+    .delete-confirm {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

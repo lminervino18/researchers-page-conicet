@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { Author, calculateAge } from '../../api/authors';
+import { Author, calculateAge } from '../../api/Authors';
 import CoursesModal from './CoursesModal';
 import PublicationsModal from './PublicationsModal';
 import './styles/MemberDetailModal.css';

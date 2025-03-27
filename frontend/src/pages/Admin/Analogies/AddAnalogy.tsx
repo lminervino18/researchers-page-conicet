@@ -2,7 +2,7 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AnalogyForm from '../../../components/analogies/AnalogyForm';
-import { createAnalogy } from '../../../api/analogy';
+import { createAnalogy } from '../../../api/Analogy';
 import { AnalogyDTO } from '../../../types';
 import './styles/AddAnalogy.css';
 
@@ -11,10 +11,16 @@ const AddAnalogy: FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (data: AnalogyDTO, _id?: number) => {
+  const handleSubmit = async (data: AnalogyDTO, id?: number) => {
     try {
       setIsSubmitting(true);
       setError(null);
+
+       // Optionally use the ID if needed
+    if (id) {
+      // Handle ID-specific logic if required
+      console.log('Potential update for ID:', id);
+    }
 
       await createAnalogy(data);
       navigate('/admin/analogies');

@@ -29,7 +29,6 @@ const PublicationsList: FC<PublicationsListProps> = ({
             <div className="publication-content">
               <div className="publication-main">
                 <p className="publication-abstract">{publication.researchAbstract}</p>
-                <p className="publication-authors">{publication.authors.join(', ')}</p>
                 {publication.links.length > 0 }
               </div>
               <div className="publication-actions">
