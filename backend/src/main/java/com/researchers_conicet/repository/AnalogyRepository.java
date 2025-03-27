@@ -108,16 +108,10 @@ public interface AnalogyRepository extends JpaRepository<Analogy, Long> {
     Page<Analogy> findByKeywordInTitle(@Param("keyword") String keyword, Pageable pageable);
 
     /**
-     * Finds analogies with support count greater than a specified threshold
-     * Useful for finding popular analogies
-     */
-    List<Analogy> findBySupportCountGreaterThan(Integer supportCount);
-
-    /**
      * Finds analogies sorted by support count in descending order
      * Useful for displaying most supported analogies
      */
-    @Query("SELECT a FROM Analogy a ORDER BY a.supportCount DESC")
+    @Query("SELECT a FROM Analogy a ORDER BY SIZE(a.supportEmails) DESC")
     List<Analogy> findMostSupportedAnalogies(Pageable pageable);
 
     /**
@@ -129,4 +123,13 @@ public interface AnalogyRepository extends JpaRepository<Analogy, Long> {
         @Param("analogyId") Long analogyId, 
         @Param("emailToCheck") String emailToCheck
     );
+
+    /**
+     * Counts the number of unique support emails for a specific analogy
+     * 
+     * @param analogyId The ID of the analogy
+     * @return Number of unique support emails
+     */
+    @Query("SELECT COUNT(DISTINCT email) FROM Analogy a JOIN a.supportEmails email WHERE a.id = :analogyId")
+    int countSupportsByAnalogyId(@Param("analogyId") Long analogyId);
 }

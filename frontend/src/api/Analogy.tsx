@@ -265,6 +265,25 @@ export const verifyEmail = async (
   }
 };
 
+/**
+ * Get support count for an analogy
+ * @param analogyId - Analogy identifier
+ * @returns Number of supports for the analogy
+ */
+export const getSupportCount = async (
+  analogyId: number
+): Promise<number> => {
+  try {
+    const response = await axios.get<number>(
+      `${API_BASE_URL}/${analogyId}/support-count`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error getting support count:', error);
+    throw error;
+  }
+};
+
 // Default export with all methods
 export default {
   getAllAnalogies,
@@ -278,5 +297,6 @@ export default {
   searchWithFilters,
   addSupport,
   removeSupport,
-  verifyEmail
+  verifyEmail,
+  getSupportCount
 };

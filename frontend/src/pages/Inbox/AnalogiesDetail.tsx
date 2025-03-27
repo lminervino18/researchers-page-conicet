@@ -2,27 +2,62 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '../../layouts/MainLayout';
 import { Analogy, Comment, PaginatedResponse } from '../../types';
-import { getAnalogyById, addSupport } from '../../api/Analogy';
+import { 
+  getAnalogyById, 
+  addSupport, 
+  getSupportCount  // Import new support count function
+} from '../../api/Analogy';
 import { getCommentsByAnalogy, createComment } from '../../api/Comment';
 import { authors as authorsList } from '../../api/Authors';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faComment, faThumbsUp, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faThumbsUp, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
+import CommentSection from './CommentSection';
+import LoginModal from './LoginModal';
+import { useAuth } from '../../hooks/useAuth';
 import './styles/AnalogiesDetail.css';
 
+/**
+ * Detailed view component for an individual analogy
+ * Provides comprehensive information and interaction capabilities
+ */
 const AnalogiesDetail: React.FC = () => {
+  // Extract analogy ID from URL parameters
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user, login } = useAuth();
 
+  // State management for component data and UI
   const [analogy, setAnalogy] = useState<Analogy | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [supportCount, setSupportCount] = useState(0);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [loginPurpose, setLoginPurpose] = useState<'support' | 'comment' | null>(null);
+  const [pendingComment, setPendingComment] = useState<string | null>(null);
 
+  /**
+   * Fetches the current support count for an analogy
+   * Updates the supportCount state
+   * 
+   * @param analogyId - ID of the analogy to fetch support count
+   */
+  const fetchSupportCount = async (analogyId: number) => {
+    try {
+      const count = await getSupportCount(analogyId);
+      setSupportCount(count);
+    } catch (error) {
+      console.error('Error fetching support count:', error);
+    }
+  };
+
+  /**
+   * Fetch analogy details and comments on component mount or page change
+   * Handles data loading, error management, and pagination
+   */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -33,6 +68,7 @@ const AnalogiesDetail: React.FC = () => {
           throw new Error('Invalid analogy ID');
         }
 
+        // Fetch analogy details
         const analogyResponse = await getAnalogyById(Number(id));
 
         if (!analogyResponse) {
@@ -40,12 +76,17 @@ const AnalogiesDetail: React.FC = () => {
         }
 
         setAnalogy(analogyResponse);
+        
+        // Fetch support count
+        await fetchSupportCount(analogyResponse.id);
 
+        // Fetch comments
         const commentsResponse: PaginatedResponse<Comment[]> = await getCommentsByAnalogy(
           analogyResponse.id,
           page
         );
 
+        // Extract and validate comments
         const extractComments = (data: unknown): Comment[] => {
           if (Array.isArray(data)) {
             return data.filter(isValidComment);
@@ -68,16 +109,19 @@ const AnalogiesDetail: React.FC = () => {
           []
         );
 
+        // Update comments state with pagination support
         setComments(prevComments =>
           page === 0
             ? extractedComments
             : [...prevComments, ...extractedComments]
         );
 
+        // Determine if more comments are available
         setHasMore(extractedComments.length === 10);
       } catch (error) {
         console.error('Error fetching data:', error);
 
+        // Handle and display errors
         if (axios.isAxiosError(error)) {
           setError(
             error.response?.data?.message ||
@@ -95,6 +139,12 @@ const AnalogiesDetail: React.FC = () => {
     fetchData();
   }, [id, page]);
 
+  /**
+   * Validates comment structure
+   * 
+   * @param comment - Unknown object to validate
+   * @returns Boolean indicating if object is a valid comment
+   */
   const isValidComment = (comment: unknown): comment is Comment => {
     return (
       typeof comment === 'object' &&
@@ -110,55 +160,113 @@ const AnalogiesDetail: React.FC = () => {
     );
   };
 
+  /**
+   * Retrieves author data based on name
+   * 
+   * @param authorName - Full name of the author
+   * @returns Author data or undefined
+   */
   const getAuthorData = (authorName: string) => {
     return authorsList.find(
       author => `${author.firstName} ${author.lastName}` === authorName
     );
   };
 
-  const handleSubmitComment = async () => {
-    if (!newComment.trim() || !analogy) return;
-
-    try {
-      const commentData = {
-        content: newComment,
-        userName: 'Current User',
-        email: 'user@example.com'
-      };
-
-      const response = await createComment(analogy.id, commentData);
-
-      if (isValidComment(response.data)) {
-        setComments(prevComments => [response.data, ...prevComments]);
-        setNewComment('');
-      }
-    } catch (error) {
-      console.error('Error submitting comment:', error);
-    }
-  };
-
+  /**
+   * Handles adding support to an analogy
+   * Requires user authentication
+   */
   const handleAddSupport = async () => {
+    if (!user) {
+      setLoginPurpose('support');
+      setIsLoginModalOpen(true);
+      return;
+    }
+
     if (!analogy) return;
 
     try {
-      const response = await addSupport(analogy.id, 'user@example.com');
+      const response = await addSupport(analogy.id, user.email);
       if (response.data) {
-        setSupportCount(prevCount => prevCount + 1);
+        // Refresh support count after adding support
+        await fetchSupportCount(analogy.id);
       }
     } catch (error) {
       console.error('Error adding support:', error);
     }
   };
 
+  /**
+   * Handles comment submission
+   * Requires user authentication
+   * 
+   * @param commentContent - Text content of the comment
+   */
+  const handleSubmitComment = async (commentContent: string) => {
+    if (!user) {
+      setLoginPurpose('comment');
+      setPendingComment(commentContent);
+      setIsLoginModalOpen(true);
+      return;
+    }
+
+    if (!analogy) return;
+
+    try {
+      const commentData = {
+        content: commentContent,
+        userName: user.username,
+        email: user.email
+      };
+
+      const response = await createComment(analogy.id, commentData);
+
+      if (isValidComment(response.data)) {
+        setComments(prevComments => [response.data, ...prevComments]);
+      }
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+    }
+  };
+
+  /**
+   * Handles user login process
+   * Completes pending support or comment action
+   * 
+   * @param username - User's username
+   * @param email - User's email
+   */
+  const handleLogin = (username: string, email: string) => {
+    login(username, email);
+    setIsLoginModalOpen(false);
+
+    if (loginPurpose === 'support') {
+      handleAddSupport();
+    } else if (loginPurpose === 'comment' && pendingComment) {
+      handleSubmitComment(pendingComment);
+      setPendingComment(null);
+    }
+  };
+
+  /**
+   * Loads more comments for pagination
+   */
   const loadMoreComments = () => {
     setPage(prevPage => prevPage + 1);
   };
 
+  /**
+   * Converts YouTube URL to embeddable iframe URL
+   * 
+   * @param url - YouTube video URL
+   * @returns Embeddable URL or null
+   */
   const getYoutubeEmbedUrl = (url: string) => {
     const videoId = url.split('v=')[1]?.split('&')[0];
     return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
   };
 
+  // Render loading state
   if (loading) {
     return (
       <div className="loading-container">
@@ -168,6 +276,7 @@ const AnalogiesDetail: React.FC = () => {
     );
   }
 
+  // Render error state
   if (error) {
     return (
       <div className="error-container">
@@ -177,6 +286,7 @@ const AnalogiesDetail: React.FC = () => {
     );
   }
 
+  // Render not found state
   if (!analogy) {
     return (
       <div className="error-container">
@@ -186,8 +296,15 @@ const AnalogiesDetail: React.FC = () => {
     );
   }
 
+  // Main render
   return (
     <MainLayout>
+      <LoginModal 
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLogin={handleLogin}
+      />
+
       <div className="analogy-detail-page">
         <button
           className="back-button"
@@ -271,62 +388,13 @@ const AnalogiesDetail: React.FC = () => {
               <span className="support-count">{supportCount} Supports</span>
             </div>
 
-            <div className="comments-section">
-              <h2>Comments</h2>
-
-              {error && (
-                <div className="error-message">
-                  {error}
-                  <button onClick={() => setError(null)}>Retry</button>
-                </div>
-              )}
-
-              {!error && (
-                <>
-                  <div className="comment-input">
-                    <textarea
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      placeholder="Write a comment..."
-                    />
-                    <button
-                      onClick={handleSubmitComment}
-                      disabled={!newComment.trim()}
-                    >
-                      <FontAwesomeIcon icon={faComment} /> Submit
-                    </button>
-                  </div>
-
-                  <div className="comments-list">
-                    {loading && page === 0 ? (
-                      <div>Loading comments...</div>
-                    ) : (
-                      comments.map(comment => (
-                        <div key={comment.id} className="comment">
-                          <p>{comment.content}</p>
-                          <div className="comment-metadata">
-                            <span className="comment-author">{comment.userName}</span>
-                            <span className="comment-date">
-                              {new Date(comment.createdAt).toLocaleString()}
-                            </span>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-
-                  {hasMore && (
-                    <button
-                      className="load-more-comments"
-                      onClick={loadMoreComments}
-                      disabled={loading}
-                    >
-                      {loading ? 'Loading...' : 'Load More Comments'}
-                    </button>
-                  )}
-                </>
-              )}
-            </div>
+            <CommentSection 
+              comments={comments}
+              loading={loading}
+              hasMore={hasMore}
+              onSubmitComment={handleSubmitComment}
+              onLoadMoreComments={loadMoreComments}
+            />
           </div>
         </div>
       </div>

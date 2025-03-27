@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 /**
  * REST Controller for managing analogy publications.
@@ -183,5 +184,47 @@ public class AnalogyController {
             @RequestParam String email) {
         log.info("REST request to verify email: {}", email);
         return ResponseEntity.ok(analogyService.isEmailVerified(email));
+    }
+
+    /**
+     * Gets the support count for a specific analogy
+     * 
+     * @param analogyId ID of the analogy
+     * @return Number of supports for the analogy
+     */
+    @GetMapping("/{id}/support-count")
+    public ResponseEntity<Integer> getSupportCount(
+            @PathVariable("id") Long analogyId) {
+        log.info("REST request to get support count for Analogy: {}", analogyId);
+        return ResponseEntity.ok(analogyService.getSupportCount(analogyId));
+    }
+
+    /**
+     * Gets the support emails for a specific analogy
+     * 
+     * @param analogyId ID of the analogy
+     * @return Set of support emails
+     */
+    @GetMapping("/{id}/support-emails")
+    public ResponseEntity<Set<String>> getSupportEmails(
+            @PathVariable("id") Long analogyId) {
+        log.info("REST request to get support emails for Analogy: {}", analogyId);
+        return ResponseEntity.ok(analogyService.getSupportEmails(analogyId));
+    }
+
+    /**
+     * Checks if a specific email has supported an analogy
+     * 
+     * @param analogyId ID of the analogy
+     * @param email Email to check
+     * @return Boolean indicating if the email has supported the analogy
+     */
+    @GetMapping("/{id}/has-supported")
+    public ResponseEntity<Boolean> hasEmailSupported(
+            @PathVariable("id") Long analogyId,
+            @RequestParam String email) {
+        log.info("REST request to check if email {} has supported Analogy: {}", email, analogyId);
+        Set<String> supportEmails = analogyService.getSupportEmails(analogyId);
+        return ResponseEntity.ok(supportEmails.contains(email));
     }
 }

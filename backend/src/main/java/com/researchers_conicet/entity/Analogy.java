@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Entity representing an analogy publication.
  * This class maps to the 'analogies' table in the database and contains
- * all information about an analogy box, including its relationships and support count.
+ * all information about an analogy box, including its relationships.
  */
 @Entity
 @Data
@@ -49,13 +49,6 @@ public class Analogy {
      */
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-
-    /**
-     * Number of supports (likes) for this analogy.
-     * Defaults to 0 if no supports are given.
-     */
-    @Column(name = "support_count", nullable = false)
-    private Integer supportCount = 0;
 
     /**
      * Collection of author names for this analogy.
@@ -101,5 +94,23 @@ public class Analogy {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+    }
+
+    /**
+     * Adds a support email to the analogy.
+     * @param email The email to add to supports
+     * @return true if the email was added, false if it was already present
+     */
+    public boolean addSupportEmail(String email) {
+        return supportEmails.add(email);
+    }
+
+    /**
+     * Removes a support email from the analogy.
+     * @param email The email to remove from supports
+     * @return true if the email was removed, false if it was not present
+     */
+    public boolean removeSupportEmail(String email) {
+        return supportEmails.remove(email);
     }
 }
