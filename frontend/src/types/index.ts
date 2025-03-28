@@ -1,26 +1,38 @@
-// Base interfaces and types
-
-// Pagination Parameters Interface
+/**
+ * Pagination parameters for API requests
+ * @interface PaginationParams
+ */
 export interface PaginationParams {
   page: number;
   limit: number;
   total: number;
 }
 
-// Base API Response Interface
+/**
+ * Base API response structure
+ * @interface BaseApiResponse
+ */
 export interface BaseApiResponse {
   success: boolean;
   message?: string;
 }
 
-// Flexible API Response Interface
+/**
+ * Generic API response with typed data
+ * @interface ApiResponse
+ * @template T - Type of response data
+ */
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
   message?: string;
 }
 
-// Paginated Response Interface
+/**
+ * Paginated response interface supporting multiple data structures
+ * @interface PaginatedResponse
+ * @template T - Type of response data
+ */
 export interface PaginatedResponse<T> {
   success?: boolean;
   data?: T | T[] | { content?: T[] };
@@ -29,7 +41,11 @@ export interface PaginatedResponse<T> {
   pagination?: PaginationParams;
 }
 
-// Flexible Paginated Response Interface
+/**
+ * Flexible paginated response with strict typing
+ * @interface FlexiblePaginatedResponse
+ * @template T - Type of response data
+ */
 export interface FlexiblePaginatedResponse<T> {
   success: boolean;
   data: T | T[];
@@ -38,29 +54,39 @@ export interface FlexiblePaginatedResponse<T> {
   pagination: PaginationParams;
 }
 
-// Loading State Interface
+/**
+ * Loading state management interface
+ * @interface LoadingState
+ */
 export interface LoadingState {
   isLoading: boolean;
   error: string | null;
 }
 
-// Search Filters Interfaces
+/**
+ * Base search filters for API queries
+ * @interface BaseSearchFilters
+ */
 export interface BaseSearchFilters {
   searchTerm?: string;
   startDate?: string;
   endDate?: string;
 }
 
-// Research-related Interfaces and Enums
-
-// Research Status Enum
+/**
+ * Research status enumeration
+ * @enum ResearchStatus
+ */
 export enum ResearchStatus {
   DRAFT = 'draft',
   PUBLISHED = 'published',
   ARCHIVED = 'archived'
 }
 
-// Main Research Interface
+/**
+ * Research entity interface
+ * @interface Research
+ */
 export interface Research {
   id: number;
   researchAbstract: string;
@@ -73,19 +99,28 @@ export interface Research {
   links: string[];
 }
 
-// Research DTO
+/**
+ * Data Transfer Object for creating/updating research
+ * @interface ResearchDTO
+ */
 export interface ResearchDTO {
   researchAbstract: string;
   authors: string[];
   links: string[];
 }
 
-// Research Filters Interface
+/**
+ * Research-specific search filters
+ * @interface ResearchFilters
+ */
 export interface ResearchFilters extends BaseSearchFilters {
   author?: string;
 }
 
-// Research Metadata Interface
+/**
+ * Research metadata interface
+ * @interface ResearchMetadata
+ */
 export interface ResearchMetadata {
   keywords: string[];
   category: string;
@@ -93,7 +128,10 @@ export interface ResearchMetadata {
   lastModified: string;
 }
 
-// PDF File Interface
+/**
+ * PDF file representation
+ * @interface PdfFile
+ */
 export interface PdfFile {
   file: File;
   name: string;
@@ -101,16 +139,20 @@ export interface PdfFile {
   type: string;
 }
 
-// Section Interface (for navigation or rendering)
+/**
+ * Section interface for navigation or rendering
+ * @interface Section
+ */
 export interface Section {
   id: string;
   title: string;
   ref: React.RefObject<HTMLElement | HTMLDivElement>;
 }
 
-// Analogy-related Interfaces
-
-// Main Analogy Interface
+/**
+ * Analogy entity interface
+ * @interface Analogy
+ */
 export interface Analogy {
   id: number;
   title: string;
@@ -120,7 +162,10 @@ export interface Analogy {
   links: string[];
 }
 
-// Analogy DTO
+/**
+ * Data Transfer Object for creating/updating analogy
+ * @interface AnalogyDTO
+ */
 export interface AnalogyDTO {
   title: string;
   content?: string;
@@ -128,13 +173,18 @@ export interface AnalogyDTO {
   links: string[];
 }
 
-// Analogy Filters Interface
+/**
+ * Analogy-specific search filters
+ * @interface AnalogyFilters
+ */
 export interface AnalogyFilters extends BaseSearchFilters {
   author?: string;
 }
 
-// En tu archivo de tipos
-
+/**
+ * Comment entity interface
+ * @interface Comment
+ */
 export interface Comment {
   id: number;
   content: string;
@@ -142,46 +192,76 @@ export interface Comment {
   email: string;
   createdAt: string;
   analogyId: number;
-  parentId?: number; 
+  parentId?: number;
+  replies?: Comment[]; // Added for nested comments support
+  childrenCount?: number; // Optional count of child comments
 }
 
+/**
+ * Data Transfer Object for creating a comment
+ * @interface CommentRequestDTO
+ */
 export interface CommentRequestDTO {
   content: string;
   userName: string;
   email: string;
   analogyId: number;
-  parentId?: number; 
+  parentId?: number;
 }
 
+/**
+ * Response Data Transfer Object for comments
+ * @interface CommentResponseDTO
+ */
 export interface CommentResponseDTO extends Comment {
-  children?: Comment[]; 
+  children?: Comment[];
   childrenCount?: number;
 }
-// Utility Types
 
-// Nullable type
+/**
+ * Utility type for nullable values
+ * @type Nullable
+ */
 export type Nullable<T> = T | null | undefined;
 
-// Partial type for flexible updates
+/**
+ * Utility type for partial updates
+ * @type PartialBy
+ */
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
-// Error Interface
+/**
+ * API error representation
+ * @interface ApiError
+ */
 export interface ApiError {
   message: string;
   code?: number;
   details?: Record<string, unknown>;
 }
 
-// Utility Class for Response Handling
+/**
+ * Utility class for handling API responses
+ * @class ApiResponseHandler
+ * @template T - Type of response data
+ */
 export class ApiResponseHandler<T> {
   private response: PaginatedResponse<T>;
 
+  /**
+   * Constructor
+   * @param response - Paginated API response
+   */
   constructor(response: PaginatedResponse<T>) {
     this.response = response;
   }
 
+  /**
+   * Extract data from response with robust handling
+   * @returns Array of data items
+   */
   getData(): T[] {
-    // Robust data extraction
+    // Robust data extraction logic
     if (Array.isArray(this.response.data)) {
       return this.response.data;
     }
@@ -198,13 +278,19 @@ export class ApiResponseHandler<T> {
     return [];
   }
 
+  /**
+   * Check if the response was successful
+   * @returns Boolean indicating success status
+   */
   isSuccessful(): boolean {
-    // Ensure a boolean is always returned
     return this.response.success ?? true;
   }
 
+  /**
+   * Get pagination information
+   * @returns Pagination parameters
+   */
   getPagination(): PaginationParams {
-    // Provide a default pagination if not present
     return this.response.pagination ?? {
       page: 0,
       limit: 10,
@@ -212,8 +298,11 @@ export class ApiResponseHandler<T> {
     };
   }
 
+  /**
+   * Get error message if response was not successful
+   * @returns Error message or null
+   */
   getErrorMessage(): Nullable<string> {
-    // Only return message if not successful
     return this.isSuccessful() ? null : this.response.message ?? 'Unknown error occurred';
   }
 }
