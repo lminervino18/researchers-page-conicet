@@ -1,5 +1,92 @@
+/**
+ * Pagination parameters for API requests
+ * @interface PaginationParams
+ */
+export interface PaginationParams {
+  page: number;
+  limit: number;
+  total: number;
+}
 
-// Interfaz principal para los datos de investigación
+/**
+ * Base API response structure
+ * @interface BaseApiResponse
+ */
+export interface BaseApiResponse {
+  success: boolean;
+  message?: string;
+}
+
+/**
+ * Generic API response with typed data
+ * @interface ApiResponse
+ * @template T - Type of response data
+ */
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+}
+
+/**
+ * Paginated response interface supporting multiple data structures
+ * @interface PaginatedResponse
+ * @template T - Type of response data
+ */
+export interface PaginatedResponse<T> {
+  success?: boolean;
+  data?: T | T[] | { content?: T[] };
+  content?: T[];
+  message?: string;
+  pagination?: PaginationParams;
+}
+
+/**
+ * Flexible paginated response with strict typing
+ * @interface FlexiblePaginatedResponse
+ * @template T - Type of response data
+ */
+export interface FlexiblePaginatedResponse<T> {
+  success: boolean;
+  data: T | T[];
+  content?: T[];
+  message?: string;
+  pagination: PaginationParams;
+}
+
+/**
+ * Loading state management interface
+ * @interface LoadingState
+ */
+export interface LoadingState {
+  isLoading: boolean;
+  error: string | null;
+}
+
+/**
+ * Base search filters for API queries
+ * @interface BaseSearchFilters
+ */
+export interface BaseSearchFilters {
+  searchTerm?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+/**
+ * Research status enumeration
+ * @enum ResearchStatus
+ */
+export enum ResearchStatus {
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  ARCHIVED = 'archived'
+}
+
+/**
+ * Research entity interface
+ * @interface Research
+ */
 export interface Research {
   id: number;
   researchAbstract: string;
@@ -12,68 +99,28 @@ export interface Research {
   links: string[];
 }
 
-export interface Section {
-  id: string;
-  title: string;
-  ref: React.RefObject<HTMLElement | HTMLDivElement>;
-}
-
-// DTO para crear/actualizar una investigación
+/**
+ * Data Transfer Object for creating/updating research
+ * @interface ResearchDTO
+ */
 export interface ResearchDTO {
   researchAbstract: string;
   authors: string[];
   links: string[];
 }
 
-// Interfaz para la respuesta de la API
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message?: string;
-}
-
-// Interfaz para el estado de carga
-export interface LoadingState {
-  isLoading: boolean;
-  error: string | null;
-}
-
-// Interfaz para los filtros de búsqueda
-export interface ResearchFilters {
-  searchTerm?: string;
-  startDate?: string;
-  endDate?: string;
+/**
+ * Research-specific search filters
+ * @interface ResearchFilters
+ */
+export interface ResearchFilters extends BaseSearchFilters {
   author?: string;
 }
 
-// Interfaz para la paginación
-export interface PaginationParams {
-  page: number;
-  limit: number;
-  total: number;
-}
-
-// Interfaz para la respuesta paginada
-export interface PaginatedResponse<T> extends ApiResponse<T> {
-  pagination: PaginationParams;
-}
-
-// Interfaz para el archivo PDF
-export interface PdfFile {
-  file: File;
-  name: string;
-  size: number;
-  type: string;
-}
-
-// Enums para estados de la investigación
-export enum ResearchStatus {
-  DRAFT = 'draft',
-  PUBLISHED = 'published',
-  ARCHIVED = 'archived'
-}
-
-// Interfaz para los metadatos de la investigación
+/**
+ * Research metadata interface
+ * @interface ResearchMetadata
+ */
 export interface ResearchMetadata {
   keywords: string[];
   category: string;
@@ -81,54 +128,181 @@ export interface ResearchMetadata {
   lastModified: string;
 }
 
+/**
+ * PDF file representation
+ * @interface PdfFile
+ */
+export interface PdfFile {
+  file: File;
+  name: string;
+  size: number;
+  type: string;
+}
 
-// Main interface for analogy data
+/**
+ * Section interface for navigation or rendering
+ * @interface Section
+ */
+export interface Section {
+  id: string;
+  title: string;
+  ref: React.RefObject<HTMLElement | HTMLDivElement>;
+}
+
+/**
+ * Analogy entity interface
+ * @interface Analogy
+ */
 export interface Analogy {
-  id: number; // Unique identifier for the analogy
-  title: string; // Title of the analogy
-  content?: string; // Optional content or description of the analogy
-  createdAt: string; // Timestamp of when the analogy was created
-  authors: string[]; // List of authors associated with the analogy
-  links: string[]; // List of related links for the analogy
+  id: number;
+  title: string;
+  content?: string;
+  createdAt: string;
+  authors: string[];
+  links: string[];
 }
 
-// DTO for creating/updating an analogy
+/**
+ * Data Transfer Object for creating/updating analogy
+ * @interface AnalogyDTO
+ */
 export interface AnalogyDTO {
-  title: string; // Title of the analogy (required)
-  content?: string; // Optional content or description
-  authors: string[]; // List of authors
-  links: string[]; // List of related links
+  title: string;
+  content?: string;
+  authors: string[];
+  links: string[];
 }
 
-// Generic interface for API responses
-export interface ApiResponse<T> {
-  success: boolean; // Indicates if the API request was successful
-  data: T; // The data returned from the API
-  message?: string; // Optional message from the API
+/**
+ * Analogy-specific search filters
+ * @interface AnalogyFilters
+ */
+export interface AnalogyFilters extends BaseSearchFilters {
+  author?: string;
 }
 
-// Interface for loading state
-export interface LoadingState {
-  isLoading: boolean; // Indicates if a request is currently loading
-  error: string | null; // Error message if the request failed
+/**
+ * Comment entity interface
+ * @interface Comment
+ */
+export interface Comment {
+  id: number;
+  content: string;
+  userName: string;
+  email: string;
+  createdAt: string;
+  analogyId: number;
+  parentId?: number;
+  replies?: Comment[]; // Added for nested comments support
+  childrenCount?: number; // Optional count of child comments
 }
 
-// Interface for analogy search filters
-export interface AnalogyFilters {
-  searchTerm?: string; // Optional search term for filtering analogies
-  startDate?: string; // Optional start date for filtering
-  endDate?: string; // Optional end date for filtering
-  author?: string; // Optional author name for filtering
+/**
+ * Data Transfer Object for creating a comment
+ * @interface CommentRequestDTO
+ */
+export interface CommentRequestDTO {
+  content: string;
+  userName: string;
+  email: string;
+  analogyId: number;
+  parentId?: number;
 }
 
-// Interface for pagination parameters
-export interface PaginationParams {
-  page: number; // Current page number
-  limit: number; // Number of items per page
-  total: number; // Total number of items available
+/**
+ * Response Data Transfer Object for comments
+ * @interface CommentResponseDTO
+ */
+export interface CommentResponseDTO extends Comment {
+  children?: Comment[];
+  childrenCount?: number;
 }
 
-// Interface for paginated API responses
-export interface PaginatedResponse<T> extends ApiResponse<T> {
-  pagination: PaginationParams; // Pagination details
+/**
+ * Utility type for nullable values
+ * @type Nullable
+ */
+export type Nullable<T> = T | null | undefined;
+
+/**
+ * Utility type for partial updates
+ * @type PartialBy
+ */
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+/**
+ * API error representation
+ * @interface ApiError
+ */
+export interface ApiError {
+  message: string;
+  code?: number;
+  details?: Record<string, unknown>;
+}
+
+/**
+ * Utility class for handling API responses
+ * @class ApiResponseHandler
+ * @template T - Type of response data
+ */
+export class ApiResponseHandler<T> {
+  private response: PaginatedResponse<T>;
+
+  /**
+   * Constructor
+   * @param response - Paginated API response
+   */
+  constructor(response: PaginatedResponse<T>) {
+    this.response = response;
+  }
+
+  /**
+   * Extract data from response with robust handling
+   * @returns Array of data items
+   */
+  getData(): T[] {
+    // Robust data extraction logic
+    if (Array.isArray(this.response.data)) {
+      return this.response.data;
+    }
+
+    if (this.response.content && Array.isArray(this.response.content)) {
+      return this.response.content;
+    }
+
+    if (this.response.data && typeof this.response.data === 'object' && 'content' in this.response.data) {
+      const contentData = (this.response.data as { content?: T[] }).content;
+      return contentData || [];
+    }
+
+    return [];
+  }
+
+  /**
+   * Check if the response was successful
+   * @returns Boolean indicating success status
+   */
+  isSuccessful(): boolean {
+    return this.response.success ?? true;
+  }
+
+  /**
+   * Get pagination information
+   * @returns Pagination parameters
+   */
+  getPagination(): PaginationParams {
+    return this.response.pagination ?? {
+      page: 0,
+      limit: 10,
+      total: 0
+    };
+  }
+
+  /**
+   * Get error message if response was not successful
+   * @returns Error message or null
+   */
+  getErrorMessage(): Nullable<string> {
+    return this.isSuccessful() ? null : this.response.message ?? 'Unknown error occurred';
+  }
 }

@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import MainLayout from '../../layouts/MainLayout';
 import MemberGrid from '../../components/members/MemberGrid';
-import { authors } from '../../api/authors';
+import { authors } from '../../api/Authors';
 import './styles/Members.css';
 
 const Members: FC = () => {

@@ -1,27 +1,130 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Analogy } from '../../types';
-import { authors as authorsList } from '../../api/authors';
+import { authors as authorsList } from '../../api/Authors';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLink, faComment, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
+import { faLink, faComment } from '@fortawesome/free-solid-svg-icons';
 import { faYoutube, faFacebook, faTiktok } from '@fortawesome/free-brands-svg-icons';
+import SupportAnalogyButton from '../analogies/SupportAnalogyButton';
+import LoginModal from './LoginModal';
+import { useAuth } from '../../hooks/useAuth';
 import './styles/AnalogiesList.css';
 
+/**
+ * Props interface for AnalogiesList component
+ */
 interface AnalogiesListProps {
   analogies: Analogy[];
 }
 
-const AnalogiesList: FC<AnalogiesListProps> = ({ analogies }) => {
+/**
+ * Truncates text to a specified maximum length
+ * @param text - Text to truncate
+ * @param maxLength - Maximum length of text
+ * @returns Truncated text
+ */
+const truncateText = (text: string, maxLength: number = 200) => {
+  if (!text) return '';
+  return text.length <= maxLength 
+    ? text 
+    : text.substring(0, maxLength) + '...';
+};
 
+/**
+ * Component to display a list of analogies
+ */
+const AnalogiesList: FC<AnalogiesListProps> = ({ analogies }) => {
+  const navigate = useNavigate();
+  const { user, login } = useAuth();
+
+  // State for login modal
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  /**
+   * Retrieves author data based on name
+   * @param authorName - Full name of the author
+   * @returns Author data or undefined
+   */
   const getAuthorData = (authorName: string) => {
     return authorsList.find(
       author => `${author.firstName} ${author.lastName}` === authorName
     );
   };
 
+  /**
+   * Navigates to the detailed view of an analogy
+   * @param analogyId - ID of the analogy to view
+   */
+  const handleAnalogyClick = (analogyId: number) => {
+    navigate(`/analogies/${analogyId}`);
+  };
+
+  /**
+   * Returns an icon based on the link type
+   * @param link - URL to determine icon
+   * @returns FontAwesome icon
+   */
+  const getLinkIcon = (link: string) => {
+    if (link.includes('youtube')) return <FontAwesomeIcon icon={faYoutube} />;
+    if (link.includes('facebook')) return <FontAwesomeIcon icon={faFacebook} />;
+    if (link.includes('tiktok')) return <FontAwesomeIcon icon={faTiktok} />;
+    return <FontAwesomeIcon icon={faLink} />;
+  };
+
+  /**
+   * Generates a preview image for YouTube links
+   * @param link - YouTube URL
+   * @returns Iframe or default image
+   */
+  const getPreviewImage = (link: string) => {
+    const youtubeId = getYoutubeId(link);
+    return youtubeId ? (
+      <iframe
+        src={`https://www.youtube.com/embed/${youtubeId}`}
+        title="YouTube video"
+        allowFullScreen
+      />
+    ) : (
+      <img src="/default-image.png" alt="Default preview" />
+    );
+  };
+
+  /**
+   * Extracts YouTube video ID from URL
+   * @param url - YouTube URL
+   * @returns YouTube video ID or null
+   */
+  const getYoutubeId = (url: string) => {
+    const regExp = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return match && match[1].length === 11 ? match[1] : null;
+  };
+
+  /**
+   * Handles login process
+   * @param username - User's username
+   * @param email - User's email
+   */
+  const handleLogin = (username: string, email: string) => {
+    login(username, email);
+    setIsLoginModalOpen(false);
+  };
+
   return (
     <div className="analogies-list">
+      <LoginModal 
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLogin={handleLogin}
+      />
+
       {analogies.map(analogy => (
-        <div key={analogy.id} className="analogy-card">
+        <div 
+          key={analogy.id} 
+          className="analogy-card"
+          onClick={() => handleAnalogyClick(analogy.id)}
+          style={{ cursor: 'pointer' }}
+        >
           <div className="analogy-header">
             <div className="analogy-author">
               {analogy.authors.map(authorName => {
@@ -38,7 +141,7 @@ const AnalogiesList: FC<AnalogiesListProps> = ({ analogies }) => {
                 );
               })}
             </div>
-            <h2 className="analogy-title">{analogy.title}</h2>
+            <h2 className="analogy-preview-title">{analogy.title}</h2>
             <p className="analogy-date">
               {new Date(analogy.createdAt).toLocaleDateString('en-US', {
                 day: 'numeric',
@@ -47,10 +150,18 @@ const AnalogiesList: FC<AnalogiesListProps> = ({ analogies }) => {
               })}
             </p>
           </div>
-          <p className="analogy-description">{analogy.content}</p>
+          <p className="analogy-description">
+            {truncateText(analogy.content || '')}
+          </p>
           <div className="links">
             {analogy.links.map((link, index) => (
-              <a key={index} href={link} target="_blank" rel="noopener noreferrer">
+              <a 
+                key={index} 
+                href={link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
                 {getLinkIcon(link)}
               </a>
             ))}
@@ -64,44 +175,31 @@ const AnalogiesList: FC<AnalogiesListProps> = ({ analogies }) => {
               )
             ))}
           </div>
-          <div className="interaction-buttons">
-            <button className="comment-btn">
+          <div 
+            className="interaction-buttons"
+            onClick={(e) => e.stopPropagation()} // Añadido para detener propagación en toda la sección
+          >
+            <button 
+              className="comment-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                // Implement comment logic if needed
+              }}
+            >
               <FontAwesomeIcon icon={faComment} /> Comment
             </button>
-            <button className="support-btn">
-              <FontAwesomeIcon icon={faThumbsUp} /> Support
-            </button>
+            <SupportAnalogyButton 
+              analogyId={analogy.id}
+              userEmail={user?.email}
+              onLoginRequired={() => {
+                setIsLoginModalOpen(true);
+              }}
+            />
           </div>
         </div>
       ))}
     </div>
   );
-};
-
-const getLinkIcon = (link: string) => {
-  if (link.includes('youtube')) return <FontAwesomeIcon icon={faYoutube} />;
-  if (link.includes('facebook')) return <FontAwesomeIcon icon={faFacebook} />;
-  if (link.includes('tiktok')) return <FontAwesomeIcon icon={faTiktok} />;
-  return <FontAwesomeIcon icon={faLink} />;
-};
-
-const getPreviewImage = (link: string) => {
-  const youtubeId = getYoutubeId(link);
-  return youtubeId ? (
-    <iframe
-      src={`https://www.youtube.com/embed/${youtubeId}`}
-      title="YouTube video"
-      allowFullScreen
-    />
-  ) : (
-    <img src="/default-image.png" alt="Default preview" />
-  );
-};
-
-const getYoutubeId = (url: string) => {
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-  const match = url.match(regExp);
-  return match && match[2].length === 11 ? match[2] : null;
 };
 
 export default AnalogiesList;

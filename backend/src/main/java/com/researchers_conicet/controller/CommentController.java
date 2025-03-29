@@ -126,6 +126,17 @@ public class CommentController {
     }
 
     /**
+     * Searches comments by email
+     */
+    @GetMapping(value = "/{analogyId}/comments/search", params = "email")
+    public ResponseEntity<List<CommentResponseDTO>> searchByEmail(
+            @PathVariable Long analogyId,
+            @RequestParam String email) {
+        log.info("REST request to search Comments by email: {}", email);
+        return ResponseEntity.ok(commentService.searchByEmail(email, analogyId));
+    }
+
+    /**
      * Searches comments which content contains a specific keyword
      */
     @GetMapping(value = "/{analogyId}/comments/search", params = "term")
@@ -135,4 +146,48 @@ public class CommentController {
         log.info("REST request to search Comments everywhere: {}", term);
         return ResponseEntity.ok(commentService.searchEverywhere(term, analogyId));
     }
+
+    /**
+     * Verifies if an email is authorized to comment
+     * 
+     * @param email Email to verify
+     * @return True if the email is authorized, false otherwise
+     */
+    @GetMapping("/{analogyId}/comments/verify-email")
+    public ResponseEntity<Boolean> verifyEmailAuthorization(
+            @RequestParam String email) {
+        log.info("REST request to verify email authorization: {}", email);
+        return ResponseEntity.ok(commentService.isEmailAuthorizedToComment(email));
+    }
+
+    /**
+     * Retrieves comments for a specific analogy with pagination and sorting
+     * 
+     * @param analogyId ID of the analogy
+     * @param page Page number (0-based)
+     * @param size Items per page
+     * @param sort Sort field
+     * @param direction Sort direction (ASC/DESC)
+     * @return Paginated list of comments for the analogy
+     */
+    @GetMapping("/{analogyId}/comments")
+    public ResponseEntity<Page<CommentResponseDTO>> getCommentsByAnalogy(
+            @PathVariable Long analogyId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sort,
+            @RequestParam(defaultValue = "DESC") String direction) {
+        
+        log.info("REST request to get Comments for Analogy {}", analogyId);
+        
+        PageRequest pageRequest = PageRequest.of(
+            page,
+            size,
+            Sort.Direction.fromString(direction),
+            sort
+        );
+
+        return ResponseEntity.ok(commentService.getCommentsByAnalogy(analogyId, pageRequest));
+    }
+
 }

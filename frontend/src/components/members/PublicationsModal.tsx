@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { Research } from '../../types';
 import PublicationsList from '../publications/PublicationsList';
-import { searchByAuthor, viewPdf, downloadPdf } from '../../api/research';
+import { searchByAuthor, viewPdf, downloadPdf } from '../../api/Research';
 import './styles/PublicationsModal.css';
 
 interface PublicationsModalProps {

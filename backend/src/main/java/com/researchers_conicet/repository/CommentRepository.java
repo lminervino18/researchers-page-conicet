@@ -6,15 +6,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+
+
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Repository interface for Comment entity.
- * Extends JpaRepository to inherit basic CRUD operations.
- */
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
@@ -24,10 +23,18 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * @param id the ID of the comment
      * @param analogyId the ID of the analogy
      * @return the comment belonging to the specified ID and analogy ID
-	 * @throws IllegalArgumentException if {@literal id} is {@literal null}.
      */
     Optional<Comment> findByIdAndAnalogyId(Long id, Long analogyId);
     
+    /**
+     * Returns a paginated list of comments associated with a specific analogy.
+     *
+     * @param analogyId the ID of the analogy
+     * @param pageable  the pagination information
+     * @return a paginated list of comments belonging to the specified analogy
+     */
+    Page<Comment> findByAnalogyId(Long analogyId, Pageable pageable);
+
     /**
      * Returns all comments associated with a specific analogy.
      *
@@ -129,4 +136,56 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * @return a list of comments that are child comments of other comments
      */
     List<Comment> findByParentIdIsNotNull();
+
+    /**
+     * Checks if an email exists in the database
+     *
+     * @param email the email to verify
+     * @return true if the email exists, false otherwise
+     */
+    boolean existsByEmail(String email);
+
+    /**
+     * Finds comments by email
+     *
+     * @param email the user's email
+     * @return list of comments associated with the email
+     */
+    List<Comment> findByEmail(String email);
+
+    /**
+     * Finds comments by email in a specific analogy
+     *
+     * @param email the user's email
+     * @param analogyId the ID of the analogy
+     * @return list of user's comments in the analogy
+     */
+    List<Comment> findByEmailAndAnalogyId(String email, Long analogyId);
+
+    /**
+     * Counts the number of comments by email
+     *
+     * @param email the user's email
+     * @return number of comments made by the email
+     */
+    Long countByEmail(String email);
+
+    /**
+     * Searches for a comment by email and comment ID
+     *
+     * @param email the user's email
+     * @param commentId the ID of the comment
+     * @return Optional of the comment if it exists
+     */
+    Optional<Comment> findByEmailAndId(String email, Long commentId);
+
+    /**
+     * Custom query method to verify if an email can comment
+     * Can be customized based on specific requirements
+     *
+     * @param email the email to verify
+     * @return true if the email is authorized to comment, false otherwise
+     */
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM Comment c WHERE c.email = :email")
+    boolean isEmailAuthorizedToComment(@Param("email") String email);
 }
