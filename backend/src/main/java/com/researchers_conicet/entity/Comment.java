@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -53,19 +56,57 @@ public class Comment {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Analogy analogy;
 
+    /**
+     * Collection of emails that have supported this comment.
+     * Prevents multiple supports from the same email.
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "comment_supports",
+        joinColumns = @JoinColumn(name = "comment_id"),
+        uniqueConstraints = @UniqueConstraint(columnNames = {"comment_id", "email"})
+    )
+    @Column(name = "support_email")
+    private Set<String> supportEmails = new HashSet<>();
+    
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
 
-    public Comment(String content, String userName, String email, Comment parent, Analogy analogy) {
+    public Comment() {}
+
+    /**
+     * 
+     * @param content
+     * @param userName
+     * @param email
+     * @param parent
+     * @param analogy
+     */
+    public Comment(String userName, String content, String email, Optional<Comment> parent, Analogy analogy) {
         this.content = content;
         this.userName = userName;
         this.email = email;
-        this.parent = parent;
         this.analogy = analogy;
+        parent.ifPresent(this::setParent);
     }
 
-    // Default constructor
-    public Comment() {}
+    /**
+     * Adds a support email to the comment.
+     * @param email The email to add to supports
+     * @return true if the email was added, false if it was already present
+     */
+    public boolean addSupportEmail(String email) {
+        return supportEmails.add(email);
+    }
+
+    /**
+     * Removes a support email from the comment.
+     * @param email The email to remove from supports
+     * @return true if the email was removed, false if it was not present
+     */
+    public boolean removeSupportEmail(String email) {
+        return supportEmails.remove(email);
+    }
 }

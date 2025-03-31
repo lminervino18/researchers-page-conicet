@@ -15,10 +15,11 @@ import org.springframework.http.HttpHeaders;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 /**
  * REST Controller for managing comment publications.
- * Provides endpoints for CRUD operations, searches, and file handling.
+ * Provides endpoints for CRUD operations, searches, and fsupport management.
  */
 @Slf4j
 @RestController
@@ -62,7 +63,7 @@ public class CommentController {
     /**
      * Updates an existing comment publication
      */
-    @PutMapping(value = "{analogyId}/comments/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{analogyId}/comments/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommentResponseDTO> updateComment(
             @PathVariable Long id,
             @RequestBody @Valid CommentRequestDTO requestDTO) {
@@ -74,7 +75,7 @@ public class CommentController {
     /**
      * Retrieves an specific comment publication by ID
      */
-    @GetMapping("{analogyId}/comments/{id}")
+    @GetMapping("/{analogyId}/comments/{id}")
     public ResponseEntity<CommentResponseDTO> getComment(@PathVariable Long id) {
         log.info("REST request to get Comment : {}", id);
         return ResponseEntity.ok(commentService.getComment(id));
@@ -107,7 +108,7 @@ public class CommentController {
     /**
      * Deletes an comment publication
      */
-    @DeleteMapping("{analogyId}/comments/{id}")
+    @DeleteMapping("/{analogyId}/comments/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
         log.info("REST request to delete Comment : {}", id);
         commentService.deleteComment(id);
@@ -188,6 +189,91 @@ public class CommentController {
         );
 
         return ResponseEntity.ok(commentService.getCommentsByAnalogy(analogyId, pageRequest));
+    }
+
+    /**
+     * Adds support to a comment
+     * 
+     * @param commentId ID of the comment to support
+     * @param email Email of the user giving support
+     * @return Updated comment with support information
+     */
+    @PostMapping("/{analogyId}/comments/{id}/support")
+    public ResponseEntity<CommentResponseDTO> addSupport(
+            @PathVariable("id") Long commentId,
+            @RequestParam String email) {
+        log.info("REST request to add support to Comment: {}", commentId);
+        return ResponseEntity.ok(commentService.addSupport(commentId, email));
+    }
+
+    /**
+     * Removes support from a comment
+     * 
+     * @param commentId ID of the comment to remove support from
+     * @param email Email of the user removing support
+     * @return Updated comment with support information
+     */
+    @DeleteMapping("/{analogyId}/comments/{id}/support")
+    public ResponseEntity<CommentResponseDTO> removeSupport(
+            @PathVariable("id") Long commentId,
+            @RequestParam String email) {
+        log.info("REST request to remove support from Comment: {}", commentId);
+        return ResponseEntity.ok(commentService.removeSupport(commentId, email));
+    }
+
+    /**
+     * Checks if an email is verified
+     * 
+     * @param email Email to verify
+     * @return Boolean indicating if email is verified
+     */
+    @GetMapping("/comments/verify-email")
+    public ResponseEntity<Boolean> verifyEmail(
+            @RequestParam String email) {
+        log.info("REST request to verify email: {}", email);
+        return ResponseEntity.ok(commentService.isEmailVerified(email));
+    }
+
+    /**
+     * Gets the support count for a specific comment
+     * 
+     * @param commentId ID of the comment
+     * @return Number of supports for the comment
+     */
+    @GetMapping("/{analogyId}/comments/{id}/support-count")
+    public ResponseEntity<Integer> getSupportCount(
+            @PathVariable("id") Long commentId) {
+        log.info("REST request to get support count for Comment: {}", commentId);
+        return ResponseEntity.ok(commentService.getSupportCount(commentId));
+    }
+
+    /**
+     * Gets the support emails for a specific comment
+     * 
+     * @param commentId ID of the comment
+     * @return Set of support emails
+     */
+    @GetMapping("/{analogyId}/comments/{id}/support-emails")
+    public ResponseEntity<Set<String>> getSupportEmails(
+            @PathVariable("id") Long commentId) {
+        log.info("REST request to get support emails for Comment: {}", commentId);
+        return ResponseEntity.ok(commentService.getSupportEmails(commentId));
+    }
+
+    /**
+     * Checks if a specific email has supported a comment
+     * 
+     * @param commentId ID of the comment
+     * @param email Email to check
+     * @return Boolean indicating if the email has supported the comment
+     */
+    @GetMapping("/{analogyId}/comments/{id}/has-supported")
+    public ResponseEntity<Boolean> hasEmailSupported(
+            @PathVariable("id") Long commentId,
+            @RequestParam String email) {
+        log.info("REST request to check if email {} has supported Comment: {}", email, commentId);
+        Set<String> supportEmails = commentService.getSupportEmails(commentId);
+        return ResponseEntity.ok(supportEmails.contains(email));
     }
 
 }
