@@ -5,6 +5,7 @@ import { Comment } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 import { deleteComment } from '../../api/Comment';
 import { getColorForName, getInitials } from '../../utils/ColorUtils';
+import ConfirmationModal from './ConfirmationModal'; // Import the confirmation modal
 import './styles/CommentSection.css';
 
 /**
@@ -32,7 +33,6 @@ const buildCommentHierarchy = (comments: Comment[]): Comment[] => {
   
   // First pass: Create base comment objects with consistent structure
   comments.forEach(comment => {
-    // Only add if not already in map to prevent duplicates
     if (!commentMap.has(comment.id)) {
       commentMap.set(comment.id, {
         ...comment,
@@ -53,22 +53,18 @@ const buildCommentHierarchy = (comments: Comment[]): Comment[] => {
       const parentComment = commentMap.get(comment.parentId);
       
       if (parentComment && currentComment) {
-        // Ensure replies array exists and is initialized
         parentComment.replies = parentComment.replies || [];
         
-        // Prevent duplicate replies
         const isDuplicateReply = parentComment.replies.some(
           reply => reply.id === currentComment.id
         );
 
         if (!isDuplicateReply) {
           parentComment.replies.push(currentComment);
-          // Safely increment children count
           parentComment.childrenCount = (parentComment.childrenCount || 0) + 1;
         }
       }
     } else {
-      // Prevent duplicate root comments
       if (currentComment && !processedParentIds.has(currentComment.id)) {
         rootComments.push(currentComment);
         processedParentIds.add(currentComment.id);
@@ -83,18 +79,15 @@ const buildCommentHierarchy = (comments: Comment[]): Comment[] => {
 
   // Sort replies for each root comment (oldest first)
   rootComments.forEach(comment => {
-    // Ensure replies array exists
     comment.replies = comment.replies || [];
 
     if (comment.replies.length > 0) {
-      // Remove potential duplicates in replies
       comment.replies = Array.from(
         new Map(comment.replies.map(reply => [reply.id, reply])).values()
       ).sort((a, b) => 
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       );
       
-      // Update children count after deduplication
       comment.childrenCount = comment.replies.length;
     }
   });
@@ -125,6 +118,8 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
   const [mainComment, setMainComment] = useState('');
   const [replyComment, setReplyComment] = useState('');
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
 
   // Configuration constants
   const MAX_COMMENT_LENGTH = 250;
@@ -162,7 +157,6 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
    * @param parentId - ID of the parent comment
    */
   const handleSubmitReplyComment = useCallback(async (parentId: number) => {
-    
     const trimmedReply = replyComment.trim();
     if (!trimmedReply) return;
 
@@ -180,17 +174,30 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
    * 
    * @param commentId - ID of the comment to delete
    */
-  const handleDeleteComment = useCallback(async (commentId: number) => {
-    try {
-      if (onDeleteComment) {
-        await onDeleteComment(commentId);
-      } else {
-        await deleteComment(analogyId, commentId);
+  const handleDeleteComment = useCallback((commentId: number) => {
+    setCommentToDelete(commentId);
+    setIsModalOpen(true);
+  }, []);
+
+  /**
+   * Confirms the deletion of a comment
+   */
+  const confirmDeleteComment = useCallback(async () => {
+    if (commentToDelete !== null) {
+      try {
+        if (onDeleteComment) {
+          await onDeleteComment(commentToDelete);
+        } else {
+          await deleteComment(analogyId, commentToDelete);
+        }
+      } catch (error) {
+        // Silent error handling
+      } finally {
+        setIsModalOpen(false);
+        setCommentToDelete(null);
       }
-    } catch (error) {
-      // Silent error handling
     }
-  }, [analogyId, onDeleteComment]);
+  }, [commentToDelete, analogyId, onDeleteComment]);
 
   /**
    * Renders comment tree recursively
@@ -349,6 +356,13 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
           {loading ? 'Loading...' : 'Load More Comments'}
         </button>
       )}
+
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={confirmDeleteComment}
+        message="Are you sure you want to delete this comment?"
+      />
     </div>
   );
 });
