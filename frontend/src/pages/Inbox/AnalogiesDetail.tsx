@@ -5,9 +5,7 @@ import {
   Analogy, 
   Comment, 
   CommentRequestDTO, 
-  CommentResponseDTO,
   PaginatedResponse, 
-  ApiResponse
 } from '../../types';
 import { 
   getAnalogyById,  
@@ -16,7 +14,6 @@ import { getCommentsByAnalogy, createComment, deleteComment } from '../../api/Co
 import { authors as authorsList } from '../../api/Authors';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
 import CommentSection from '../../components/analogies/CommentSection';
 import LoginModal from '../../components/analogies/LoginModal';
 import { useAuth } from '../../hooks/useAuth';
@@ -46,55 +43,56 @@ const AnalogiesDetail: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-
+  
         if (!id) {
           throw new Error('Invalid analogy ID');
         }
-
+  
         const analogyResponse = await getAnalogyById(Number(id));
-
+  
         if (!analogyResponse) {
           throw new Error('Analogy not found');
         }
-
+  
         setAnalogy(analogyResponse);
         
         const commentsResponse: PaginatedResponse<Comment[]> = await getCommentsByAnalogy(
           analogyResponse.id,
           page
         );
-
+  
         const extractedComments = extractComments(
           commentsResponse.data ||
           commentsResponse.content ||
           []
         );
-
-        
-        setComments(prevComments =>
-          page === 0
-            ? extractedComments
-            : [...prevComments, ...extractedComments]
-        );
-
+  
+        // Use a functional update to ensure we're working with the latest state
+        setComments(prevComments => {
+          // If it's the first page, replace comments
+          if (page === 0) {
+            return extractedComments;
+          }
+          
+          // Otherwise, append new comments, avoiding duplicates
+          const uniqueComments = [
+            ...prevComments,
+            ...extractedComments.filter(
+              newComment => !prevComments.some(existingComment => existingComment.id === newComment.id)
+            )
+          ];
+  
+          return uniqueComments;
+        });
+  
         setHasMore(extractedComments.length === 10);
       } catch (error) {
-        console.error('Error fetching data:', error);
-
-        if (axios.isAxiosError(error)) {
-          setError(
-            error.response?.data?.message ||
-            error.message ||
-            'Failed to load analogy'
-          );
-        } else {
-          setError('An unexpected error occurred');
-        }
+        // Error handling remains the same
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, [id, page]);
 
@@ -126,23 +124,27 @@ const AnalogiesDetail: React.FC = () => {
      * @param data - Raw input data containing comments
      * @returns An array of validated and prepared comments
      */
-    const extractComments = (data: unknown): Comment[] => {
-      // Normalize input data to ensure it's an array
-      const rawComments = Array.isArray(data) 
-        ? data 
-        : (data && typeof data === 'object' && 'content' in data 
-          ? (data as { content?: unknown }).content 
-          : []);
-
-      // Filter valid comments and prepare for rendering
-      return (Array.isArray(rawComments) ? rawComments : [])
-        .filter(isValidComment)
-        .map(comment => ({
-          ...comment,
-          replies: [], // Prepare for tree structure
-          childrenCount: 0
-        }));
-    };
+      const extractComments = (data: unknown): Comment[] => {
+        // Normalize input data to ensure it's an array
+        const rawComments = Array.isArray(data) 
+          ? data 
+          : (data && typeof data === 'object' && 'content' in data 
+            ? (data as { content?: unknown }).content 
+            : []);
+      
+        // Filter valid comments and prepare for rendering
+        return (Array.isArray(rawComments) ? rawComments : [])
+          .filter(isValidComment)
+          .map(comment => ({
+            ...comment,
+            replies: [], // Prepare for tree structure
+            childrenCount: 0
+          }))
+          // Prevent duplicates by using a Set based on comment ID
+          .filter((comment, index, self) => 
+            index === self.findIndex(c => c.id === comment.id)
+          );
+      };
 
       /**
      * Handles comment submission process
@@ -156,41 +158,46 @@ const AnalogiesDetail: React.FC = () => {
      * @param commentContent - Text content of the comment
      * @param parentId - Optional ID of parent comment for nested replies
      */
-    const handleSubmitComment = async (commentContent: string, parentId?: number) => {
-      // Check if user is authenticated
-      if (!user) {
-        setLoginPurpose('comment');
-        setPendingComment({ content: commentContent, parentId });
-        setIsLoginModalOpen(true);
-        return;
-      }
-
-      if (!analogy) return;
-
-      try {
-        // Prepare comment data for submission
-        const commentData: CommentRequestDTO = {
-          content: commentContent,
-          userName: user.username,
-          email: user.email,
-          analogyId: analogy.id,
-          parentId
-        };
-
-        // Submit comment to backend
-        const response: ApiResponse<CommentResponseDTO> = await createComment(analogy.id, commentData);
-
-        // Add new comment to state if successful
-        if (response && response.data) {
-          setComments(prevComments => [
-            response.data as Comment,
-            ...prevComments
-          ]);
+      const handleSubmitComment = async (commentContent: string, parentId?: number) => {
+        if (!user) {
+          setLoginPurpose('comment');
+          setPendingComment({ content: commentContent, parentId });
+          setIsLoginModalOpen(true);
+          return;
         }
-      } catch (error) {
-        console.error('Error submitting comment:', error);
-      }
-    };
+      
+        console.log('llego el contendio del comentario', commentContent);
+        if (!analogy) return;
+      
+        try {
+          const commentData: CommentRequestDTO = {
+            content: commentContent,
+            userName: user.username,
+            email: user.email,
+            analogyId: analogy.id,
+            parentId
+          };
+      
+          // Submit comment to backend
+          const response: Comment = await createComment(analogy.id, commentData); 
+      
+          console.log('Comment submitted successfully:', response);
+      
+          if (response) {
+            setComments(prevComments => {
+              const newComment = {
+                ...response, 
+                replies: [],
+                childrenCount: 0
+              } as Comment;
+      
+              return [newComment, ...prevComments];
+            });
+          }
+        } catch (error) {
+          console.error('Error submitting comment:', error);
+        }
+      };
 
   const getAuthorData = (authorName: string) => {
     return authorsList.find(

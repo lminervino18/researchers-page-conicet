@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faTrash, faReply } from '@fortawesome/free-solid-svg-icons';
 import { Comment } from '../../types';
@@ -7,6 +7,10 @@ import { deleteComment } from '../../api/Comment';
 import { getColorForName, getInitials } from '../../utils/ColorUtils';
 import './styles/CommentSection.css';
 
+/**
+ * Props interface for CommentSection component
+ * Defines the structure and type of props passed to the component
+ */
 interface CommentSectionProps {
   comments: Comment[];
   loading: boolean;
@@ -17,7 +21,95 @@ interface CommentSectionProps {
   onDeleteComment?: (commentId: number) => Promise<void>;
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({
+/**
+ * Builds a hierarchical comment structure from a flat list of comments
+ * 
+ * @param comments - Flat list of comments to be transformed
+ * @returns Hierarchically structured comments
+ */
+const buildCommentHierarchy = (comments: Comment[]): Comment[] => {
+  const commentMap = new Map<number, Comment>();
+  
+  // First pass: Create base comment objects with consistent structure
+  comments.forEach(comment => {
+    // Only add if not already in map to prevent duplicates
+    if (!commentMap.has(comment.id)) {
+      commentMap.set(comment.id, {
+        ...comment,
+        replies: [], // Always start with empty replies
+        childrenCount: 0 // Reset children count
+      });
+    }
+  });
+
+  const rootComments: Comment[] = [];
+  const processedParentIds = new Set<number>();
+
+  // Second pass: Build comment hierarchy
+  comments.forEach(comment => {
+    const currentComment = commentMap.get(comment.id);
+    
+    if (comment.parentId) {
+      const parentComment = commentMap.get(comment.parentId);
+      
+      if (parentComment && currentComment) {
+        // Ensure replies array exists and is initialized
+        parentComment.replies = parentComment.replies || [];
+        
+        // Prevent duplicate replies
+        const isDuplicateReply = parentComment.replies.some(
+          reply => reply.id === currentComment.id
+        );
+
+        if (!isDuplicateReply) {
+          parentComment.replies.push(currentComment);
+          // Safely increment children count
+          parentComment.childrenCount = (parentComment.childrenCount || 0) + 1;
+        }
+      }
+    } else {
+      // Prevent duplicate root comments
+      if (currentComment && !processedParentIds.has(currentComment.id)) {
+        rootComments.push(currentComment);
+        processedParentIds.add(currentComment.id);
+      }
+    }
+  });
+
+  // Sort root comments by creation date (most recent first)
+  rootComments.sort((a, b) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
+  // Sort replies for each root comment (oldest first)
+  rootComments.forEach(comment => {
+    // Ensure replies array exists
+    comment.replies = comment.replies || [];
+
+    if (comment.replies.length > 0) {
+      // Remove potential duplicates in replies
+      comment.replies = Array.from(
+        new Map(comment.replies.map(reply => [reply.id, reply])).values()
+      ).sort((a, b) => 
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      );
+      
+      // Update children count after deduplication
+      comment.childrenCount = comment.replies.length;
+    }
+  });
+
+  return rootComments;
+};
+
+/**
+ * CommentSection component
+ * Manages rendering, submission, and interaction with comments
+ * 
+ * @param props - Component properties for comments section
+ * @returns Fully rendered comments section with interaction capabilities
+ */
+const CommentSection: React.FC<CommentSectionProps> = React.memo(({
   comments,
   loading,
   hasMore,
@@ -26,99 +118,94 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   onLoadMoreComments,
   onDeleteComment
 }) => {
+  // Authentication and user context
   const { user } = useAuth();
+
+  // State management for comments and replies
   const [mainComment, setMainComment] = useState('');
   const [replyComment, setReplyComment] = useState('');
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
 
+  // Configuration constants
   const MAX_COMMENT_LENGTH = 250;
+
+  // Memoized processed comments to prevent unnecessary re-renders
+  const processedComments = useMemo(() => {
+    return buildCommentHierarchy(comments);
+  }, [comments]);
+
   /**
-   * Builds a hierarchical comment structure from a flat list of comments
-   * 
-   * This function performs the following steps:
-   * 1. Creates a map of comments for quick access
-   * 2. Processes comments to ensure consistent structure
-   * 3. Builds a hierarchical tree of comments
-   * 4. Sorts root comments and their replies
-   * 
-   * @param comments - Flat list of comments to be transformed
-   * @returns Hierarchically structured comments with root-level comments
+   * Handles submission of main comment
+   * Validates user authentication and comment content
    */
-  const buildCommentHierarchy = (comments: Comment[]): Comment[] => {
-    // Create a map to quickly access comments by ID
-    const commentMap = new Map<number, Comment>();
+  const handleSubmitMainComment = useCallback(async () => {
+    if (!user) {
+      alert('Please log in to comment');
+      return;
+    }
+
+    const trimmedComment = mainComment.trim();
+    if (!trimmedComment) return;
     
-    // First pass: Create base comment objects with consistent structure
-    comments.forEach(comment => {
-      commentMap.set(comment.id, {
-        ...comment,
-        // Ensure replies array exists
-        replies: comment.replies || [],
-        // Initialize or preserve children count
-        childrenCount: comment.childrenCount ?? 0
-      });
-    });
+    try {
+      await onSubmitComment(trimmedComment);
+      setMainComment('');
+    } catch (error) {
+      alert('Failed to submit comment');
+    }
+  }, [mainComment, user, onSubmitComment]);
 
-    // Container for root-level comments
-    const rootComments: Comment[] = [];
+  /**
+   * Handles submission of reply comment
+   * Validates user authentication and reply content
+   * 
+   * @param parentId - ID of the parent comment
+   */
+  const handleSubmitReplyComment = useCallback(async (parentId: number) => {
+    
+    const trimmedReply = replyComment.trim();
+    if (!trimmedReply) return;
 
-    // Second pass: Build comment hierarchy
-    comments.forEach(comment => {
-      if (comment.parentId) {
-        // Find parent and current comment in the map
-        const parentComment = commentMap.get(comment.parentId);
-        const processedComment = commentMap.get(comment.id);
-        
-        if (parentComment && processedComment) {
-          // Ensure parent has replies array
-          parentComment.replies = parentComment.replies || [];
-          
-          // Add current comment as a child
-          parentComment.replies.push(processedComment);
-          
-          // Increment children count safely
-          parentComment.childrenCount = (parentComment.childrenCount || 0) + 1;
-        }
+    try {
+      await onSubmitComment(trimmedReply, parentId);
+      setReplyComment('');
+      setReplyingTo(null);
+    } catch (error) {
+      alert('Failed to submit reply');
+    }
+  }, [replyComment, user, onSubmitComment]);
+
+  /**
+   * Handles comment deletion
+   * 
+   * @param commentId - ID of the comment to delete
+   */
+  const handleDeleteComment = useCallback(async (commentId: number) => {
+    try {
+      if (onDeleteComment) {
+        await onDeleteComment(commentId);
       } else {
-        // If no parent, it's a root-level comment
-        const processedComment = commentMap.get(comment.id);
-        if (processedComment) {
-          rootComments.push(processedComment);
-        }
+        await deleteComment(analogyId, commentId);
       }
-    });
-
-    // Sort root comments by creation date (most recent first)
-    rootComments.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-
-    // Sort replies for each root comment (oldest first)
-    rootComments.forEach(comment => {
-      if (comment.replies && comment.replies.length > 0) {
-        comment.replies.sort((a, b) => 
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
-      }
-    });
-
-    return rootComments;
-  };
+    } catch (error) {
+      // Silent error handling
+    }
+  }, [analogyId, onDeleteComment]);
 
   /**
    * Renders comment tree recursively
-   * @param comments - List of comments
+   * 
+   * @param comments - List of comments to render
    * @param parentId - Parent comment ID
    * @param depth - Current nesting depth
    * @returns Rendered comment tree
    */
-  const renderCommentTree = (comments: Comment[], parentId: number | null = null, depth: number = 0) => {
-    // If first call, build hierarchy
-    const processedComments = parentId === null 
-      ? buildCommentHierarchy(comments)
+  const renderCommentTree = useCallback((comments: Comment[], parentId: number | null = null, depth: number = 0) => {
+    const filteredComments = parentId === null 
+      ? processedComments 
       : comments.filter(comment => comment.parentId === parentId);
 
-    return processedComments.map(comment => (
+    return filteredComments.map(comment => (
       <div 
         key={comment.id} 
         className={`comment depth-${depth}`}
@@ -187,16 +274,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                 {replyComment.length}/{MAX_COMMENT_LENGTH}
               </span>
               <button
-                onClick={async () => {
-                  if (!user) {
-                    alert('Please log in to comment');
-                    return;
-                  }
-                  
-                  await onSubmitComment(replyComment, comment.id);
-                  setReplyComment('');
-                  setReplyingTo(null);
-                }}
+                onClick={() => handleSubmitReplyComment(comment.id)}
                 disabled={!replyComment.trim()}
               >
                 <FontAwesomeIcon icon={faComment} /> Submit
@@ -212,38 +290,14 @@ const CommentSection: React.FC<CommentSectionProps> = ({
         )}
       </div>
     ));
-  };
-
-  /**
-   * Handles comment deletion
-   * @param commentId - ID of the comment to delete
-   */
-  const handleDeleteComment = async (commentId: number) => {
-    try {
-      if (onDeleteComment) {
-        await onDeleteComment(commentId);
-      } else {
-        await deleteComment(analogyId, commentId);
-      }
-    } catch (error) {
-      // Silent error handling
-    }
-  };
-
-  /**
-   * Handles submission of main comment
-   */
-  const handleSubmitMainComment = async () => {
-    if (!user) {
-      alert('Please log in to comment');
-      return;
-    }
-
-    if (!mainComment.trim()) return;
-    
-    await onSubmitComment(mainComment);
-    setMainComment('');
-  };
+  }, [
+    processedComments, 
+    user, 
+    replyingTo, 
+    replyComment, 
+    handleDeleteComment, 
+    handleSubmitReplyComment
+  ]);
 
   return (
     <div className="comments-section">
@@ -297,6 +351,6 @@ const CommentSection: React.FC<CommentSectionProps> = ({
       )}
     </div>
   );
-};
+});
 
 export default CommentSection;
