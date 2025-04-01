@@ -98,6 +98,8 @@
 }
 
 .comments-list {
+  max-height: 500px; /* Set a fixed height */
+  overflow-y: auto;  /* Enable vertical scrolling */
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);

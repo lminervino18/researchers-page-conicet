@@ -55,7 +55,7 @@ const AnalogiesDetail: React.FC = () => {
         }
   
         setAnalogy(analogyResponse);
-        
+  
         const commentsResponse: PaginatedResponse<Comment[]> = await getCommentsByAnalogy(
           analogyResponse.id,
           page
@@ -67,27 +67,32 @@ const AnalogiesDetail: React.FC = () => {
           []
         );
   
-        // Use a functional update to ensure we're working with the latest state
         setComments(prevComments => {
-          // If it's the first page, replace comments
           if (page === 0) {
             return extractedComments;
           }
           
-          // Otherwise, append new comments, avoiding duplicates
           const uniqueComments = [
             ...prevComments,
             ...extractedComments.filter(
               newComment => !prevComments.some(existingComment => existingComment.id === newComment.id)
             )
           ];
+          if (page > 0) {
+            setTimeout(() => {
+              window.scrollTo({
+                top: document.documentElement.scrollHeight,
+              });
+            }, 100);
+          }
   
           return uniqueComments;
         });
   
         setHasMore(extractedComments.length === 10);
+  
       } catch (error) {
-        // Error handling remains the same
+        setError('An error occurred while fetching data');
       } finally {
         setLoading(false);
       }
@@ -113,91 +118,88 @@ const AnalogiesDetail: React.FC = () => {
     );
   };
 
-      /**
-     * Extracts and validates comments from raw input data
-     * 
-     * This function does the following:
-     * 1. Normalizes input data to ensure it's an array
-     * 2. Filters out invalid comments
-     * 3. Prepares comments for hierarchical rendering
-     * 
-     * @param data - Raw input data containing comments
-     * @returns An array of validated and prepared comments
-     */
-      const extractComments = (data: unknown): Comment[] => {
-        // Normalize input data to ensure it's an array
-        const rawComments = Array.isArray(data) 
-          ? data 
-          : (data && typeof data === 'object' && 'content' in data 
-            ? (data as { content?: unknown }).content 
-            : []);
-      
-        // Filter valid comments and prepare for rendering
-        return (Array.isArray(rawComments) ? rawComments : [])
-          .filter(isValidComment)
-          .map(comment => ({
-            ...comment,
-            replies: [], // Prepare for tree structure
-            childrenCount: 0
-          }))
-          // Prevent duplicates by using a Set based on comment ID
-          .filter((comment, index, self) => 
-            index === self.findIndex(c => c.id === comment.id)
-          );
+  /**
+   * Extracts and validates comments from raw input data
+   * 
+   * This function does the following:
+   * 1. Normalizes input data to ensure it's an array
+   * 2. Filters out invalid comments
+   * 3. Prepares comments for hierarchical rendering
+   * 
+   * @param data - Raw input data containing comments
+   * @returns An array of validated and prepared comments
+   */
+  const extractComments = (data: unknown): Comment[] => {
+    // Normalize input data to ensure it's an array
+    const rawComments = Array.isArray(data) 
+      ? data 
+      : (data && typeof data === 'object' && 'content' in data 
+        ? (data as { content?: unknown }).content 
+        : []);
+    
+    // Filter valid comments and prepare for rendering
+    return (Array.isArray(rawComments) ? rawComments : [])
+      .filter(isValidComment)
+      .map(comment => ({
+        ...comment,
+        replies: [], // Prepare for tree structure
+        childrenCount: 0
+      }))
+      // Prevent duplicates by using a Set based on comment ID
+      .filter((comment, index, self) => 
+        index === self.findIndex(c => c.id === comment.id)
+      );
+  };
+
+  /**
+   * Handles comment submission process
+   * 
+   * This function:
+   * 1. Checks user authentication
+   * 2. Prepares comment data
+   * 3. Sends comment to backend
+   * 4. Updates comments state
+   * 
+   * @param commentContent - Text content of the comment
+   * @param parentId - Optional ID of parent comment for nested replies
+   */
+  const handleSubmitComment = async (commentContent: string, parentId?: number) => {
+    if (!user) {
+      setLoginPurpose('comment');
+      setPendingComment({ content: commentContent, parentId });
+      setIsLoginModalOpen(true);
+      return;
+    }
+
+    if (!analogy) return;
+
+    try {
+      const commentData: CommentRequestDTO = {
+        content: commentContent,
+        userName: user.username,
+        email: user.email,
+        analogyId: analogy.id,
+        parentId
       };
 
-      /**
-     * Handles comment submission process
-     * 
-     * This function:
-     * 1. Checks user authentication
-     * 2. Prepares comment data
-     * 3. Sends comment to backend
-     * 4. Updates comments state
-     * 
-     * @param commentContent - Text content of the comment
-     * @param parentId - Optional ID of parent comment for nested replies
-     */
-      const handleSubmitComment = async (commentContent: string, parentId?: number) => {
-        if (!user) {
-          setLoginPurpose('comment');
-          setPendingComment({ content: commentContent, parentId });
-          setIsLoginModalOpen(true);
-          return;
-        }
-      
-        console.log('llego el contendio del comentario', commentContent);
-        if (!analogy) return;
-      
-        try {
-          const commentData: CommentRequestDTO = {
-            content: commentContent,
-            userName: user.username,
-            email: user.email,
-            analogyId: analogy.id,
-            parentId
-          };
-      
-          // Submit comment to backend
-          const response: Comment = await createComment(analogy.id, commentData); 
-      
-          console.log('Comment submitted successfully:', response);
-      
-          if (response) {
-            setComments(prevComments => {
-              const newComment = {
-                ...response, 
-                replies: [],
-                childrenCount: 0
-              } as Comment;
-      
-              return [newComment, ...prevComments];
-            });
-          }
-        } catch (error) {
-          console.error('Error submitting comment:', error);
-        }
-      };
+      // Submit comment to backend
+      const response: Comment = await createComment(analogy.id, commentData); 
+
+      if (response) {
+        setComments(prevComments => {
+          const newComment = {
+            ...response, 
+            replies: [],
+            childrenCount: 0
+          } as Comment;
+
+          return [newComment, ...prevComments];
+        });
+      }
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+    }
+  };
 
   const getAuthorData = (authorName: string) => {
     return authorsList.find(
@@ -205,7 +207,6 @@ const AnalogiesDetail: React.FC = () => {
     );
   };
 
-  
   const handleLogin = (username: string, email: string) => {
     login(username, email);
     setIsLoginModalOpen(false);
@@ -222,7 +223,7 @@ const AnalogiesDetail: React.FC = () => {
     setPage(prevPage => prevPage + 1);
   };
 
-    /**
+  /**
    * Handles comment deletion process
    * 
    * This function:

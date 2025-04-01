@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faTrash, faReply } from '@fortawesome/free-solid-svg-icons';
 import { Comment } from '../../types';
@@ -121,6 +121,10 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
 
+  // Ref to maintain scroll position
+  const commentsListRef = useRef<HTMLDivElement | null>(null);
+  const scrollPositionRef = useRef<number>(0);
+
   // Configuration constants
   const MAX_COMMENT_LENGTH = 250;
 
@@ -198,6 +202,25 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
       }
     }
   }, [commentToDelete, analogyId, onDeleteComment]);
+
+  /**
+   * Handles loading more comments while maintaining scroll position
+   */
+  const handleLoadMoreComments = useCallback(() => {
+    if (commentsListRef.current) {
+      scrollPositionRef.current = commentsListRef.current.scrollTop;
+    }
+    onLoadMoreComments();
+  }, [onLoadMoreComments]);
+
+  /**
+   * Effect to restore scroll position after comments update
+   */
+  useEffect(() => {
+    if (commentsListRef.current) {
+      commentsListRef.current.scrollTop = scrollPositionRef.current;
+    }
+  }, [comments]);
 
   /**
    * Renders comment tree recursively
@@ -337,7 +360,7 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
         </div>
       </div>
 
-      <div className="comments-list">
+      <div className="comments-list" ref={commentsListRef}>
         {loading && comments.length === 0 ? (
           <div>Loading comments...</div>
         ) : comments.length === 0 ? (
@@ -350,7 +373,7 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
       {hasMore && (
         <button
           className="load-more-comments"
-          onClick={onLoadMoreComments}
+          onClick={handleLoadMoreComments}
           disabled={loading}
         >
           {loading ? 'Loading...' : 'Load More Comments'}
