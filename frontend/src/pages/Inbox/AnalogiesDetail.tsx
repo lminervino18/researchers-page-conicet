@@ -115,157 +115,82 @@ const AnalogiesDetail: React.FC = () => {
     );
   };
 
-  /**
- * Extracts and organizes comments from raw input data
- * 
- * This function does the following:
- * 1. Normalizes input data to ensure it's an array
- * 2. Validates each comment
- * 3. Creates a map of comments for easy lookup
- * 4. Builds a hierarchical structure of comments
- * 5. Sorts root comments and their replies
- * 
- * @param data - Raw input data containing comments
- * @returns An array of root-level comments with nested replies
- */
-  const extractComments = (data: unknown): Comment[] => {
-   
-    // Normalize input data to ensure it's an array
-    const rawComments = Array.isArray(data) 
-      ? data 
-      : (data && typeof data === 'object' && 'content' in data 
-        ? (data as { content?: unknown }).content 
-        : []);
+      /**
+     * Extracts and validates comments from raw input data
+     * 
+     * This function does the following:
+     * 1. Normalizes input data to ensure it's an array
+     * 2. Filters out invalid comments
+     * 3. Prepares comments for hierarchical rendering
+     * 
+     * @param data - Raw input data containing comments
+     * @returns An array of validated and prepared comments
+     */
+    const extractComments = (data: unknown): Comment[] => {
+      // Normalize input data to ensure it's an array
+      const rawComments = Array.isArray(data) 
+        ? data 
+        : (data && typeof data === 'object' && 'content' in data 
+          ? (data as { content?: unknown }).content 
+          : []);
 
-    // Log the processed raw comments
-    console.log('Processed raw comments:', rawComments);
-
-    // Create a map to store all comments for quick access
-    const commentMap = new Map<number, Comment>();
-    
-    // Filter and prepare comments
-    const validComments = (Array.isArray(rawComments) ? rawComments : [])
-      .filter(isValidComment)  // Remove invalid comments
-      .map(comment => {
-        // Create a processed comment with additional properties
-        const processedComment: Comment = {
+      // Filter valid comments and prepare for rendering
+      return (Array.isArray(rawComments) ? rawComments : [])
+        .filter(isValidComment)
+        .map(comment => ({
           ...comment,
-          replies: [],        // Initialize empty replies array
-          childrenCount: 0    // Initialize children count
-        };
-        
-        // Store comment in map for quick access
-        commentMap.set(comment.id, processedComment);
-        
-        return processedComment;
-      });
-
-    // Container for root-level comments
-    const rootComments: Comment[] = [];
-
-    // Build comment hierarchy
-    validComments.forEach(comment => {
-      // Check if comment has a parent
-      if (comment.parentId) {
-        // Find the parent comment
-        const parentComment = commentMap.get(comment.parentId);
-        
-        if (parentComment) {
-          // Log found parent comment
-          console.log('Found parent comment:', parentComment);
-          
-          // Ensure parent has replies array
-          parentComment.replies = parentComment.replies || [];
-          
-          // Add current comment as a child
-          parentComment.replies.push(comment);
-          
-          // Increment children count
-          parentComment.childrenCount = (parentComment.childrenCount || 0) + 1;
-        } else {
-          // Log if parent comment is not found
-          console.log('Parent comment not found for:', comment);
-        }
-      } else {
-        // If no parent, it's a root-level comment
-        rootComments.push(comment);
-      }
-    });
-
-    // Log root comments before sorting
-    console.log('Root comments before sorting:', rootComments);
-
-    // Sort root comments by creation date (most recent first)
-    rootComments.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-
-    // Sort replies for each root comment (oldest first)
-    rootComments.forEach(comment => {
-      if (comment.replies && comment.replies.length > 0) {
-        comment.replies.sort((a, b) => 
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
-      }
-    });
-
-    // Log final root comments
-    console.log('Final root comments:', rootComments);
-
-    // Return only root-level comments (parent comments will have their children in 'replies')
-    return rootComments;
-  };
-  
-  const handleSubmitComment = async (commentContent: string, parentId?: number) => {
-    if (!user) {
-      setLoginPurpose('comment');
-      setPendingComment({ content: commentContent, parentId });
-      setIsLoginModalOpen(true);
-      return;
-    }
-
-    if (!analogy) return;
-
-    try {
-      const commentData: CommentRequestDTO = {
-        content: commentContent,
-        userName: user.username,
-        email: user.email,
-        analogyId: analogy.id,
-        parentId
-      };
-
-      const response: ApiResponse<CommentResponseDTO> = await createComment(analogy.id, commentData);
-
-      if (response && response.data && isValidComment(response.data)) {
-        const newComment: Comment = {
-          ...response.data,
-          replies: [],
+          replies: [], // Prepare for tree structure
           childrenCount: 0
+        }));
+    };
+
+      /**
+     * Handles comment submission process
+     * 
+     * This function:
+     * 1. Checks user authentication
+     * 2. Prepares comment data
+     * 3. Sends comment to backend
+     * 4. Updates comments state
+     * 
+     * @param commentContent - Text content of the comment
+     * @param parentId - Optional ID of parent comment for nested replies
+     */
+    const handleSubmitComment = async (commentContent: string, parentId?: number) => {
+      // Check if user is authenticated
+      if (!user) {
+        setLoginPurpose('comment');
+        setPendingComment({ content: commentContent, parentId });
+        setIsLoginModalOpen(true);
+        return;
+      }
+
+      if (!analogy) return;
+
+      try {
+        // Prepare comment data for submission
+        const commentData: CommentRequestDTO = {
+          content: commentContent,
+          userName: user.username,
+          email: user.email,
+          analogyId: analogy.id,
+          parentId
         };
 
-        setComments(prevComments => {
-          if (!parentId) {
-            return [newComment, ...prevComments];
-          }
+        // Submit comment to backend
+        const response: ApiResponse<CommentResponseDTO> = await createComment(analogy.id, commentData);
 
-          return prevComments.map(comment => {
-            if (comment.id === parentId) {
-              return {
-                ...comment,
-                replies: [...(comment.replies || []), newComment],
-                childrenCount: (comment.childrenCount || 0) + 1
-              };
-            }
-            return comment;
-          });
-        });
+        // Add new comment to state if successful
+        if (response && response.data) {
+          setComments(prevComments => [
+            response.data as Comment,
+            ...prevComments
+          ]);
+        }
+      } catch (error) {
+        console.error('Error submitting comment:', error);
       }
-    } catch (error) {
-      console.error('Error submitting comment:', error);
-    }
-  };
-
+    };
 
   const getAuthorData = (authorName: string) => {
     return authorsList.find(
@@ -290,28 +215,29 @@ const AnalogiesDetail: React.FC = () => {
     setPage(prevPage => prevPage + 1);
   };
 
+    /**
+   * Handles comment deletion process
+   * 
+   * This function:
+   * 1. Validates analogy existence
+   * 2. Sends delete request to backend
+   * 3. Updates comments state by removing deleted comment
+   * 
+   * @param commentId - ID of the comment to be deleted
+   * @returns Promise resolving to deletion result
+   */
   const handleDeleteComment = async (commentId: number) => {
+    // Validate analogy existence
     if (!analogy) return Promise.reject('No analogy found');
 
     try {
+      // Send delete request to backend
       await deleteComment(analogy.id, commentId);
 
-      setComments(prevComments => {
-        const removeComment = (comments: Comment[]): Comment[] => {
-          return comments.filter(comment => {
-            if (comment.id === commentId) return false;
-            
-            if (comment.replies) {
-              comment.replies = removeComment(comment.replies);
-              comment.childrenCount = comment.replies.length;
-            }
-            
-            return true;
-          });
-        };
-
-        return removeComment(prevComments);
-      });
+      // Update comments state by filtering out deleted comment
+      setComments(prevComments => 
+        prevComments.filter(comment => comment.id !== commentId)
+      );
 
       return Promise.resolve();
     } catch (error) {
