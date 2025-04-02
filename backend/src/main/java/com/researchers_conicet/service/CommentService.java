@@ -62,6 +62,9 @@ public class CommentService {
      * @return Number of supports for the comment
      */
     public int getSupportCount(Long commentId) {
+        if (!commentRepository.existsById(commentId)) {
+            throw new ResourceNotFoundException("Comment not found with id: " + commentId);
+        }
         return commentRepository.countSupportsByCommentId(commentId);
     }
 
@@ -323,15 +326,15 @@ public class CommentService {
                 // Only save if the email was present
                 commentRepository.save(comment);
                 log.info("Removed support from comment with ID: {}", commentId);
-            } else {
-                log.warn("Email {} has not supported this comment", email);
+                return mapToDTO(comment);
             }
-
-            return mapToDTO(comment);
         } catch (Exception e) {
             log.error("Error removing support from comment with ID: {}", commentId, e);
             throw new RuntimeException("Failed to remove support from comment", e);
         }
+        
+        log.warn("Email {} has not supported this comment", email);
+        throw new IllegalArgumentException(String.format("Email %s has not given support to comment %d", email, commentId));
     }
 
     /**

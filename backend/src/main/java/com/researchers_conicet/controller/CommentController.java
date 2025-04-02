@@ -218,7 +218,7 @@ public class CommentController {
             @PathVariable("id") Long commentId,
             @RequestParam String email) {
         log.info("REST request to remove support from Comment: {}", commentId);
-        return ResponseEntity.ok(commentService.removeSupport(commentId, email));
+        return new ResponseEntity<CommentResponseDTO>(commentService.removeSupport(commentId, email), HttpStatus.OK);
     }
 
     /**
@@ -244,7 +244,7 @@ public class CommentController {
     public ResponseEntity<Integer> getSupportCount(
             @PathVariable("id") Long commentId) {
         log.info("REST request to get support count for Comment: {}", commentId);
-        return ResponseEntity.ok(commentService.getSupportCount(commentId));
+        return new ResponseEntity<Integer>(commentService.getSupportCount(commentId), HttpStatus.OK);
     }
 
     /**
@@ -272,8 +272,7 @@ public class CommentController {
             @PathVariable("id") Long commentId,
             @RequestParam String email) {
         log.info("REST request to check if email {} has supported Comment: {}", email, commentId);
-        Set<String> supportEmails = commentService.getSupportEmails(commentId);
-        return ResponseEntity.ok(supportEmails.contains(email));
+        return new ResponseEntity<Boolean>(commentService.hasEmailSupported(commentId, email), HttpStatus.OK);
     }
 
 }
