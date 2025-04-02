@@ -23,7 +23,7 @@ import java.util.Set;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/analogies")
+@RequestMapping("/api")
 @CrossOrigin(
     origins = {"http://localhost:5173", "http://localhost:5174"},
     allowedHeaders = "*",
@@ -49,7 +49,7 @@ public class CommentController {
      * @param analogyId Analogy that is being commented
      * @return Created comment details
      */
-    @PostMapping("/{analogyId}/comments")
+    @PostMapping("/analogies/{analogyId}/comments")
     public ResponseEntity<CommentResponseDTO> createComment(
             @PathVariable Long analogyId,
             @RequestBody @Valid CommentRequestDTO requestDTO) {
@@ -63,7 +63,7 @@ public class CommentController {
     /**
      * Updates an existing comment publication
      */
-    @PutMapping(value = "/{analogyId}/comments/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/analogies/{analogyId}/comments/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommentResponseDTO> updateComment(
             @PathVariable Long id,
             @RequestBody @Valid CommentRequestDTO requestDTO) {
@@ -75,7 +75,7 @@ public class CommentController {
     /**
      * Retrieves an specific comment publication by ID
      */
-    @GetMapping("/{analogyId}/comments/{id}")
+    @GetMapping("/comments/{id}")
     public ResponseEntity<CommentResponseDTO> getComment(@PathVariable Long id) {
         log.info("REST request to get Comment : {}", id);
         return ResponseEntity.ok(commentService.getComment(id));
@@ -108,7 +108,7 @@ public class CommentController {
     /**
      * Deletes an comment publication
      */
-    @DeleteMapping("/{analogyId}/comments/{id}")
+    @DeleteMapping("/comments/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
         log.info("REST request to delete Comment : {}", id);
         commentService.deleteComment(id);
@@ -118,7 +118,7 @@ public class CommentController {
     /**
      * Searches comments by user name
      */
-    @GetMapping(value = "/{analogyId}/comments/search", params = "userName")
+    @GetMapping(value = "/analogies/{analogyId}/comments/search", params = "userName")
     public ResponseEntity<List<CommentResponseDTO>> searchByUser(
             @PathVariable Long analogyId,
             @RequestParam String userName) {
@@ -129,7 +129,7 @@ public class CommentController {
     /**
      * Searches comments by email
      */
-    @GetMapping(value = "/{analogyId}/comments/search", params = "email")
+    @GetMapping(value = "/analogies/{analogyId}/comments/search", params = "email")
     public ResponseEntity<List<CommentResponseDTO>> searchByEmail(
             @PathVariable Long analogyId,
             @RequestParam String email) {
@@ -140,7 +140,7 @@ public class CommentController {
     /**
      * Searches comments which content contains a specific keyword
      */
-    @GetMapping(value = "/{analogyId}/comments/search", params = "term")
+    @GetMapping(value = "/analogies/{analogyId}/comments/search", params = "term")
     public ResponseEntity<List<CommentResponseDTO>> searchEverywhere(
             @PathVariable Long analogyId,
             @RequestParam String term) {
@@ -154,7 +154,7 @@ public class CommentController {
      * @param email Email to verify
      * @return True if the email is authorized, false otherwise
      */
-    @GetMapping("/{analogyId}/comments/verify-email")
+    @GetMapping("/comments/email-authorization")
     public ResponseEntity<Boolean> verifyEmailAuthorization(
             @RequestParam String email) {
         log.info("REST request to verify email authorization: {}", email);
@@ -171,7 +171,7 @@ public class CommentController {
      * @param direction Sort direction (ASC/DESC)
      * @return Paginated list of comments for the analogy
      */
-    @GetMapping("/{analogyId}/comments")
+    @GetMapping("analogies/{analogyId}/comments")
     public ResponseEntity<Page<CommentResponseDTO>> getCommentsByAnalogy(
             @PathVariable Long analogyId,
             @RequestParam(defaultValue = "0") int page,
@@ -198,7 +198,7 @@ public class CommentController {
      * @param email Email of the user giving support
      * @return Updated comment with support information
      */
-    @PostMapping("/{analogyId}/comments/{id}/support")
+    @PostMapping("/comments/{id}/support")
     public ResponseEntity<CommentResponseDTO> addSupport(
             @PathVariable("id") Long commentId,
             @RequestParam String email) {
@@ -213,7 +213,7 @@ public class CommentController {
      * @param email Email of the user removing support
      * @return Updated comment with support information
      */
-    @DeleteMapping("/{analogyId}/comments/{id}/support")
+    @DeleteMapping("/comments/{id}/support")
     public ResponseEntity<CommentResponseDTO> removeSupport(
             @PathVariable("id") Long commentId,
             @RequestParam String email) {
@@ -240,7 +240,7 @@ public class CommentController {
      * @param commentId ID of the comment
      * @return Number of supports for the comment
      */
-    @GetMapping("/{analogyId}/comments/{id}/support-count")
+    @GetMapping("/comments/{id}/support-count")
     public ResponseEntity<Integer> getSupportCount(
             @PathVariable("id") Long commentId) {
         log.info("REST request to get support count for Comment: {}", commentId);
@@ -253,7 +253,7 @@ public class CommentController {
      * @param commentId ID of the comment
      * @return Set of support emails
      */
-    @GetMapping("/{analogyId}/comments/{id}/support-emails")
+    @GetMapping("/comments/{id}/support-emails")
     public ResponseEntity<Set<String>> getSupportEmails(
             @PathVariable("id") Long commentId) {
         log.info("REST request to get support emails for Comment: {}", commentId);
@@ -267,7 +267,7 @@ public class CommentController {
      * @param email Email to check
      * @return Boolean indicating if the email has supported the comment
      */
-    @GetMapping("/{analogyId}/comments/{id}/has-supported")
+    @GetMapping("/comments/{id}/has-supported")
     public ResponseEntity<Boolean> hasEmailSupported(
             @PathVariable("id") Long commentId,
             @RequestParam String email) {
