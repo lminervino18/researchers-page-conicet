@@ -67,7 +67,6 @@ public class EmailVerificationController {
         EmailVerification verification = emailVerificationService.registerEmail(requestDTO.getEmail());
         
         EmailVerificationResponseDTO responseDTO = new EmailVerificationResponseDTO();
-        responseDTO.setId(verification.getId());
         responseDTO.setEmail(verification.getEmail());
         responseDTO.setCreatedAt(verification.getCreatedAt());
         responseDTO.setRegistered(true);

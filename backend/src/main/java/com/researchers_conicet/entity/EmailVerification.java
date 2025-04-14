@@ -8,16 +8,16 @@ import java.time.LocalDateTime;
 @Data
 @Table(name = "email_verifications")
 public class EmailVerification {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
+    @Id
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "username")
+    private String username = null;
 
     @PrePersist
     protected void onCreate() {
