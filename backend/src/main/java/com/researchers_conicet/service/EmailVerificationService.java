@@ -1,6 +1,7 @@
 package com.researchers_conicet.service;
 
 import com.researchers_conicet.entity.EmailVerification;
+import com.researchers_conicet.exception.ResourceNotFoundException;
 import com.researchers_conicet.repository.EmailVerificationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -97,6 +98,30 @@ public class EmailVerificationService {
         }
     }
 
+    @Transactional
+    public void updateUserName(String email, String newUsername) {
+        if (!StringUtils.hasText(email) || !StringUtils.hasText(newUsername)) {
+            throw new IllegalArgumentException("Email and new username cannot be empty");
+        }
+
+        try {
+            Optional<EmailVerification> optionalVerification = emailVerificationRepository.findByEmail(email);
+            if (optionalVerification.isPresent()) {
+                EmailVerification verification = optionalVerification.get();
+                verification.setUsername(newUsername);
+                emailVerificationRepository.save(verification);
+                log.info("Updated username for email: {}", email);
+                return;
+            }
+        } catch (Exception e) {
+            log.error("Error updating username for email: {}", email, e);
+            throw new RuntimeException("Unexpected error when updating user name of " + email, e);
+        }
+
+        log.warn("Email not found: {}", email);
+        throw new ResourceNotFoundException(String.format("Email %s was not found", email));
+    }
+    
     /**
      * Retrieves an email verification entry
      *

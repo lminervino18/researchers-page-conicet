@@ -89,6 +89,22 @@ public class EmailVerificationController {
     }
 
     /**
+     * Updates the username associated with a specific email
+     *
+     * @param email Email address to modify
+     * @param newUsername New username to set
+     * @return ResponseEntity indicating success or failure
+     */
+    @PatchMapping("/{email}/update-username")
+    public ResponseEntity<Void> updateUserName(
+            @PathVariable String email,
+            @RequestParam String newUsername) {
+        log.info("Updating username for email: {}, new username: {}", email, newUsername);
+        emailVerificationService.updateUserName(email, newUsername);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
      * Registers multiple emails for verification
      *
      * @param emails List of email addresses to register
