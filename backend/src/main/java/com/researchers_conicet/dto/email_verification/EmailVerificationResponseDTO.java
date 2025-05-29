@@ -5,8 +5,8 @@ import java.time.LocalDateTime;
 
 @Data
 public class EmailVerificationResponseDTO {
-    private Long id;
     private String email;
+    private String username = null;
     private LocalDateTime createdAt;
     private boolean registered;
 }

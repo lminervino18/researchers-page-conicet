@@ -15,6 +15,7 @@ public class CommentResponseDTO {
     private String content;
     private Long parentId;
     private Long analogyId;
+    private Integer supportCount;
     
     // Metadata
     private LocalDateTime createdAt;
