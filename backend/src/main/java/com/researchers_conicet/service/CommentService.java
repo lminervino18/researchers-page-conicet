@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,6 +31,9 @@ public class CommentService {
     private final AnalogyRepository analogyRepository;
     private final EmailVerificationService emailVerificationService;
 
+    /** Email validation regex */
+    private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+
     // Constructor to inject dependencies
     public CommentService(
         CommentRepository commentRepository, 
@@ -38,6 +43,52 @@ public class CommentService {
         this.commentRepository = commentRepository;
         this.analogyRepository = analogyRepository;
         this.emailVerificationService = emailVerificationService;
+    }
+
+    /**
+     * Checks if an email is verified
+     * 
+     * @param email Email to verify
+     * @return true if email is registered, false otherwise
+     */
+    public boolean isEmailVerified(String email) {
+        return emailVerificationService.isEmailRegistered(email);
+    }
+
+    /**
+     * Gets the support count for a specific comment
+     * 
+     * @param commentId ID of the comment
+     * @return Number of supports for the comment
+     */
+    public int getSupportCount(Long commentId) {
+        if (!commentRepository.existsById(commentId)) {
+            throw new ResourceNotFoundException("Comment not found with id: " + commentId);
+        }
+        return commentRepository.countSupportsByCommentId(commentId);
+    }
+
+    /**
+     * Gets the emails that have supported a comment
+     * 
+     * @param commentId Comment identifier
+     * @return Set of support emails
+     */
+    public Set<String> getSupportEmails(Long commentId) {
+        Comment comment = findCommentById(commentId);
+        return comment.getSupportEmails();
+    }
+
+    /**
+     * Checks if an email has supported a specific comment
+     * 
+     * @param commentId ID of the comment
+     * @param email Email to check
+     * @return Boolean indicating if the email has supported the comment
+     */
+    public boolean hasEmailSupported(Long commentId, String email) {
+        Comment comment = findCommentById(commentId);
+        return comment.getSupportEmails().contains(email);
     }
 
     /**
@@ -60,12 +111,13 @@ public class CommentService {
 
         try {
             // Create and save the comment
-            Comment comment = new Comment();
-            comment.setUserName(requestDTO.getUserName());
-            comment.setContent(requestDTO.getContent());
-            comment.setEmail(requestDTO.getEmail());
-            optParent.ifPresent(comment::setParent);
-            comment.setAnalogy(analogy);
+            Comment comment = new Comment(
+                requestDTO.getUserName(),
+                requestDTO.getContent(),
+                requestDTO.getEmail(),
+                optParent,
+                analogy
+            );
 
             Comment savedComment = commentRepository.save(comment);
             log.info("Created comment with ID: {}", savedComment.getId());
@@ -195,6 +247,95 @@ public class CommentService {
         }
         return commentRepository.isEmailAuthorizedToComment(email);
     }
+ 
+    /**
+     * Retrieves comments by analogy ID with pagination.
+     */
+    @Transactional(readOnly = true)
+    public Page<CommentResponseDTO> getCommentsByAnalogy(Long analogyId, Pageable pageable) {
+        analogyRepository.findById(analogyId)
+            .orElseThrow(() -> new ResourceNotFoundException("Analogy not found with ID: " + analogyId));
+
+        return commentRepository.findByAnalogyId(analogyId, pageable)
+            .map(this::mapToDTO);
+    }
+
+    /**
+     * Adds support to a comment
+     * 
+     * @param commentId Comment identifier
+     * @param email User's email
+     * @return Updated comment response DTO
+     * @throws ResourceNotFoundException if comment not found
+     * @throws IllegalArgumentException if email is invalid
+     */
+    @Transactional
+    public CommentResponseDTO addSupport(Long commentId, String email) {
+        log.info("Adding support to comment with ID: {}", commentId);
+
+        // Validate email input
+        validateEmail(email);
+
+        // Verify email is registered in the system
+        if (!emailVerificationService.isEmailRegistered(email)) {
+            throw new IllegalArgumentException("Email is not registered");
+        }
+
+        // Find the comment
+        Comment comment = findCommentById(commentId);
+
+        try {
+            // Use the method from the entity to add support email
+            if (comment.addSupportEmail(email)) {
+                // Only save if the email was not already present
+                commentRepository.save(comment);
+                log.info("Added support to comment with ID: {}", commentId);
+            } else {
+                log.warn("Email {} has already supported this comment", email);
+            }
+
+            return mapToDTO(comment);
+        } catch (Exception e) {
+            log.error("Error adding support to comment with ID: {}", commentId, e);
+            throw new RuntimeException("Failed to add support to comment", e);
+        }
+    }
+
+    /**
+     * Removes support from a comment
+     * 
+     * @param commentId Comment identifier
+     * @param email User's email
+     * @return Updated comment response DTO
+     * @throws ResourceNotFoundException if comment not found
+     * @throws IllegalArgumentException if email is invalid
+     */
+    @Transactional
+    public CommentResponseDTO removeSupport(Long commentId, String email) {
+        log.info("Removing support from comment with ID: {}", commentId);
+
+        // Validate email input
+        validateEmail(email);
+
+        // Find the comment
+        Comment comment = findCommentById(commentId);
+
+        try {
+            // Use the method from the entity to remove support email
+            if (comment.removeSupportEmail(email)) {
+                // Only save if the email was present
+                commentRepository.save(comment);
+                log.info("Removed support from comment with ID: {}", commentId);
+                return mapToDTO(comment);
+            }
+        } catch (Exception e) {
+            log.error("Error removing support from comment with ID: {}", commentId, e);
+            throw new RuntimeException("Failed to remove support from comment", e);
+        }
+        
+        log.warn("Email {} has not supported this comment", email);
+        throw new IllegalArgumentException(String.format("Email %s has not given support to comment %d", email, commentId));
+    }
 
     /**
      * Finds a comment by its ID.
@@ -255,19 +396,24 @@ public class CommentService {
         dto.setAnalogyId(comment.getAnalogy().getId());
         Comment parent = comment.getParent();
         dto.setParentId((parent != null)? parent.getId() : null);
+        // Dynamically get support count
+        dto.setSupportCount(comment.getSupportEmails().size());
         return dto;
     }
 
     /**
-     * Retrieves comments by analogy ID with pagination.
+     * Validates email format
+     * 
+     * @param email Email to validate
+     * @throws IllegalArgumentException if email is invalid
      */
-    @Transactional(readOnly = true)
-    public Page<CommentResponseDTO> getCommentsByAnalogy(Long analogyId, Pageable pageable) {
-        analogyRepository.findById(analogyId)
-            .orElseThrow(() -> new ResourceNotFoundException("Analogy not found with ID: " + analogyId));
-
-        return commentRepository.findByAnalogyId(analogyId, pageable)
-            .map(this::mapToDTO);
+    private void validateEmail(String email) {
+        if (!StringUtils.hasText(email)) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        
+        if (!Pattern.matches(EMAIL_REGEX, email)) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
     }
-
 }

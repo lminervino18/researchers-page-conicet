@@ -188,4 +188,32 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      */
     @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM Comment c WHERE c.email = :email")
     boolean isEmailAuthorizedToComment(@Param("email") String email);
+
+
+    /**
+     * Finds comments sorted by support count in descending order
+     * Useful for displaying most supported comments
+     * @param analogyId The ID of the analogy for which find comments
+     */
+    @Query("SELECT c FROM Comment c WHERE c.analogy.id = :analogyId ORDER BY SIZE(c.supportEmails) DESC")
+    List<Comment> findMostSupportedCommentsByAnalogyId(Pageable pageable, @Param("analogyId") Long analogyId);
+
+    /**
+     * Checks if an email has already supported a specific comment
+     */
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END " +
+           "FROM Comment c JOIN c.supportEmails email WHERE c.id = :commentId AND email = :emailToCheck")
+    boolean hasEmailSupportedAnalogy(
+        @Param("commentId") Long commentId, 
+        @Param("emailToCheck") String emailToCheck
+    );
+
+    /**
+     * Counts the number of unique support emails for a specific comment
+     * 
+     * @param commentId The ID of the comment
+     * @return Number of unique support emails
+     */
+    @Query("SELECT COUNT(DISTINCT email) FROM Comment c JOIN c.supportEmails email WHERE c.id = :commentId")
+    int countSupportsByCommentId(@Param("commentId") Long commentId);
 }

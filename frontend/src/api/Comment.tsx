@@ -1,10 +1,7 @@
-  import axios from 'axios';
-  import { 
-    ApiResponse, 
-    PaginatedResponse 
-  } from '../types/index';
+import axios from "axios";
+import { ApiResponse, PaginatedResponse } from "../types/index";
 
-  const API_BASE_URL = 'http://localhost:8080/api/analogies';
+const API_BASE_URL = "http://localhost:8080/api";
 
   export interface Comment {
     id: number;
@@ -23,200 +20,202 @@
     parentId?: number;
   }
 
-  export const createComment = async (
-    analogyId: number, 
-    commentData: CommentRequestDTO
-  ): Promise<Comment> => { // Cambia el tipo de retorno a Comment
-    try {
-      const response = await axios.post<Comment>(
-        `${API_BASE_URL}/${analogyId}/comments`, 
-        commentData
-      );
-      return response.data; // Devuelve directamente el objeto Comment
-    } catch (error) {
-      console.error('Error creating comment:', error);
-      throw error;
-    }
-  };
+export const createComment = async (
+  commentData: CommentRequestDTO
+): Promise<ApiResponse<Comment>> => {
+  try {
+    const response = await axios.post<ApiResponse<Comment>>(
+      `${API_BASE_URL}/comments`,
+      commentData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error creating comment:", error);
+    throw error;
+  }
+};
 
-  export const getCommentsByAnalogy = async (
-      analogyId: number,
-      page = 0,
-      size = 10
-    ): Promise<PaginatedResponse<Comment[]>> => {
-      try {
-        console.log('Fetching comments with parameters:', {
-          analogyId,
+export const getCommentsByAnalogy = async (
+  analogyId: number,
+  page = 0,
+  size = 10
+): Promise<PaginatedResponse<Comment[]>> => {
+  try {
+    console.log("Fetching comments with parameters:", {
+      analogyId,
+      page,
+      size,
+    });
+
+    const response = await axios.get<PaginatedResponse<Comment[]>>(
+      `${API_BASE_URL}/analogies/${analogyId}/comments`,
+      {
+        params: {
           page,
-          size
-        });
-    
-        const response = await axios.get<PaginatedResponse<Comment[]>>(
-          `${API_BASE_URL}/${analogyId}/comments`,
-          {
-            params: {
-              page,
-              size,
-              sort: 'createdAt',
-              direction: 'DESC'
-            },
-            timeout: 10000
-          }
-        );
-
-        console.log('Comments Response:', {
-          status: response.status,
-          data: response.data
-        });
-    
-        if (!response.data) {
-          console.error('Empty response received for comments');
-          throw new Error('No data received from server');
-        }
-    
-        return response.data;
-      } catch (error) {
-        console.error('Detailed error fetching comments:', {
-          error,
-          errorName: error instanceof Error ? error.name : 'Unknown Error',
-          errorMessage: error instanceof Error ? error.message : 'No error message',
-          errorStack: error instanceof Error ? error.stack : 'No stack trace'
-        });
-        
-        if (axios.isAxiosError(error)) {
-          console.error('Axios Error Details:', {
-            response: error.response,
-            request: error.request,
-            config: error.config,
-            status: error.response?.status,
-            data: error.response?.data
-          });
-          if (error.response) {
-            switch (error.response.status) {
-              case 404:
-                throw new Error(`Comments for Analogy with ID ${analogyId} not found`);
-              case 500:
-                throw new Error('Internal server error while fetching comments');
-              default:
-                throw new Error(error.response.data?.message || 'An error occurred while fetching comments');
-            }
-          } else if (error.request) {
-            throw new Error('No response received from server when fetching comments');
-          }
-        }
-    
-        throw new Error('Failed to fetch comments');
+          size,
+          sort: "createdAt",
+          direction: "DESC",
+        },
+        timeout: 10000,
       }
-    };
+    );
 
-  export const updateComment = async (
-    analogyId: number,
-    commentId: number,
-    commentData: CommentRequestDTO
-  ): Promise<ApiResponse<Comment>> => {
-    try {
-      const response = await axios.put<ApiResponse<Comment>>(
-        `${API_BASE_URL}/${analogyId}/comments/${commentId}`, 
-        commentData
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Error updating comment:', error);
-      throw error;
+    console.log("Comments Response:", {
+      status: response.status,
+      data: response.data,
+    });
+
+    if (!response.data) {
+      console.error("Empty response received for comments");
+      throw new Error("No data received from server");
     }
-  };
 
-  export const deleteComment = async (
-    analogyId: number,
-    commentId: number
-  ): Promise<void> => {
-    try {
-      await axios.delete(`${API_BASE_URL}/${analogyId}/comments/${commentId}`);
-    } catch (error) {
-      console.error('Error deleting comment:', error);
-      throw error;
-    }
-  };
+    return response.data;
+  } catch (error) {
+    console.error("Detailed error fetching comments:", {
+      error,
+      errorName: error instanceof Error ? error.name : "Unknown Error",
+      errorMessage: error instanceof Error ? error.message : "No error message",
+      errorStack: error instanceof Error ? error.stack : "No stack trace",
+    });
 
-  export const searchCommentsByUserName = async (
-    analogyId: number,
-    userName: string
-  ): Promise<ApiResponse<Comment[]>> => {
-    try {
-      const response = await axios.get<ApiResponse<Comment[]>>(
-        `${API_BASE_URL}/${analogyId}/comments/search`,
-        {
-          params: { userName }
+    if (axios.isAxiosError(error)) {
+      console.error("Axios Error Details:", {
+        response: error.response,
+        request: error.request,
+        config: error.config,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+      if (error.response) {
+        switch (error.response.status) {
+          case 404:
+            throw new Error(
+              `Comments for Analogy with ID ${analogyId} not found`
+            );
+          case 500:
+            throw new Error("Internal server error while fetching comments");
+          default:
+            throw new Error(
+              error.response.data?.message ||
+                "An error occurred while fetching comments"
+            );
         }
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Error searching comments by user name:', error);
-      throw error;
+      } else if (error.request) {
+        throw new Error(
+          "No response received from server when fetching comments"
+        );
+      }
     }
-  };
 
-  export const searchCommentsByEmail = async (
-    analogyId: number,
-    email: string
-  ): Promise<ApiResponse<Comment[]>> => {
-    try {
-      const response = await axios.get<ApiResponse<Comment[]>>(
-        `${API_BASE_URL}/${analogyId}/comments/search`,
-        {
-          params: { email }
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Error searching comments by email:', error);
-      throw error;
-    }
-  };
+    throw new Error("Failed to fetch comments");
+  }
+};
 
-  export const searchCommentsEverywhere = async (
-    analogyId: number,
-    term: string
-  ): Promise<ApiResponse<Comment[]>> => {
-    try {
-      const response = await axios.get<ApiResponse<Comment[]>>(
-        `${API_BASE_URL}/${analogyId}/comments/search`,
-        {
-          params: { term }
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Error searching comments:', error);
-      throw error;
-    }
-  };
+export const updateComment = async (
+  analogyId: number,
+  commentId: number,
+  commentData: CommentRequestDTO
+): Promise<ApiResponse<Comment>> => {
+  try {
+    const response = await axios.put<ApiResponse<Comment>>(
+      `${API_BASE_URL}/analogies/${analogyId}/comments/${commentId}`,
+      commentData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating comment:", error);
+    throw error;
+  }
+};
 
-  export const verifyEmailAuthorization = async (
-    analogyId: number,
-    email: string
-  ): Promise<boolean> => {
-    try {
-      const response = await axios.get<boolean>(
-        `${API_BASE_URL}/${analogyId}/comments/verify-email`,
-        {
-          params: { email }
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Error verifying email authorization:', error);
-      throw error;
-    }
-  };
+export const deleteComment = async (commentId: number): Promise<void> => {
+  try {
+    await axios.delete(`${API_BASE_URL}/comments/${commentId}`);
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    throw error;
+  }
+};
 
-  export default {
-    createComment,
-    getCommentsByAnalogy,
-    updateComment,
-    deleteComment,
-    searchCommentsByUserName,
-    searchCommentsByEmail,
-    searchCommentsEverywhere,
-    verifyEmailAuthorization,
-  };
+export const searchCommentsByUserName = async (
+  analogyId: number,
+  userName: string
+): Promise<ApiResponse<Comment[]>> => {
+  try {
+    const response = await axios.get<ApiResponse<Comment[]>>(
+      `${API_BASE_URL}/analogies/${analogyId}/comments/search`,
+      {
+        params: { userName },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error searching comments by user name:", error);
+    throw error;
+  }
+};
+
+export const searchCommentsByEmail = async (
+  analogyId: number,
+  email: string
+): Promise<ApiResponse<Comment[]>> => {
+  try {
+    const response = await axios.get<ApiResponse<Comment[]>>(
+      `${API_BASE_URL}/analogies/${analogyId}/comments/search`,
+      {
+        params: { email },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error searching comments by email:", error);
+    throw error;
+  }
+};
+
+export const searchCommentsEverywhere = async (
+  analogyId: number,
+  term: string
+): Promise<ApiResponse<Comment[]>> => {
+  try {
+    const response = await axios.get<ApiResponse<Comment[]>>(
+      `${API_BASE_URL}/analogies/${analogyId}/comments/search`,
+      {
+        params: { term },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error searching comments:", error);
+    throw error;
+  }
+};
+
+export const verifyEmailAuthorization = async (
+  email: string
+): Promise<boolean> => {
+  try {
+    const response = await axios.get<boolean>(
+      `${API_BASE_URL}/comments/email-authorization`,
+      {
+        params: { email },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error verifying email authorization:", error);
+    throw error;
+  }
+};
+
+export default {
+  createComment,
+  getCommentsByAnalogy,
+  updateComment,
+  deleteComment,
+  searchCommentsByUserName,
+  searchCommentsByEmail,
+  searchCommentsEverywhere,
+  verifyEmailAuthorization,
+};

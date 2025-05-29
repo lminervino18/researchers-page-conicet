@@ -67,7 +67,6 @@ public class EmailVerificationController {
         EmailVerification verification = emailVerificationService.registerEmail(requestDTO.getEmail());
         
         EmailVerificationResponseDTO responseDTO = new EmailVerificationResponseDTO();
-        responseDTO.setId(verification.getId());
         responseDTO.setEmail(verification.getEmail());
         responseDTO.setCreatedAt(verification.getCreatedAt());
         responseDTO.setRegistered(true);
@@ -86,6 +85,22 @@ public class EmailVerificationController {
             @RequestParam String email) {
         log.info("Removing email: {}", email);
         emailVerificationService.removeEmail(email);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Updates the username associated with a specific email
+     *
+     * @param email Email address to modify
+     * @param newUsername New username to set
+     * @return ResponseEntity indicating success or failure
+     */
+    @PatchMapping("/{email}/update-username")
+    public ResponseEntity<Void> updateUserName(
+            @PathVariable String email,
+            @RequestParam String newUsername) {
+        log.info("Updating username for email: {}, new username: {}", email, newUsername);
+        emailVerificationService.updateUserName(email, newUsername);
         return ResponseEntity.noContent().build();
     }
 

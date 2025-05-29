@@ -1,12 +1,11 @@
-import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faComment, faTrash, faReply } from '@fortawesome/free-solid-svg-icons';
-import { Comment } from '../../types';
-import { useAuth } from '../../hooks/useAuth';
-import { deleteComment } from '../../api/Comment';
-import { getColorForName, getInitials } from '../../utils/ColorUtils';
-import ConfirmationModal from './ConfirmationModal'; // Import the confirmation modal
-import './styles/CommentSection.css';
+import React, { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faComment, faTrash, faReply } from "@fortawesome/free-solid-svg-icons";
+import { Comment } from "../../types";
+import { useAuth } from "../../hooks/useAuth";
+import { deleteComment } from "../../api/Comment";
+import { getColorForName, getInitials } from "../../utils/ColorUtils";
+import "./styles/CommentSection.css";
 
 /**
  * Props interface for CommentSection component
@@ -16,7 +15,6 @@ interface CommentSectionProps {
   comments: Comment[];
   loading: boolean;
   hasMore: boolean;
-  analogyId: number;
   onSubmitComment: (content: string, parentId?: number) => Promise<void>;
   onLoadMoreComments: () => void;
   onDeleteComment?: (commentId: number) => Promise<void>;
@@ -106,17 +104,13 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
   comments,
   loading,
   hasMore,
-  analogyId,
   onSubmitComment,
   onLoadMoreComments,
-  onDeleteComment
+  onDeleteComment,
 }) => {
-  // Authentication and user context
   const { user } = useAuth();
-
-  // State management for comments and replies
-  const [mainComment, setMainComment] = useState('');
-  const [replyComment, setReplyComment] = useState('');
+  const [mainComment, setMainComment] = useState("");
+  const [replyComment, setReplyComment] = useState("");
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
@@ -128,211 +122,188 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
   // Configuration constants
   const MAX_COMMENT_LENGTH = 250;
 
-  // Memoized processed comments to prevent unnecessary re-renders
-  const processedComments = useMemo(() => {
-    return buildCommentHierarchy(comments);
-  }, [comments]);
+  const handleDeleteComment = async (commentId: number) => {
+    try {
+      if (onDeleteComment) {
+        await onDeleteComment(commentId);
+      } else {
+        await deleteComment(commentId);
+      }
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  };
+
+  const organizeComments = () => {
+    const commentMap = new Map<number, Comment>();
+
+    comments.forEach((comment) => {
+      commentMap.set(comment.id, comment);
+    });
+
+    return commentMap;
+  };
 
   /**
-   * Handles submission of main comment
-   * Validates user authentication and comment content
+   * Renders a tree of comments recursively
+   *
+   * This function performs the following:
+   * 1. Determines which comments to render based on parentId
+   * 2. Maps through the comments and renders each comment
+   * 3. Handles nested replies and their respective UI
+   *
+   * @param commentMap - Map of all comments
+   * @param parentId - ID of the parent comment (null for root comments)
+   * @param depth - Current depth in the comment tree
    */
-  const handleSubmitMainComment = useCallback(async () => {
+  const renderCommentTree = (
+    commentMap: Map<number, Comment>,
+    parentId: number | null = null,
+    depth: number = 0
+  ) => {
+    console.log(
+      `Rendering comment tree - Depth: ${depth}, ParentId: ${parentId}`,
+      {
+        commentsCount: commentMap.size,
+      }
+    );
+
+    // Determine comments to render
+    // If parentId is null, render root comments
+    // Otherwise, render children of the specified parent
+    const commentsToRender =
+      parentId === null
+        ? Array.from(commentMap.values())
+        : commentMap.get(parentId)?.replies || [];
+
+    return commentsToRender.map((comment) => {
+      console.log(`Rendering comment - ID: ${comment.id}, Depth: ${depth}`, {
+        content: comment.content,
+        hasReplies: comment.replies && comment.replies.length > 0,
+        parentId: comment.parentId,
+      });
+
+      return (
+        <div
+          key={comment.id}
+          className={`comment depth-${depth}`}
+          style={{
+            marginLeft: depth > 0 ? `${depth * 20}px` : "0",
+            borderLeft: depth > 0 ? "2px solid var(--border-color)" : "none",
+          }}
+        >
+          {/* Comment content container */}
+          <div className="comment-content">
+            {/* User avatar */}
+            <div
+              className="user-avatar"
+              style={{
+                backgroundColor: getColorForName(comment.userName),
+                color: "white",
+              }}
+            >
+              {getInitials(comment.userName)}
+            </div>
+
+            {/* Comment body */}
+            <div className="comment-body">
+              <p>{comment.content}</p>
+
+              {/* Comment metadata */}
+              <div className="comment-metadata">
+                <span className="comment-author">{comment.userName}</span>
+                <span className="comment-date">
+                  {new Date(comment.createdAt).toLocaleString()}
+                </span>
+
+                {/* Delete comment button */}
+                {user?.email === comment.email && (
+                  <button
+                    className="delete-comment-btn"
+                    onClick={() => handleDeleteComment(comment.id)}
+                  >
+                    <FontAwesomeIcon icon={faTrash} />
+                  </button>
+                )}
+
+                {/* Reply button */}
+                {depth < 3 && (
+                  <button
+                    className="reply-btn"
+                    onClick={() => {
+                      setReplyingTo(comment.id);
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faReply} /> Reply
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Reply input section */}
+          {replyingTo === comment.id && (
+            <div className="reply-input">
+              <textarea
+                value={replyComment}
+                onChange={(e) => {
+                  if (e.target.value.length <= MAX_COMMENT_LENGTH) {
+                    setReplyComment(e.target.value);
+                  }
+                }}
+                placeholder="Write a reply..."
+                maxLength={MAX_COMMENT_LENGTH}
+              />
+              <div className="comment-input-footer">
+                <span className="char-count">
+                  {replyComment.length}/{MAX_COMMENT_LENGTH}
+                </span>
+                <button
+                  onClick={async () => {
+                    if (!user) {
+                      alert("Please log in to comment");
+                      return;
+                    }
+
+                    await onSubmitComment(replyComment, comment.id);
+                    setReplyComment("");
+                    setReplyingTo(null);
+                  }}
+                  disabled={!replyComment.trim()}
+                >
+                  <FontAwesomeIcon icon={faComment} /> Submit
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Render nested comments */}
+          {comment.replies && comment.replies.length > 0 && (
+            <div className="nested-comments">
+              {renderCommentTree(commentMap, comment.id, depth + 1)}
+            </div>
+          )}
+        </div>
+      );
+    });
+  };
+
+  const handleSubmitMainComment = async () => {
     if (!user) {
-      alert('Please log in to comment');
+      alert("Please log in to comment");
       return;
     }
 
-    const trimmedComment = mainComment.trim();
-    if (!trimmedComment) return;
-    
-    try {
-      await onSubmitComment(trimmedComment);
-      setMainComment('');
-    } catch (error) {
-      alert('Failed to submit comment');
-    }
-  }, [mainComment, user, onSubmitComment]);
+    if (!mainComment.trim()) return;
 
-  /**
-   * Handles submission of reply comment
-   * Validates user authentication and reply content
-   * 
-   * @param parentId - ID of the parent comment
-   */
-  const handleSubmitReplyComment = useCallback(async (parentId: number) => {
-    const trimmedReply = replyComment.trim();
-    if (!trimmedReply) return;
-
-    try {
-      await onSubmitComment(trimmedReply, parentId);
-      setReplyComment('');
-      setReplyingTo(null);
-    } catch (error) {
-      alert('Failed to submit reply');
-    }
-  }, [replyComment, user, onSubmitComment]);
-
-  /**
-   * Handles comment deletion
-   * 
-   * @param commentId - ID of the comment to delete
-   */
-  const handleDeleteComment = useCallback((commentId: number) => {
-    setCommentToDelete(commentId);
-    setIsModalOpen(true);
-  }, []);
-
-  /**
-   * Confirms the deletion of a comment
-   */
-  const confirmDeleteComment = useCallback(async () => {
-    if (commentToDelete !== null) {
-      try {
-        if (onDeleteComment) {
-          await onDeleteComment(commentToDelete);
-        } else {
-          await deleteComment(analogyId, commentToDelete);
-        }
-      } catch (error) {
-        // Silent error handling
-      } finally {
-        setIsModalOpen(false);
-        setCommentToDelete(null);
-      }
-    }
-  }, [commentToDelete, analogyId, onDeleteComment]);
-
-  /**
-   * Handles loading more comments while maintaining scroll position
-   */
-  const handleLoadMoreComments = useCallback(() => {
-    if (commentsListRef.current) {
-      scrollPositionRef.current = commentsListRef.current.scrollTop;
-    }
-    onLoadMoreComments();
-  }, [onLoadMoreComments]);
-
-  /**
-   * Effect to restore scroll position after comments update
-   */
-  useEffect(() => {
-    if (commentsListRef.current) {
-      commentsListRef.current.scrollTop = scrollPositionRef.current;
-    }
-  }, [comments]);
-
-  /**
-   * Renders comment tree recursively
-   * 
-   * @param comments - List of comments to render
-   * @param parentId - Parent comment ID
-   * @param depth - Current nesting depth
-   * @returns Rendered comment tree
-   */
-  const renderCommentTree = useCallback((comments: Comment[], parentId: number | null = null, depth: number = 0) => {
-    const filteredComments = parentId === null 
-      ? processedComments 
-      : comments.filter(comment => comment.parentId === parentId);
-
-    return filteredComments.map(comment => (
-      <div 
-        key={comment.id} 
-        className={`comment depth-${depth}`}
-        style={{ 
-          marginLeft: depth > 0 ? `${depth * 20}px` : '0',
-          borderLeft: depth > 0 ? '2px solid var(--border-color)' : 'none'
-        }}
-      >
-        <div className="comment-content">
-          <div 
-            className="user-avatar" 
-            style={{ 
-              backgroundColor: getColorForName(comment.userName),
-              color: 'white'
-            }}
-          >
-            {getInitials(comment.userName)}
-          </div>
-
-          <div className="comment-body">
-            <p>{comment.content}</p>
-            
-            <div className="comment-metadata">
-              <span className="comment-author">{comment.userName}</span>
-              <span className="comment-date">
-                {new Date(comment.createdAt).toLocaleString()}
-              </span>
-              
-              {user?.email === comment.email && (
-                <button 
-                  className="delete-comment-btn"
-                  onClick={() => handleDeleteComment(comment.id)}
-                >
-                  <FontAwesomeIcon icon={faTrash} />
-                </button>
-              )}
-              
-              {depth < 3 && (
-                <button 
-                  className="reply-btn"
-                  onClick={() => {
-                    setReplyingTo(comment.id);
-                  }}
-                >
-                  <FontAwesomeIcon icon={faReply} /> Reply
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
- 
-        {replyingTo === comment.id && (
-          <div className="reply-input">
-            <textarea
-              value={replyComment}
-              onChange={(e) => {
-                if (e.target.value.length <= MAX_COMMENT_LENGTH) {
-                  setReplyComment(e.target.value);
-                }
-              }}
-              placeholder="Write a reply..."
-              maxLength={MAX_COMMENT_LENGTH}
-            />
-            <div className="comment-input-footer">
-              <span className="char-count">
-                {replyComment.length}/{MAX_COMMENT_LENGTH}
-              </span>
-              <button
-                onClick={() => handleSubmitReplyComment(comment.id)}
-                disabled={!replyComment.trim()}
-              >
-                <FontAwesomeIcon icon={faComment} /> Submit
-              </button>
-            </div>
-          </div>
-        )}
- 
-        {depth < 3 && comment.replies && comment.replies.length > 0 && (
-          <div className="nested-comments">
-            {renderCommentTree(comment.replies, comment.id, depth + 1)}
-          </div>
-        )}
-      </div>
-    ));
-  }, [
-    processedComments, 
-    user, 
-    replyingTo, 
-    replyComment, 
-    handleDeleteComment, 
-    handleSubmitReplyComment
-  ]);
+    await onSubmitComment(mainComment);
+    setMainComment("");
+  };
 
   return (
     <div className="comments-section">
       <h2>Comments</h2>
-      
+
       <div className="comment-input">
         <textarea
           value={mainComment}
@@ -341,9 +312,7 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
               setMainComment(e.target.value);
             }
           }}
-          placeholder={user 
-            ? "Write a comment..." 
-            : "Please log in to comment"}
+          placeholder={user ? "Write a comment..." : "Please log in to comment"}
           disabled={!user}
           maxLength={MAX_COMMENT_LENGTH}
         />
@@ -376,7 +345,7 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
           onClick={handleLoadMoreComments}
           disabled={loading}
         >
-          {loading ? 'Loading...' : 'Load More Comments'}
+          {loading ? "Loading..." : "Load More Comments"}
         </button>
       )}
 
