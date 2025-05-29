@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 import {
   Analogy,
   Comment,
   CommentRequestDTO,
-  CommentResponseDTO,
   PaginatedResponse,
-  ApiResponse,
 } from "../../types";
 import { getAnalogyById } from "../../api/Analogy";
 import {
@@ -37,55 +35,58 @@ const AnalogiesDetail: React.FC = () => {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [loginPurpose, setLoginPurpose] = useState<
-    "support" | "comment" | null
-  >(null);
-  const [pendingComment, setPendingComment] = useState<{
-    content: string;
-    parentId?: number;
-  } | null>(null);
+  const [loginPurpose, setLoginPurpose] = useState<"support" | "comment" | null>(null);
+  const [pendingComment, setPendingComment] = useState<{ content: string; parentId?: number } | null>(null);
+
+  const commentsSectionRef = useRef<HTMLDivElement>(null);
+
+  const fetchComments = async (pageToLoad = 0) => {
+    if (!analogy) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const commentsResponse: PaginatedResponse<Comment[]> =
+        await getCommentsByAnalogy(analogy.id, pageToLoad);
+
+      const rawData = commentsResponse.data || commentsResponse.content || [];
+      const extractedComments = extractComments(rawData);
+
+      setComments((prevComments) =>
+        pageToLoad === 0 ? extractedComments : [...prevComments, ...extractedComments]
+      );
+
+      setHasMore(extractedComments.length === 10);
+      setPage(pageToLoad);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      setError("Failed to load comments");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
-  
-        if (!id) {
-          throw new Error("Invalid analogy ID");
-        }
-  
+
+        if (!id) throw new Error("Invalid analogy ID");
+
         const analogyResponse = await getAnalogyById(Number(id));
-  
-        if (!analogyResponse) {
-          throw new Error("Analogy not found");
-        }
-  
+        if (!analogyResponse) throw new Error("Analogy not found");
+
         setAnalogy(analogyResponse);
 
-        const commentsResponse: PaginatedResponse<Comment[]> =
-          await getCommentsByAnalogy(analogyResponse.id, page);
-
-        const extractedComments = extractComments(
-          commentsResponse.data || commentsResponse.content || []
-        );
-
-        setComments((prevComments) =>
-          page === 0
-            ? extractedComments
-            : [...prevComments, ...extractedComments]
-        );
-
-        setHasMore(extractedComments.length === 10);
-  
+        // Initial fetch of comments regardless of user state
+        await fetchComments(0);
       } catch (error) {
         console.error("Error fetching data:", error);
-
         if (axios.isAxiosError(error)) {
           setError(
-            error.response?.data?.message ||
-              error.message ||
-              "Failed to load analogy"
+            error.response?.data?.message || error.message || "Failed to load analogy"
           );
         } else {
           setError("An unexpected error occurred");
@@ -94,9 +95,16 @@ const AnalogiesDetail: React.FC = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
-  }, [id, page]);
+  }, [id]);
+
+  // Scroll comments into view on change
+  useEffect(() => {
+    if (commentsSectionRef.current) {
+      commentsSectionRef.current.scrollIntoView({ behavior: "auto" });
+    }
+  }, [comments]);
 
   const isValidComment = (comment: any): comment is Comment => {
     return (
@@ -115,112 +123,59 @@ const AnalogiesDetail: React.FC = () => {
     );
   };
 
-  /**
-   * Extracts and organizes comments from raw input data
-   *
-   * This function does the following:
-   * 1. Normalizes input data to ensure it's an array
-   * 2. Validates each comment
-   * 3. Creates a map of comments for easy lookup
-   * 4. Builds a hierarchical structure of comments
-   * 5. Sorts root comments and their replies
-   *
-   * @param data - Raw input data containing comments
-   * @returns An array of root-level comments with nested replies
-   */
   const extractComments = (data: unknown): Comment[] => {
-    // Normalize input data to ensure it's an array
     const rawComments = Array.isArray(data)
       ? data
       : data && typeof data === "object" && "content" in data
       ? (data as { content?: unknown }).content
       : [];
 
-    // Log the processed raw comments
-    console.log("Processed raw comments:", rawComments);
+    if (!Array.isArray(rawComments)) return [];
 
-    // Create a map to store all comments for quick access
     const commentMap = new Map<number, Comment>();
-
-    // Filter and prepare comments
-    const validComments = (Array.isArray(rawComments) ? rawComments : [])
-      .filter(isValidComment) // Remove invalid comments
+    const validComments = rawComments
+      .filter(isValidComment)
       .map((comment) => {
-        // Create a processed comment with additional properties
         const processedComment: Comment = {
           ...comment,
-          replies: [], // Initialize empty replies array
-          childrenCount: 0, // Initialize children count
+          replies: [],
+          childrenCount: 0,
         };
-
-        // Store comment in map for quick access
         commentMap.set(comment.id, processedComment);
-
         return processedComment;
       });
 
-    // Container for root-level comments
     const rootComments: Comment[] = [];
 
-    // Build comment hierarchy
     validComments.forEach((comment) => {
-      // Check if comment has a parent
       if (comment.parentId) {
-        // Find the parent comment
         const parentComment = commentMap.get(comment.parentId);
-
         if (parentComment) {
-          // Log found parent comment
-          console.log("Found parent comment:", parentComment);
-
-          // Ensure parent has replies array
           parentComment.replies = parentComment.replies || [];
-
-          // Add current comment as a child
           parentComment.replies.push(comment);
-
-          // Increment children count
           parentComment.childrenCount = (parentComment.childrenCount || 0) + 1;
-        } else {
-          // Log if parent comment is not found
-          console.log("Parent comment not found for:", comment);
         }
       } else {
-        // If no parent, it's a root-level comment
         rootComments.push(comment);
       }
     });
 
-    // Log root comments before sorting
-    console.log("Root comments before sorting:", rootComments);
-
-    // Sort root comments by creation date (most recent first)
     rootComments.sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
-    // Sort replies for each root comment (oldest first)
     rootComments.forEach((comment) => {
       if (comment.replies && comment.replies.length > 0) {
         comment.replies.sort(
-          (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
       }
     });
 
-    // Log final root comments
-    console.log("Final root comments:", rootComments);
-
-    // Return only root-level comments (parent comments will have their children in 'replies')
     return rootComments;
   };
 
-  const handleSubmitComment = async (
-    commentContent: string,
-    parentId?: number
-  ) => {
+  const handleSubmitComment = async (commentContent: string, parentId?: number) => {
     if (!user) {
       setLoginPurpose("comment");
       setPendingComment({ content: commentContent, parentId });
@@ -239,34 +194,9 @@ const AnalogiesDetail: React.FC = () => {
         parentId,
       };
 
-      const response: ApiResponse<CommentResponseDTO> = await createComment(
-        commentData
-      );
+      await createComment(analogy.id, commentData);
 
-      if (response && response.data && isValidComment(response.data)) {
-        const newComment: Comment = {
-          ...response.data,
-          replies: [],
-          childrenCount: 0,
-        };
-
-        setComments((prevComments) => {
-          if (!parentId) {
-            return [newComment, ...prevComments];
-          }
-
-          return prevComments.map((comment) => {
-            if (comment.id === parentId) {
-              return {
-                ...comment,
-                replies: [...(comment.replies || []), newComment],
-                childrenCount: (comment.childrenCount || 0) + 1,
-              };
-            }
-            return comment;
-          });
-        });
-      }
+      await fetchComments(0);
     } catch (error) {
       console.error("Error submitting comment:", error);
     }
@@ -283,7 +213,7 @@ const AnalogiesDetail: React.FC = () => {
     setIsLoginModalOpen(false);
 
     if (loginPurpose === "support") {
-      // Support logic now handled by SupportAnalogyButton
+      // Support logic handled elsewhere
     } else if (loginPurpose === "comment" && pendingComment) {
       handleSubmitComment(pendingComment.content, pendingComment.parentId);
       setPendingComment(null);
@@ -291,43 +221,17 @@ const AnalogiesDetail: React.FC = () => {
   };
 
   const loadMoreComments = () => {
-    setPage((prevPage) => prevPage + 1);
+    if (hasMore && !loading) {
+      fetchComments(page + 1);
+    }
   };
 
-  /**
-   * Handles comment deletion process
-   * 
-   * This function:
-   * 1. Validates analogy existence
-   * 2. Sends delete request to backend
-   * 3. Updates comments state by removing deleted comment
-   * 
-   * @param commentId - ID of the comment to be deleted
-   * @returns Promise resolving to deletion result
-   */
   const handleDeleteComment = async (commentId: number) => {
     if (!analogy) return Promise.reject("No analogy found");
 
     try {
       await deleteComment(commentId);
-
-      setComments((prevComments) => {
-        const removeComment = (comments: Comment[]): Comment[] => {
-          return comments.filter((comment) => {
-            if (comment.id === commentId) return false;
-
-            if (comment.replies) {
-              comment.replies = removeComment(comment.replies);
-              comment.childrenCount = comment.replies.length;
-            }
-
-            return true;
-          });
-        };
-
-        return removeComment(prevComments);
-      });
-
+      await fetchComments(0);
       return Promise.resolve();
     } catch (error) {
       console.error("Error deleting comment:", error);
@@ -381,34 +285,32 @@ const AnalogiesDetail: React.FC = () => {
         </button>
 
         <div className="analogy-content">
-          <div className="analogy-metadata">
-            <div className="authors">
-              {analogy.authors.map((authorName) => {
-                const author = getAuthorData(authorName);
-                return author ? (
-                  <div key={authorName} className="author-profile">
-                    <img
-                      src={author.imageUrl}
-                      alt={authorName}
-                      className="author-profile-image"
-                    />
-                    <span className="author-name">{authorName}</span>
-                  </div>
-                ) : (
-                  <span key={authorName} className="author-tag">
-                    {authorName}
-                  </span>
-                );
-              })}
-            </div>
-            <p className="creation-date">
-              {new Date(analogy.createdAt).toLocaleDateString("en-US", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </p>
+          <div className="authors">
+            {analogy.authors.map((authorName) => {
+              const author = getAuthorData(authorName);
+              return author ? (
+                <div key={authorName} className="author-profile">
+                  <img
+                    src={author.imageUrl}
+                    alt={authorName}
+                    className="author-profile-image"
+                  />
+                  <span className="author-name">{authorName}</span>
+                </div>
+              ) : (
+                <span key={authorName} className="author-tag">
+                  {authorName}
+                </span>
+              );
+            })}
           </div>
+          <p className="creation-date">
+            {new Date(analogy.createdAt).toLocaleDateString("en-US", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </p>
 
           <h1 className="analogy-title">{analogy.title}</h1>
           <p className="full-description">{analogy.content}</p>
@@ -446,7 +348,7 @@ const AnalogiesDetail: React.FC = () => {
               ))}
           </div>
 
-          <div className="interaction-section">
+          <div className="interaction-section" ref={commentsSectionRef}>
             <div className="support-section">
               <SupportAnalogyButton
                 analogyId={analogy.id}
@@ -460,10 +362,15 @@ const AnalogiesDetail: React.FC = () => {
             <CommentSection
               comments={comments}
               loading={loading}
-              hasMore={hasMore}
+              hasMore={hasMore && comments.length > 0}
               onSubmitComment={handleSubmitComment}
               onLoadMoreComments={loadMoreComments}
               onDeleteComment={handleDeleteComment}
+              user={user}
+              onRequestLogin={() => {
+                setLoginPurpose("comment");
+                setIsLoginModalOpen(true);
+              }}
             />
           </div>
         </div>

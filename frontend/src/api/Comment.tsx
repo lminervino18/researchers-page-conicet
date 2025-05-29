@@ -3,29 +3,30 @@ import { ApiResponse, PaginatedResponse } from "../types/index";
 
 const API_BASE_URL = "http://localhost:8080/api";
 
-  export interface Comment {
-    id: number;
-    content: string;
-    userName: string;
-    email: string;
-    createdAt: string;
-    analogyId: number;
-    parentId?: number;
-  }
+export interface Comment {
+  id: number;
+  content: string;
+  userName: string;
+  email: string;
+  createdAt: string;
+  analogyId: number;
+  parentId?: number;
+}
 
-  export interface CommentRequestDTO {
-    content: string;
-    userName: string;
-    email: string;
-    parentId?: number;
-  }
+export interface CommentRequestDTO {
+  content: string;
+  userName: string;
+  email: string;
+  parentId?: number;
+}
 
 export const createComment = async (
+  analogyId: number,
   commentData: CommentRequestDTO
 ): Promise<ApiResponse<Comment>> => {
   try {
     const response = await axios.post<ApiResponse<Comment>>(
-      `${API_BASE_URL}/comments`,
+      `${API_BASE_URL}/analogies/${analogyId}/comments`,
       commentData
     );
     return response.data;

@@ -1,124 +1,169 @@
 .member-detail-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .member-detail-modal {
-    background-color: var(--background-color);
-    border-radius: var(--border-radius-lg);
-    width: 90%;
-    max-width: 1000px;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-    box-shadow: var(--shadow-lg);
-  }
-  
-  .member-detail-modal-close {
-    position: absolute;
-    top: var(--spacing-md);
-    right: var(--spacing-md);
-    background: none;
-    border: none;
-    font-size: var(--font-size-huge);
-    color: var(--text-color);
-    cursor: pointer;
-    transition: color var(--transition-fast);
-  }
-  
-  .member-detail-modal-close:hover {
-    color: var(--primary-color);
-  }
-  
-  .member-detail-content {
-    display: flex;
-    padding: var(--spacing-xl);
-    gap: var(--spacing-xl);
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 10px; /* para que no toque bordes en móviles */
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.member-detail-modal {
+  background-color: var(--background-color);
+  border-radius: var(--border-radius-lg);
+  width: 100%;
+  max-width: 900px;  /* ancho máximo razonable */
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-lg);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.member-detail-modal-close {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: none;
+  border: none;
+  font-size: var(--font-size-huge);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  z-index: 10;
+}
+
+.member-detail-modal-close:hover {
+  color: var(--primary-color);
+}
+
+.member-detail-content {
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap; /* permite que el contenido baje en pantallas chicas */
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.member-detail-image {
+  flex: 0 0 300px;
+  max-width: 100%;
+  height: auto;
+}
+
+.member-detail-image img {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: var(--border-radius-lg);
+  display: block;
+}
+
+.member-detail-info {
+  flex: 1 1 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  min-width: 0; /* para evitar overflow en flex */
+}
+
+.member-detail-info h2 {
+  font-size: var(--font-size-huge);
+  color: var(--text-color);
+  margin: 0;
+}
+
+.member-detail-position {
+  font-size: var(--font-size-large);
+  color: var(--primary-dark);
+  font-weight: 600;
+  margin: 0;
+}
+
+.member-detail-metadata {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  color: var(--text-light);
+  margin: 0;
+}
+
+.member-detail-description {
+  margin-top: var(--spacing-md);
+}
+
+.member-detail-description h3 {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-color);
+}
+
+.member-detail-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.member-detail-courses-btn,
+.member-detail-publications-btn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--primary-color);
+  color: var(--text-on-primary);
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  white-space: nowrap; /* evitar que el texto se rompa */
+}
+
+.member-detail-courses-btn:hover,
+.member-detail-publications-btn:hover {
+  background-color: var(--primary-dark);
+}
+
+@media (max-width: 900px) {
   .member-detail-image {
-    flex: 0 0 300px;
+    flex: 1 1 100%;
+    max-width: 100%;
+    height: auto;
+    margin-bottom: var(--spacing-md);
   }
-  
-  .member-detail-image img {
-    width: 100%;
-    height: 400px;
-    object-fit: cover;
-    border-radius: var(--border-radius-lg);
-  }
-  
+
   .member-detail-info {
-    flex: 1;
-    display: flex;
+    flex: 1 1 100%;
+  }
+
+  .member-detail-content {
     flex-direction: column;
-    gap: var(--spacing-md);
+    align-items: center;
   }
-  
-  .member-detail-info h2 {
-    font-size: var(--font-size-huge);
-    color: var(--text-color);
-  }
-  
-  .member-detail-position {
-    font-size: var(--font-size-large);
-    color: var(--primary-dark);
-    font-weight: 600;
-  }
-  
-  .member-detail-metadata {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    color: var(--text-light);
-  }
-  
-  .member-detail-description {
-    margin-top: var(--spacing-md);
-  }
-  
-  .member-detail-description h3 {
-    font-size: var(--font-size-xl);
-    margin-bottom: var(--spacing-sm);
-    color: var(--text-color);
-  }
-  
+
   .member-detail-actions {
-    display: flex;
-    gap: var(--spacing-md);
-    margin-top: var(--spacing-lg);
+    justify-content: center;
   }
-  
-  .member-detail-courses-btn,
-  .member-detail-publications-btn {
-    padding: var(--spacing-sm) var(--spacing-md);
-    background-color: var(--primary-color);
-    color: var(--text-on-primary);
-    border: none;
-    border-radius: var(--border-radius-md);
-    cursor: pointer;
-    transition: background-color var(--transition-fast);
+}
+
+@media (max-width: 480px) {
+  .member-detail-modal {
+    max-width: 100%;
+    max-height: 95vh;
+    padding: var(--spacing-md);
   }
-  
-  .member-detail-courses-btn:hover,
-  .member-detail-publications-btn:hover {
-    background-color: var(--primary-dark);
+
+  .member-detail-modal-close {
+    font-size: calc(var(--font-size-huge) * 0.8);
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
   }
-  
-  @media (max-width: 768px) {
-    .member-detail-content {
-      flex-direction: column;
-      align-items: center;
-    }
-  
-    .member-detail-image {
-      flex: 0 0 250px;
-    }
-  }
+}

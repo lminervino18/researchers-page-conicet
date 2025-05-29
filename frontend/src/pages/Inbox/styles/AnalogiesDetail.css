@@ -133,10 +133,13 @@
   text-decoration: underline;
 }
 
+
 .interaction-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
+  max-height: 500px; /* ajustá según necesites */
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  padding: 0.5rem;
+  border-radius: 4px;
 }
 
 .error-message {

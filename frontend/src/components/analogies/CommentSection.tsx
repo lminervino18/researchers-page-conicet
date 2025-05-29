@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faTrash, faReply } from "@fortawesome/free-solid-svg-icons";
 import { Comment } from "../../types";
-import { useAuth } from "../../hooks/useAuth";
 import { deleteComment } from "../../api/Comment";
 import { getColorForName, getInitials } from "../../utils/ColorUtils";
+import ConfirmationModal from "./ConfirmationModal";
 import "./styles/CommentSection.css";
 
-/**
- * Props interface for CommentSection component
- * Defines the structure and type of props passed to the component
- */
+interface User {
+  email: string;
+  username: string;
+  // Additional user fields can be added here
+}
+
 interface CommentSectionProps {
   comments: Comment[];
   loading: boolean;
@@ -18,88 +20,10 @@ interface CommentSectionProps {
   onSubmitComment: (content: string, parentId?: number) => Promise<void>;
   onLoadMoreComments: () => void;
   onDeleteComment?: (commentId: number) => Promise<void>;
+  user?: User | null; // Current logged-in user, or null if not logged in
+  onRequestLogin?: () => void; // Callback to trigger login modal/prompt
 }
 
-/**
- * Builds a hierarchical comment structure from a flat list of comments
- * 
- * @param comments - Flat list of comments to be transformed
- * @returns Hierarchically structured comments
- */
-const buildCommentHierarchy = (comments: Comment[]): Comment[] => {
-  const commentMap = new Map<number, Comment>();
-  
-  // First pass: Create base comment objects with consistent structure
-  comments.forEach(comment => {
-    if (!commentMap.has(comment.id)) {
-      commentMap.set(comment.id, {
-        ...comment,
-        replies: [], // Always start with empty replies
-        childrenCount: 0 // Reset children count
-      });
-    }
-  });
-
-  const rootComments: Comment[] = [];
-  const processedParentIds = new Set<number>();
-
-  // Second pass: Build comment hierarchy
-  comments.forEach(comment => {
-    const currentComment = commentMap.get(comment.id);
-    
-    if (comment.parentId) {
-      const parentComment = commentMap.get(comment.parentId);
-      
-      if (parentComment && currentComment) {
-        parentComment.replies = parentComment.replies || [];
-        
-        const isDuplicateReply = parentComment.replies.some(
-          reply => reply.id === currentComment.id
-        );
-
-        if (!isDuplicateReply) {
-          parentComment.replies.push(currentComment);
-          parentComment.childrenCount = (parentComment.childrenCount || 0) + 1;
-        }
-      }
-    } else {
-      if (currentComment && !processedParentIds.has(currentComment.id)) {
-        rootComments.push(currentComment);
-        processedParentIds.add(currentComment.id);
-      }
-    }
-  });
-
-  // Sort root comments by creation date (most recent first)
-  rootComments.sort((a, b) => 
-    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
-
-  // Sort replies for each root comment (oldest first)
-  rootComments.forEach(comment => {
-    comment.replies = comment.replies || [];
-
-    if (comment.replies.length > 0) {
-      comment.replies = Array.from(
-        new Map(comment.replies.map(reply => [reply.id, reply])).values()
-      ).sort((a, b) => 
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      );
-      
-      comment.childrenCount = comment.replies.length;
-    }
-  });
-
-  return rootComments;
-};
-
-/**
- * CommentSection component
- * Manages rendering, submission, and interaction with comments
- * 
- * @param props - Component properties for comments section
- * @returns Fully rendered comments section with interaction capabilities
- */
 const CommentSection: React.FC<CommentSectionProps> = React.memo(({
   comments,
   loading,
@@ -107,21 +31,26 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
   onSubmitComment,
   onLoadMoreComments,
   onDeleteComment,
+  user,
+  onRequestLogin,
 }) => {
-  const { user } = useAuth();
+  // State for main comment input
   const [mainComment, setMainComment] = useState("");
+  // State for reply comment input
   const [replyComment, setReplyComment] = useState("");
+  // Which comment id is currently being replied to (if any)
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  // Modal state for delete confirmation
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // Stores the comment id pending deletion
   const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
 
-  // Ref to maintain scroll position
+  // Ref to the comments list container (if needed for scrolling)
   const commentsListRef = useRef<HTMLDivElement | null>(null);
-  const scrollPositionRef = useRef<number>(0);
+  
+  const MAX_COMMENT_LENGTH = 250; // Max allowed length for comment text
 
-  // Configuration constants
-  const MAX_COMMENT_LENGTH = 250;
-
+  // Handles deleting a comment either via prop callback or direct API call
   const handleDeleteComment = async (commentId: number) => {
     try {
       if (onDeleteComment) {
@@ -134,163 +63,148 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
     }
   };
 
-  const organizeComments = () => {
-    const commentMap = new Map<number, Comment>();
-
-    comments.forEach((comment) => {
-      commentMap.set(comment.id, comment);
-    });
-
-    return commentMap;
+  // Confirm deletion after user accepts confirmation modal
+  const confirmDeleteComment = async () => {
+    if (commentToDelete !== null) {
+      await handleDeleteComment(commentToDelete);
+      setIsModalOpen(false);
+      setCommentToDelete(null);
+    }
   };
 
+  // Handler to load more comments on button click
+  const handleLoadMoreComments = () => {
+    onLoadMoreComments();
+  };
+
+  // Convert comments array to a Map for easy access by ID
+  const commentMap = new Map<number, Comment>();
+  comments.forEach((c) => commentMap.set(c.id, c));
+
   /**
-   * Renders a tree of comments recursively
-   *
-   * This function performs the following:
-   * 1. Determines which comments to render based on parentId
-   * 2. Maps through the comments and renders each comment
-   * 3. Handles nested replies and their respective UI
-   *
-   * @param commentMap - Map of all comments
-   * @param parentId - ID of the parent comment (null for root comments)
-   * @param depth - Current depth in the comment tree
+   * Recursively renders comments as a threaded tree structure.
+   * Each reply is indented and styled.
+   * @param commentMap Map of comment IDs to comment objects
+   * @param parentId The ID of the parent comment, or null for root-level comments
+   * @param depth The current depth level of nesting (for indentation)
    */
   const renderCommentTree = (
     commentMap: Map<number, Comment>,
     parentId: number | null = null,
     depth: number = 0
   ) => {
-    console.log(
-      `Rendering comment tree - Depth: ${depth}, ParentId: ${parentId}`,
-      {
-        commentsCount: commentMap.size,
-      }
-    );
-
-    // Determine comments to render
-    // If parentId is null, render root comments
-    // Otherwise, render children of the specified parent
+    // Get comments for the current parentId (root if null)
     const commentsToRender =
       parentId === null
-        ? Array.from(commentMap.values())
+        ? Array.from(commentMap.values()).filter(c => !c.parentId)
         : commentMap.get(parentId)?.replies || [];
 
-    return commentsToRender.map((comment) => {
-      console.log(`Rendering comment - ID: ${comment.id}, Depth: ${depth}`, {
-        content: comment.content,
-        hasReplies: comment.replies && comment.replies.length > 0,
-        parentId: comment.parentId,
-      });
-
-      return (
-        <div
-          key={comment.id}
-          className={`comment depth-${depth}`}
-          style={{
-            marginLeft: depth > 0 ? `${depth * 20}px` : "0",
-            borderLeft: depth > 0 ? "2px solid var(--border-color)" : "none",
-          }}
-        >
-          {/* Comment content container */}
-          <div className="comment-content">
-            {/* User avatar */}
-            <div
-              className="user-avatar"
-              style={{
-                backgroundColor: getColorForName(comment.userName),
-                color: "white",
-              }}
-            >
-              {getInitials(comment.userName)}
-            </div>
-
-            {/* Comment body */}
-            <div className="comment-body">
-              <p>{comment.content}</p>
-
-              {/* Comment metadata */}
-              <div className="comment-metadata">
-                <span className="comment-author">{comment.userName}</span>
-                <span className="comment-date">
-                  {new Date(comment.createdAt).toLocaleString()}
-                </span>
-
-                {/* Delete comment button */}
-                {user?.email === comment.email && (
-                  <button
-                    className="delete-comment-btn"
-                    onClick={() => handleDeleteComment(comment.id)}
-                  >
-                    <FontAwesomeIcon icon={faTrash} />
-                  </button>
-                )}
-
-                {/* Reply button */}
-                {depth < 3 && (
-                  <button
-                    className="reply-btn"
-                    onClick={() => {
-                      setReplyingTo(comment.id);
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faReply} /> Reply
-                  </button>
-                )}
-              </div>
-            </div>
+    return commentsToRender.map((comment) => (
+      <div
+        key={comment.id}
+        className={`comment depth-${depth}`}
+        style={{
+          marginLeft: depth > 0 ? `${depth * 20}px` : "0",
+          borderLeft: depth > 0 ? "2px solid var(--border-color)" : "none",
+        }}
+      >
+        <div className="comment-content">
+          <div
+            className="user-avatar"
+            style={{
+              backgroundColor: getColorForName(comment.userName),
+              color: "white",
+            }}
+          >
+            {getInitials(comment.userName)}
           </div>
 
-          {/* Reply input section */}
-          {replyingTo === comment.id && (
-            <div className="reply-input">
-              <textarea
-                value={replyComment}
-                onChange={(e) => {
-                  if (e.target.value.length <= MAX_COMMENT_LENGTH) {
-                    setReplyComment(e.target.value);
-                  }
-                }}
-                placeholder="Write a reply..."
-                maxLength={MAX_COMMENT_LENGTH}
-              />
-              <div className="comment-input-footer">
-                <span className="char-count">
-                  {replyComment.length}/{MAX_COMMENT_LENGTH}
-                </span>
+          <div className="comment-body">
+            <p>{comment.content}</p>
+            <div className="comment-metadata">
+              <span className="comment-author">{comment.userName}</span>
+              <span className="comment-date">
+                {new Date(comment.createdAt).toLocaleString()}
+              </span>
+
+              {/* Show delete button only if current user is author */}
+              {user?.email === comment.email && (
                 <button
-                  onClick={async () => {
-                    if (!user) {
-                      alert("Please log in to comment");
-                      return;
-                    }
-
-                    await onSubmitComment(replyComment, comment.id);
-                    setReplyComment("");
-                    setReplyingTo(null);
+                  className="delete-comment-btn"
+                  onClick={() => {
+                    setCommentToDelete(comment.id);
+                    setIsModalOpen(true);
                   }}
-                  disabled={!replyComment.trim()}
                 >
-                  <FontAwesomeIcon icon={faComment} /> Submit
+                  <FontAwesomeIcon icon={faTrash} />
                 </button>
-              </div>
-            </div>
-          )}
+              )}
 
-          {/* Render nested comments */}
-          {comment.replies && comment.replies.length > 0 && (
-            <div className="nested-comments">
-              {renderCommentTree(commentMap, comment.id, depth + 1)}
+              {/* Show reply button only if nesting depth < 3 */}
+              {depth < 3 && (
+                <button
+                  className="reply-btn"
+                  onClick={() => setReplyingTo(comment.id)}
+                >
+                  <FontAwesomeIcon icon={faReply} /> Reply
+                </button>
+              )}
             </div>
-          )}
+          </div>
         </div>
-      );
-    });
+
+        {/* Reply input shown only when replying to this comment */}
+        {replyingTo === comment.id && (
+          <div className="reply-input">
+            <textarea
+              value={replyComment}
+              onChange={(e) => {
+                if (e.target.value.length <= MAX_COMMENT_LENGTH) {
+                  setReplyComment(e.target.value);
+                }
+              }}
+              placeholder={user ? "Write a reply..." : "Please log in to comment"}
+              maxLength={MAX_COMMENT_LENGTH}
+              disabled={!user} // Disable if not logged in
+            />
+            <div className="comment-input-footer">
+              <span className="char-count">
+                {replyComment.length}/{MAX_COMMENT_LENGTH}
+              </span>
+              <button
+                onClick={async () => {
+                  if (!user) {
+                    // If not logged in, trigger login modal via callback
+                    if (onRequestLogin) onRequestLogin();
+                    return;
+                  }
+
+                  await onSubmitComment(replyComment, comment.id);
+                  setReplyComment("");
+                  setReplyingTo(null);
+                }}
+                disabled={!replyComment.trim()}
+              >
+                <FontAwesomeIcon icon={faComment} /> Submit
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Recursively render nested replies */}
+        {comment.replies && comment.replies.length > 0 && (
+          <div className="nested-comments">
+            {renderCommentTree(commentMap, comment.id, depth + 1)}
+          </div>
+        )}
+      </div>
+    ));
   };
 
+  // Handles main comment submission, requesting login if necessary
   const handleSubmitMainComment = async () => {
     if (!user) {
-      alert("Please log in to comment");
+      if (onRequestLogin) onRequestLogin();
       return;
     }
 
@@ -313,7 +227,7 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
             }
           }}
           placeholder={user ? "Write a comment..." : "Please log in to comment"}
-          disabled={!user}
+          disabled={!user} // Disable textarea if not logged in
           maxLength={MAX_COMMENT_LENGTH}
         />
         <div className="comment-input-footer">
@@ -322,24 +236,30 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
           </span>
           <button
             onClick={handleSubmitMainComment}
-            disabled={!mainComment.trim() || !user}
+            disabled={!mainComment.trim() || !user} // Disable button if no text or not logged in
           >
             <FontAwesomeIcon icon={faComment} /> Submit
           </button>
         </div>
       </div>
 
+      {/* Comments list */}
       <div className="comments-list" ref={commentsListRef}>
         {loading && comments.length === 0 ? (
           <div>Loading comments...</div>
-        ) : comments.length === 0 ? (
-          <div>No comments yet</div>
         ) : (
-          renderCommentTree(comments)
+          <>
+            {comments.length === 0 ? (
+              <div>No comments yet</div>
+            ) : (
+              renderCommentTree(commentMap)
+            )}
+          </>
         )}
       </div>
 
-      {hasMore && (
+      {/* Show Load More Comments button only if there are comments and hasMore is true */}
+      {comments.length > 0 && hasMore && (
         <button
           className="load-more-comments"
           onClick={handleLoadMoreComments}
@@ -349,6 +269,7 @@ const CommentSection: React.FC<CommentSectionProps> = React.memo(({
         </button>
       )}
 
+      {/* Confirmation modal for deleting comments */}
       <ConfirmationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
