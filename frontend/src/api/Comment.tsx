@@ -2,6 +2,8 @@ import axios from "axios";
 import { ApiResponse, PaginatedResponse } from "../types/index";
 
 const API_BASE_URL = "http://localhost:8080/api";
+const ANALOGIES_PATH = "/analogies";
+const COMMENTS_PATH = "/comments";
 
 export interface Comment {
   id: number;
