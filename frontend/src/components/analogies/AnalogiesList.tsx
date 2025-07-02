@@ -177,13 +177,13 @@ const AnalogiesList: FC<AnalogiesListProps> = ({ analogies }) => {
           </div>
           <div 
             className="interaction-buttons"
-            onClick={(e) => e.stopPropagation()} // Añadido para detener propagación en toda la sección
+            onClick={(e) => e.stopPropagation()} 
           >
             <button 
               className="comment-btn"
               onClick={(e) => {
                 e.stopPropagation();
-                // Implement comment logic if needed
+                handleAnalogyClick(analogy.id)
               }}
             >
               <FontAwesomeIcon icon={faComment} /> Comment

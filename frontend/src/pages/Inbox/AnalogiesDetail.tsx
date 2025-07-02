@@ -27,7 +27,6 @@ const AnalogiesDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, login } = useAuth();
-
   const [analogy, setAnalogy] = useState<Analogy | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,13 +102,18 @@ const AnalogiesDetail: React.FC = () => {
       }
     }, [analogy?.id]);
 
+    const scrollToComments = () => {
+        console.log("Scrolling to comments section");
+      setTimeout(() => {
+        if (commentsSectionRef.current) {
+          commentsSectionRef.current.scrollIntoView({ behavior: "auto", block: "start" });
+        }
+      }, 50); // wait for the DOM to update
+    };
 
-  // Scroll comments into view on change
-  useEffect(() => {
-    if (commentsSectionRef.current) {
-      commentsSectionRef.current.scrollIntoView({ behavior: "auto" });
-    }
-  }, [comments]);
+
+
+
 
   const isValidComment = (comment: any): comment is Comment => {
     return (
@@ -202,6 +206,7 @@ const AnalogiesDetail: React.FC = () => {
       await createComment(analogy.id, commentData);
 
       await fetchComments(0);
+      scrollToComments();
     } catch (error) {
       console.error("Error submitting comment:", error);
     }
@@ -228,6 +233,7 @@ const AnalogiesDetail: React.FC = () => {
   const loadMoreComments = () => {
     if (hasMore && !loading) {
       fetchComments(page + 1);
+       scrollToComments();
     }
   };
 
@@ -237,6 +243,7 @@ const AnalogiesDetail: React.FC = () => {
     try {
       await deleteComment(commentId);
       await fetchComments(0);
+      scrollToComments();
       return Promise.resolve();
     } catch (error) {
       console.error("Error deleting comment:", error);
