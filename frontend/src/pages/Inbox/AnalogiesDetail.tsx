@@ -67,37 +67,42 @@ const AnalogiesDetail: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+      useEffect(() => {
+      const fetchData = async () => {
+        try {
+          setLoading(true);
+          setError(null);
 
-        if (!id) throw new Error("Invalid analogy ID");
+          if (!id) throw new Error("Invalid analogy ID");
 
-        const analogyResponse = await getAnalogyById(Number(id));
-        if (!analogyResponse) throw new Error("Analogy not found");
+          const analogyResponse = await getAnalogyById(Number(id));
+          if (!analogyResponse) throw new Error("Analogy not found");
 
-        setAnalogy(analogyResponse);
-
-        // Initial fetch of comments regardless of user state
-        await fetchComments(0);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        if (axios.isAxiosError(error)) {
-          setError(
-            error.response?.data?.message || error.message || "Failed to load analogy"
-          );
-        } else {
-          setError("An unexpected error occurred");
+          setAnalogy(analogyResponse);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          if (axios.isAxiosError(error)) {
+            setError(
+              error.response?.data?.message || error.message || "Failed to load analogy"
+            );
+          } else {
+            setError("An unexpected error occurred");
+          }
+        } finally {
+          setLoading(false);
         }
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    fetchData();
-  }, [id]);
+      fetchData();
+    }, [id]);
+
+
+    useEffect(() => {
+      if (analogy?.id) {
+        fetchComments(0);
+      }
+    }, [analogy?.id]);
+
 
   // Scroll comments into view on change
   useEffect(() => {

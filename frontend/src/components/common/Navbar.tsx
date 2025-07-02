@@ -9,7 +9,7 @@ const Navbar: FC = () => {
   const navigate = useNavigate();
 
   const sections = [
-    { id: 'lab', title: 'Our Lab', path: '/lab' },
+    { id: 'lab', title: 'Research Lines', path: '/lab' },
     { id: 'members', title: 'Members', path: '/members' },
     { id: 'publications', title: 'Publications', path: '/publications' },
     { id: 'participation', title: 'Experiment Participations', path: '/participation' },
