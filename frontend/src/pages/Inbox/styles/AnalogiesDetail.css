@@ -230,6 +230,60 @@
   border-radius: var(--border-radius-md);
 }
 
+.interaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.auth-button-section {
+  display: flex;
+  align-items: center;
+}
+
+.interaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.auth-button-section {
+  display: flex;
+  align-items: center;
+}
+
+.logout-button {
+  background-color: var(--error-color);
+  color: var(--background-color);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: var(--font-size-base);
+}
+
+.logout-button:hover {
+  background-color: var(--error-dark, #c0392b);
+}
+
+.login-button {
+  background-color: var(--primary-light);
+  color: black;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: var(--font-size-base);
+}
+
+.login-button:hover {
+  background-color: var(--primary-color);
+}
+
 
 
 @media (max-width: 768px) {

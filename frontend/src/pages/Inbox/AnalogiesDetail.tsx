@@ -19,6 +19,7 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import CommentSection from "../../components/analogies/CommentSection";
 import LoginModal from "../../components/analogies/LoginModal";
+import LogoutConfirmModal from "../../components/analogies/LogoutConfirmModal";
 import { useAuth } from "../../hooks/useAuth";
 import "./styles/AnalogiesDetail.css";
 import SupportAnalogyButton from "../../components/analogies/SupportAnalogyButton";
@@ -26,7 +27,7 @@ import SupportAnalogyButton from "../../components/analogies/SupportAnalogyButto
 const AnalogiesDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, login } = useAuth();
+  const { user, login, logout} = useAuth();
   const [analogy, setAnalogy] = useState<Analogy | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,6 +35,7 @@ const AnalogiesDetail: React.FC = () => {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [loginPurpose, setLoginPurpose] = useState<"support" | "comment" | null>(null);
   const [pendingComment, setPendingComment] = useState<{ content: string; parentId?: number } | null>(null);
 
@@ -361,16 +363,51 @@ const AnalogiesDetail: React.FC = () => {
           </div>
 
           <div className="interaction-section" ref={commentsSectionRef}>
-            <div className="support-section">
-              <SupportAnalogyButton
-                analogyId={analogy.id}
-                userEmail={user?.email}
-                onLoginRequired={() => {
-                  setLoginPurpose("support");
-                  setIsLoginModalOpen(true);
-                }}
-              />
+            <div className="interaction-header">
+              <div className="support-section">
+                <SupportAnalogyButton
+                  analogyId={analogy.id}
+                  userEmail={user?.email}
+                  onLoginRequired={() => {
+                    setLoginPurpose("support");
+                    setIsLoginModalOpen(true);
+                  }}
+                />
+              </div>
+
+              <div className="auth-button-section">
+                {user ? (
+                  <>
+                    <button
+                      className="logout-button"
+                      onClick={() => setIsLogoutModalOpen(true)}
+                    >
+                      Logout
+                    </button>
+                    <LogoutConfirmModal
+                      isOpen={isLogoutModalOpen}
+                      onConfirm={() => {
+                        logout();
+                        setIsLogoutModalOpen(false);
+                      }}
+                      onCancel={() => setIsLogoutModalOpen(false)}
+                    />
+                  </>
+                ) : (
+                  <button
+                    className="login-button"
+                    onClick={() => {
+                      setLoginPurpose("comment");
+                      setIsLoginModalOpen(true);
+                    }}
+                  >
+                    Login
+                  </button>
+                )}
+
+              </div>
             </div>
+
             <CommentSection
               comments={comments}
               loading={loading}
