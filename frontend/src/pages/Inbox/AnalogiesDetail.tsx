@@ -1,18 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
-import {
-  Analogy,
-  Comment,
-  CommentRequestDTO,
-  PaginatedResponse,
-} from "../../types";
+import { Analogy } from "../../types";
 import { getAnalogyById } from "../../api/Analogy";
-import {
-  getCommentsByAnalogy,
-  createComment,
-  deleteComment,
-} from "../../api/Comment";
 import { authors as authorsList } from "../../api/Authors";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -27,13 +17,12 @@ import SupportAnalogyButton from "../../components/analogies/SupportAnalogyButto
 const AnalogiesDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, login, logout} = useAuth();
+  const { user, login, logout } = useAuth();
+
   const [analogy, setAnalogy] = useState<Analogy | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
+
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [loginPurpose, setLoginPurpose] = useState<"support" | "comment" | null>(null);
@@ -41,178 +30,34 @@ const AnalogiesDetail: React.FC = () => {
 
   const commentsSectionRef = useRef<HTMLDivElement>(null);
 
-  const fetchComments = async (pageToLoad = 0) => {
-    if (!analogy) return;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-    setLoading(true);
-    setError(null);
+        if (!id) throw new Error("Invalid analogy ID");
 
-    try {
-      const commentsResponse: PaginatedResponse<Comment[]> =
-        await getCommentsByAnalogy(analogy.id, pageToLoad);
+        const analogyResponse = await getAnalogyById(Number(id));
+        if (!analogyResponse) throw new Error("Analogy not found");
 
-      const rawData = commentsResponse.data || commentsResponse.content || [];
-      const extractedComments = extractComments(rawData);
-
-      setComments((prevComments) =>
-        pageToLoad === 0 ? extractedComments : [...prevComments, ...extractedComments]
-      );
-
-      setHasMore(extractedComments.length === 10);
-      setPage(pageToLoad);
-    } catch (error) {
-      console.error("Error fetching comments:", error);
-      setError("Failed to load comments");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-      useEffect(() => {
-      const fetchData = async () => {
-        try {
-          setLoading(true);
-          setError(null);
-
-          if (!id) throw new Error("Invalid analogy ID");
-
-          const analogyResponse = await getAnalogyById(Number(id));
-          if (!analogyResponse) throw new Error("Analogy not found");
-
-          setAnalogy(analogyResponse);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-          if (axios.isAxiosError(error)) {
-            setError(
-              error.response?.data?.message || error.message || "Failed to load analogy"
-            );
-          } else {
-            setError("An unexpected error occurred");
-          }
-        } finally {
-          setLoading(false);
+        setAnalogy(analogyResponse);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        if (axios.isAxiosError(error)) {
+          setError(
+            error.response?.data?.message || error.message || "Failed to load analogy"
+          );
+        } else {
+          setError("An unexpected error occurred");
         }
-      };
-
-      fetchData();
-    }, [id]);
-
-
-    useEffect(() => {
-      if (analogy?.id) {
-        fetchComments(0);
+      } finally {
+        setLoading(false);
       }
-    }, [analogy?.id]);
-
-    const scrollToComments = () => {
-        console.log("Scrolling to comments section");
-      setTimeout(() => {
-        if (commentsSectionRef.current) {
-          commentsSectionRef.current.scrollIntoView({ behavior: "auto", block: "start" });
-        }
-      }, 50); // wait for the DOM to update
     };
 
-
-
-
-
-  const isValidComment = (comment: any): comment is Comment => {
-    return (
-      typeof comment === "object" &&
-      comment !== null &&
-      "id" in comment &&
-      "content" in comment &&
-      "userName" in comment &&
-      "createdAt" in comment &&
-      "analogyId" in comment &&
-      typeof comment.id === "number" &&
-      typeof comment.content === "string" &&
-      typeof comment.userName === "string" &&
-      typeof comment.createdAt === "string" &&
-      typeof comment.analogyId === "number"
-    );
-  };
-
-  const extractComments = (data: unknown): Comment[] => {
-    const rawComments = Array.isArray(data)
-      ? data
-      : data && typeof data === "object" && "content" in data
-      ? (data as { content?: unknown }).content
-      : [];
-
-    if (!Array.isArray(rawComments)) return [];
-
-    const commentMap = new Map<number, Comment>();
-    const validComments = rawComments
-      .filter(isValidComment)
-      .map((comment) => {
-        const processedComment: Comment = {
-          ...comment,
-          replies: [],
-          childrenCount: 0,
-        };
-        commentMap.set(comment.id, processedComment);
-        return processedComment;
-      });
-
-    const rootComments: Comment[] = [];
-
-    validComments.forEach((comment) => {
-      if (comment.parentId) {
-        const parentComment = commentMap.get(comment.parentId);
-        if (parentComment) {
-          parentComment.replies = parentComment.replies || [];
-          parentComment.replies.push(comment);
-          parentComment.childrenCount = (parentComment.childrenCount || 0) + 1;
-        }
-      } else {
-        rootComments.push(comment);
-      }
-    });
-
-    rootComments.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-
-    rootComments.forEach((comment) => {
-      if (comment.replies && comment.replies.length > 0) {
-        comment.replies.sort(
-          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
-      }
-    });
-
-    return rootComments;
-  };
-
-  const handleSubmitComment = async (commentContent: string, parentId?: number) => {
-    if (!user) {
-      setLoginPurpose("comment");
-      setPendingComment({ content: commentContent, parentId });
-      setIsLoginModalOpen(true);
-      return;
-    }
-
-    if (!analogy) return;
-
-    try {
-      const commentData: CommentRequestDTO = {
-        content: commentContent,
-        userName: user.username,
-        email: user.email,
-        analogyId: analogy.id,
-        parentId,
-      };
-
-      await createComment(analogy.id, commentData);
-
-      await fetchComments(0);
-      scrollToComments();
-    } catch (error) {
-      console.error("Error submitting comment:", error);
-    }
-  };
+    fetchData();
+  }, [id]);
 
   const getAuthorData = (authorName: string) => {
     return authorsList.find(
@@ -224,32 +69,11 @@ const AnalogiesDetail: React.FC = () => {
     login(username, email);
     setIsLoginModalOpen(false);
 
-    if (loginPurpose === "support") {
-      // Support logic handled elsewhere
-    } else if (loginPurpose === "comment" && pendingComment) {
-      handleSubmitComment(pendingComment.content, pendingComment.parentId);
+    if (loginPurpose === "support") return;
+
+    if (loginPurpose === "comment" && pendingComment) {
+      // Se espera que CommentSection maneje este comentario luego del login si es necesario
       setPendingComment(null);
-    }
-  };
-
-  const loadMoreComments = () => {
-    if (hasMore && !loading) {
-      fetchComments(page + 1);
-       scrollToComments();
-    }
-  };
-
-  const handleDeleteComment = async (commentId: number) => {
-    if (!analogy) return Promise.reject("No analogy found");
-
-    try {
-      await deleteComment(commentId);
-      await fetchComments(0);
-      scrollToComments();
-      return Promise.resolve();
-    } catch (error) {
-      console.error("Error deleting comment:", error);
-      return Promise.reject(error);
     }
   };
 
@@ -404,17 +228,11 @@ const AnalogiesDetail: React.FC = () => {
                     Login
                   </button>
                 )}
-
               </div>
             </div>
 
             <CommentSection
-              comments={comments}
-              loading={loading}
-              hasMore={hasMore && comments.length > 0}
-              onSubmitComment={handleSubmitComment}
-              onLoadMoreComments={loadMoreComments}
-              onDeleteComment={handleDeleteComment}
+              analogyId={analogy.id}
               user={user}
               onRequestLogin={() => {
                 setLoginPurpose("comment");

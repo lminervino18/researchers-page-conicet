@@ -43,26 +43,22 @@ export const getCommentsByAnalogy = async (
   analogyId: number,
   page = 0,
   size = 10
-): Promise<PaginatedResponse<Comment[]>> => {
-  try {
-    const response = await axios.get<PaginatedResponse<Comment[]>>(
-      `${API_BASE_URL}${ANALOGIES_PATH}/${analogyId}${COMMENTS_PATH}`,
-      {
-        params: {
-          page,
-          size,
-          sort: "createdAt",
-          direction: "DESC",
-        },
-        timeout: 10000,
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching comments:", error);
-    throw error;
-  }
+): Promise<PaginatedResponse<Comment>> => { // ✅ <Comment>, NO <Comment[]>
+  const response = await axios.get<PaginatedResponse<Comment>>(
+    `${API_BASE_URL}${ANALOGIES_PATH}/${analogyId}${COMMENTS_PATH}`,
+    {
+      params: {
+        page,
+        size,
+        sort: "createdAt",
+        direction: "DESC",
+      },
+      timeout: 10000,
+    }
+  );
+  return response.data;
 };
+
 
 export const updateComment = async (
   analogyId: number,
@@ -235,6 +231,21 @@ export const hasEmailSupportedComment = async (
 };
 
 
+export const getSupportedCommentsByEmail = async (
+  email: string
+): Promise<number[]> => {
+  try {
+    const response = await axios.get<number[]>(
+      `${API_BASE_URL}${COMMENTS_PATH}/supported`,
+      { params: { email } }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching supported comments by email:", error);
+    throw error;
+  }
+};
+
 export default {
   createComment,
   getCommentsByAnalogy,
@@ -248,4 +259,5 @@ export default {
   removeSupportFromComment,
   getSupportCountForComment,
   hasEmailSupportedComment,
+  getSupportedCommentsByEmail,
 };

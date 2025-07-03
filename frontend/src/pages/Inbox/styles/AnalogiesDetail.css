@@ -1,18 +1,3 @@
-.analogy-detail-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  padding: var(--spacing-xl);
-  overflow-y: auto;
-}
-
 .analogy-content {
   background-color: var(--background-color);
   border-radius: var(--border-radius-md);
@@ -21,33 +6,6 @@
   max-width: 1200px; 
   padding: var(--spacing-xl);
   position: relative;
-}
-
-.modal-header {
-  position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
-  z-index: 10;
-}
-
-.close-button {
-  background: none;
-  border: none;
-  color: var(--text-color);
-  font-size: var(--font-size-xl);
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.close-button:hover {
-  color: var(--primary-color);
-}
-
-.analogy-metadata {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-lg);
 }
 
 .authors {
@@ -114,6 +72,18 @@
   border: none;
 }
 
+.youtube-video-large {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.youtube-video-large iframe {
+  width: 100%;
+  height: 450px;
+  border-radius: var(--border-radius-md);
+}
+
 .external-links {
   display: flex;
   flex-direction: column;
@@ -133,33 +103,12 @@
   text-decoration: underline;
 }
 
-
 .interaction-section {
-  max-height: 500px; /* ajustá según necesites */
+  max-height: 500px;
   overflow-y: auto;
   border: 1px solid var(--border-color);
   padding: 0.5rem;
   border-radius: 4px;
-}
-
-.error-message {
-  background-color: var(--error-color);
-  color: white;
-  padding: var(--spacing-md);
-  border-radius: var(--border-radius-sm);
-  margin-bottom: var(--spacing-md);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.error-message button {
-  background-color: white;
-  color: var(--error-color);
-  border: none;
-  padding: var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
-  cursor: pointer;
 }
 
 .analogy-detail-page {
@@ -218,30 +167,6 @@
   word-wrap: break-word;
 }
 
-.youtube-video-large {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.youtube-video-large iframe {
-  width: 100%;
-  height: 450px;
-  border-radius: var(--border-radius-md);
-}
-
-.interaction-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-md);
-}
-
-.auth-button-section {
-  display: flex;
-  align-items: center;
-}
-
 .interaction-header {
   display: flex;
   justify-content: space-between;
@@ -284,8 +209,6 @@
   background-color: var(--primary-color);
 }
 
-
-
 @media (max-width: 768px) {
   .analogy-content {
     width: 95%;
@@ -294,10 +217,5 @@
 
   .youtube-video iframe {
     height: 200px;
-  }
-
-  .modal-header {
-    top: var(--spacing-sm);
-    right: var(--spacing-sm);
   }
 }
