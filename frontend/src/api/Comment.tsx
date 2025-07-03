@@ -163,6 +163,78 @@ export const verifyEmailAuthorization = async (
   }
 };
 
+
+
+export const addSupportToComment = async (
+  commentId: number,
+  email: string
+): Promise<ApiResponse<Comment>> => {
+  try {
+    const response = await axios.post<ApiResponse<Comment>>(
+      `${API_BASE_URL}${COMMENTS_PATH}/${commentId}/support`,
+      null,
+      {
+        params: { email },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error adding support to comment:", error);
+    throw error;
+  }
+};
+
+export const removeSupportFromComment = async (
+  commentId: number,
+  email: string
+): Promise<ApiResponse<Comment>> => {
+  try {
+    const response = await axios.delete<ApiResponse<Comment>>(
+      `${API_BASE_URL}${COMMENTS_PATH}/${commentId}/support`,
+      {
+        params: { email },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error removing support from comment:", error);
+    throw error;
+  }
+};
+
+export const getSupportCountForComment = async (
+  commentId: number
+): Promise<number> => {
+  try {
+    const response = await axios.get<number>(
+      `${API_BASE_URL}${COMMENTS_PATH}/${commentId}/support-count`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error getting support count for comment:", error);
+    throw error;
+  }
+};
+
+export const hasEmailSupportedComment = async (
+  commentId: number,
+  email: string
+): Promise<boolean> => {
+  try {
+    const response = await axios.get<boolean>(
+      `${API_BASE_URL}${COMMENTS_PATH}/${commentId}/has-supported`,
+      {
+        params: { email },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error checking if email has supported comment:", error);
+    throw error;
+  }
+};
+
+
 export default {
   createComment,
   getCommentsByAnalogy,
@@ -172,4 +244,8 @@ export default {
   searchCommentsByEmail,
   searchCommentsEverywhere,
   verifyEmailAuthorization,
+  addSupportToComment,
+  removeSupportFromComment,
+  getSupportCountForComment,
+  hasEmailSupportedComment,
 };
