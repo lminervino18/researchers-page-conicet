@@ -72,7 +72,6 @@ const AnalogiesDetail: React.FC = () => {
     if (loginPurpose === "support") return;
 
     if (loginPurpose === "comment" && pendingComment) {
-      // Se espera que CommentSection maneje este comentario luego del login si es necesario
       setPendingComment(null);
     }
   };

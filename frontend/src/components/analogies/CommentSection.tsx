@@ -13,7 +13,9 @@ import { getColorForName, getInitials } from "../../utils/ColorUtils";
 import ConfirmationModal from "./ConfirmationModal";
 import "./styles/CommentSection.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { faComment, faTrash, faReply } from "@fortawesome/free-solid-svg-icons";
+
 
 interface User {
   email: string;
@@ -81,6 +83,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
     try {
       const ids = await getSupportedCommentsByEmail(user.email);
       setUserSupportedIds(ids);
+      
     } catch {
       setUserSupportedIds([]);
     }
@@ -195,6 +198,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
 
   const renderTree = (nodes: Comment[], depth = 0) =>
     nodes.map((comment) => (
+      
+      
       <div key={comment.id} className={`comment depth-${depth}`} style={{ marginLeft: depth * 20 }}>
         <div className="comment-content">
           <div className="user-avatar" style={{ backgroundColor: getColorForName(comment.userName), color: "white" }}>
@@ -205,9 +210,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
             <div className="comment-metadata">
               <span>{comment.userName}</span>
               <span>{new Date(comment.createdAt).toLocaleString()}</span>
-              <button className={`support-btn ${userSupportedIds.includes(comment.id) ? "supported" : ""}`} onClick={() => toggleSupport(comment.id)}>
-                👍 {supportCounts[comment.id] ?? 0}
+              <button
+                className={`comment-support-button ${userSupportedIds.includes(comment.id) ? "supported" : ""}`}
+                onClick={() => toggleSupport(comment.id)}
+              >
+                <FontAwesomeIcon icon={faThumbsUp} /> {supportCounts[comment.id] ?? 0}
               </button>
+
               {user?.email === comment.email && (
                 <button onClick={() => { setCommentToDelete(comment.id); setIsModalOpen(true); }}>
                   <FontAwesomeIcon icon={faTrash} />

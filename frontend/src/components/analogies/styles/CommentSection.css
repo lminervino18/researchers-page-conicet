@@ -244,11 +244,13 @@
   border-left: 3px solid var(--primary-color-lightest);
 }
 
-.support-btn {
+/* Estilo base del botón (sin support) */
+.comment-support-button {
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  color: var(--text-light); /* color base */
   border: none;
   background: none;
   cursor: pointer;
@@ -257,18 +259,21 @@
   transition: color 0.3s ease, transform 0.2s ease;
 }
 
-.support-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #666;
-  margin-left: 10px;
-  font-size: 0.9rem;
+/* Hover para todos los botones */
+.comment-support-button:hover {
+  color: var(--primary-color);
+  transform: scale(1.05);
 }
 
-.support-btn.supported {
-  color: #007bff;
+/* Cuando está con support */
+.comment-support-button.supported {
+  color: var(--primary-color);
+  background-color: rgba(0, 123, 255, 0.1); 
   font-weight: bold;
 }
+
+
+
+
 
 
