@@ -100,7 +100,7 @@ const MemberDetailModal: FC<MemberDetailModalProps> = ({ member, onClose }) => {
                   className="member-detail-courses-btn"
                   onClick={handleViewCourses}
                 >
-                  
+                View Courses
                 </button>
                 <button 
                   className="member-detail-publications-btn"
