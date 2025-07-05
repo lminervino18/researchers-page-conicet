@@ -15,17 +15,21 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
   const [emailExists, setEmailExists] = useState<boolean | null>(null);
   const [usernameRequired, setUsernameRequired] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [finalUsername, setFinalUsername] = useState('');
 
   useEffect(() => {
-    if (!isOpen) {
-      setUsername('');
-      setEmail('');
-      setError('');
-      setEmailExists(null);
-      setUsernameRequired(false);
-      setLoading(false);
-    }
-  }, [isOpen]);
+  if (!isOpen && !showSuccess) {
+    setUsername('');
+    setEmail('');
+    setError('');
+    setEmailExists(null);
+    setUsernameRequired(false);
+    setLoading(false);
+    setFinalUsername('');
+  }
+}, [isOpen, showSuccess]);
+
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -60,7 +64,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
       }
 
       onLogin(userData.username, email);
-      onClose();
+      setFinalUsername(userData.username);
+      setShowSuccess(true);
+      setLoading(false);
+      setShowSuccess(true);
+      setLoading(false);
+
 
     } catch (err) {
       setError('An error occurred during email verification');
@@ -81,24 +90,87 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
       await updateUserName(email, username.trim());
 
       onLogin(username.trim(), email);
-      onClose();
+      setFinalUsername(username.trim());
+      setShowSuccess(true);
+      setLoading(false);
+      setTimeout(() => {
+        setShowSuccess(false);
+        onClose();
+      }, 2000);
     } catch (err) {
       setError('Error saving username');
-    } finally {
       setLoading(false);
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen && !showSuccess) return null;
 
   return (
     <div className="login-modal-overlay">
       <div className="login-modal">
         <button className="close-button" onClick={onClose}>&times;</button>
-        <div className="login-modal-content">
-          <h2>Verify Your Access</h2>
-          {!usernameRequired && (
+        <div className={`login-modal-content ${showSuccess ? 'success-message' : ''}`}>
+          {showSuccess ? (
             <>
+              <h2>🎉 You're logged in!</h2>
+              <p style={{ textAlign: 'center', fontSize: '1rem', marginBottom: '1rem' }}>
+                Welcome, <strong>{finalUsername || 'User'}</strong>! You can now comment and support.
+              </p>
+              <div className="modal-actions">
+                <button 
+                  type="button" 
+                  className="btn btn-primary"
+                  onClick={() => {
+                    setShowSuccess(false);
+                    onClose();
+                  }}
+                >
+                  Continue
+                </button>
+              </div>
+            </>
+
+          ) : usernameRequired ? (
+            <>
+              <p className="verification-hint">
+                Your email is authorized but you need to set your username.<br/>
+                This can only be done <strong>once</strong> and cannot be changed later.
+              </p>
+              <div className="form-group">
+                <label htmlFor="username">Username (one-time set)</label>
+                <input
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Choose your username"
+                  required
+                  disabled={loading}
+                />
+              </div>
+              {error && <p className="error-message">{error}</p>}
+              <div className="modal-actions">
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={onClose}
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleSetUsername}
+                  disabled={loading}
+                >
+                  Save Username
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2>Verify Your Access</h2>
               <p className="verification-hint">
                 Check if your email is allowed to comment or support!
               </p>
@@ -139,46 +211,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
                   </button>
                 </div>
               </form>
-            </>
-          )}
-
-          {usernameRequired && (
-            <>
-              <p className="verification-hint">
-                Your email is authorized but you need to set your username.<br/>
-                This can only be done <strong>once</strong> and cannot be changed later.
-              </p>
-              <div className="form-group">
-                <label htmlFor="username">Username (one-time set)</label>
-                <input
-                  id="username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Choose your username"
-                  required
-                  disabled={loading}
-                />
-              </div>
-              {error && <p className="error-message">{error}</p>}
-              <div className="modal-actions">
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
-                  onClick={onClose}
-                  disabled={loading}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleSetUsername}
-                  disabled={loading}
-                >
-                  Save Username
-                </button>
-              </div>
             </>
           )}
         </div>

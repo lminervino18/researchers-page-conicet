@@ -103,12 +103,15 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
           : []);
       const newComments = extractComments(commentsRaw);
 
-      if (newComments.length === 0) {
-        setHasMore(false);
-      } else {
+      if (newComments.length > 0) {
         setComments((prev) => [...prev, ...newComments]);
         await loadSupportData(commentsRaw);
       }
+
+      if (commentsRaw.length === 0) {
+        setHasMore(false);
+      }
+
     } catch (error) {
       console.error("Error loading comments:", error);
     } finally {
@@ -211,11 +214,11 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
               <span>{comment.userName}</span>
               <span>{new Date(comment.createdAt).toLocaleString()}</span>
               <button
-                className={`comment-support-button ${userSupportedIds.includes(comment.id) ? "supported" : ""}`}
-                onClick={() => toggleSupport(comment.id)}
-              >
-                <FontAwesomeIcon icon={faThumbsUp} /> {supportCounts[comment.id] ?? 0}
-              </button>
+              className={`comment-support-button ${userSupportedIds.includes(comment.id) ? "supported" : ""}`}
+              onClick={() => toggleSupport(comment.id)}
+            >
+              <FontAwesomeIcon icon={faThumbsUp} /> {supportCounts[comment.id] ?? 0}
+            </button>
 
               {user?.email === comment.email && (
                 <button onClick={() => { setCommentToDelete(comment.id); setIsModalOpen(true); }}>

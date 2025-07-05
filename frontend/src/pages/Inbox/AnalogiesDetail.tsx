@@ -231,6 +231,7 @@ const AnalogiesDetail: React.FC = () => {
             </div>
 
             <CommentSection
+              key={user?.email ?? "guest"} // fuerza el remount si cambia el usuario
               analogyId={analogy.id}
               user={user}
               onRequestLogin={() => {
