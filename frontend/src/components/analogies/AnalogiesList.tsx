@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Analogy } from '../../types';
-import { authors as authorsList } from '../../api/Authors';
+import { authors as authorsList } from '../../api/authors';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLink, faComment } from '@fortawesome/free-solid-svg-icons';
 import { faYoutube, faFacebook, faTiktok } from '@fortawesome/free-brands-svg-icons';

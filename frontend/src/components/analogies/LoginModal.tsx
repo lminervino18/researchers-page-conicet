@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { checkEmailRegistration, updateUserName } from '../../api/EmailVerification'; 
+import { checkEmailRegistration, updateUserName } from '../../api/emailVerification'; 
 import './styles/LoginModal.css';
 
 interface LoginModalProps {

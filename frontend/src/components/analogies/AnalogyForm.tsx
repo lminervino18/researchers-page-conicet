@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authors, Author } from '../../api/Authors';
+import { authors, Author } from '../../api/authors';
 import './styles/AnalogyForm.css';
 
 interface AnalogyFormProps {

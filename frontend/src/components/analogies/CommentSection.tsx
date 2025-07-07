@@ -7,7 +7,7 @@ import {
   getCommentsByAnalogy,
   deleteComment,
   createComment,
-} from "../../api/Comment";
+} from "../../api/comment";
 import { Comment } from "../../types";
 import { getColorForName, getInitials } from "../../utils/ColorUtils";
 import ConfirmationModal from "./ConfirmationModal";
