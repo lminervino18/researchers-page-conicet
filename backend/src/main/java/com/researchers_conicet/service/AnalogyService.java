@@ -174,41 +174,41 @@ public class AnalogyService {
      * @throws IllegalArgumentException if validation fails
      */
     @Transactional
-    public AnalogyResponseDTO updateAnalogy(Long id, AnalogyRequestDTO requestDTO) {
-        log.info("Updating analogy with ID: {}", id);
-        
-        validateAnalogyData(requestDTO);
-        Analogy analogy = findAnalogyById(id);
-
-        try {
-            analogy.setTitle(requestDTO.getTitle());
-            analogy.setContent(requestDTO.getContent());
-            analogy.setAuthors(requestDTO.getAuthors());
-            analogy.setLinks(requestDTO.getLinks());
-
-
-            analogy.setMediaLinks(
-            requestDTO.getMediaLinks()
-                .stream()
-                .map(dto -> new MediaLink(dto.getUrl(), dto.getMediaType()))
-                .collect(Collectors.toSet())
-            );
-
-            Analogy updatedAnalogy = analogyRepository.save(analogy);
-            log.info("Updated analogy with ID: {}", id);
+        public AnalogyResponseDTO updateAnalogy(Long id, AnalogyRequestDTO requestDTO) {
+            log.info("Updating analogy with ID: {}", id);
             
-            // Initialize lazy collections
-            Hibernate.initialize(updatedAnalogy.getAuthors());
-            Hibernate.initialize(updatedAnalogy.getLinks());
-            Hibernate.initialize(updatedAnalogy.getMediaLinks());
+            validateAnalogyData(requestDTO);
+            Analogy analogy = findAnalogyById(id);
 
-            
-            return mapToDTO(updatedAnalogy);
-        } catch (Exception e) {
-            log.error("Error updating analogy with ID: {}", id, e);
-            throw new RuntimeException("Failed to update analogy", e);
+            try {
+                analogy.setTitle(requestDTO.getTitle());
+                analogy.setContent(requestDTO.getContent());
+                analogy.setAuthors(requestDTO.getAuthors());
+                analogy.setLinks(requestDTO.getLinks());
+
+                analogy.getMediaLinks().clear();
+
+                analogy.setMediaLinks(
+                    requestDTO.getMediaLinks()
+                        .stream()
+                        .map(dto -> new MediaLink(dto.getUrl(), dto.getMediaType()))
+                        .collect(Collectors.toSet())
+                );
+
+                Analogy updatedAnalogy = analogyRepository.save(analogy);
+                log.info("Updated analogy with ID: {}", id);
+
+                Hibernate.initialize(updatedAnalogy.getAuthors());
+                Hibernate.initialize(updatedAnalogy.getLinks());
+                Hibernate.initialize(updatedAnalogy.getMediaLinks());
+
+                return mapToDTO(updatedAnalogy);
+            } catch (Exception e) {
+                log.error("Error updating analogy with ID: {}", id, e);
+                throw new RuntimeException("Failed to update analogy", e);
+            }
         }
-    }
+
 
     /**
      * Deletes an analogy

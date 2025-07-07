@@ -1,6 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authors, Author } from '../../api/authors';
+import { uploadFile } from '../../api/firebaseUploader';
 import './styles/AnalogyForm.css';
 
 interface AnalogyFormProps {
@@ -11,11 +12,17 @@ interface AnalogyFormProps {
   isEditing?: boolean;
 }
 
+interface MediaLink {
+  url: string;
+  mediaType: string; // "image" | "video"
+}
+
 interface AnalogyDTO {
   title: string;
   content: string;
-  authors: string[]; // Solo nombre y apellido
+  authors: string[];
   links: string[];
+  mediaLinks: MediaLink[];
 }
 
 interface Analogy {
@@ -24,6 +31,7 @@ interface Analogy {
   content: string;
   authors: string[];
   links: string[];
+  mediaLinks: MediaLink[];
 }
 
 const AnalogyForm: FC<AnalogyFormProps> = ({
@@ -43,29 +51,42 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
     links: false
   });
 
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+  const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
+  const [mediaTypes, setMediaTypes] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+
   const [formData, setFormData] = useState<AnalogyDTO>({
-    title: '',
-    content: '',
-    authors: [],
-    links: []
-  });
+      title: '',
+      content: '',
+      authors: [],
+      links: [],
+      mediaLinks: [] 
+    });
 
   useEffect(() => {
-    if (initialData) {
-      setFormData({
-        title: initialData.title,
-        content: initialData.content || '',
-        authors: initialData.authors,
-        links: initialData.links
-      });
-      setTouched({
-        title: true,
-        content: true,
-        authors: true,
-        links: true
-      });
-    }
-  }, [initialData]);
+  if (initialData) {
+    setFormData({
+      title: initialData.title,
+      content: initialData.content || '',
+      authors: initialData.authors,
+      links: initialData.links,
+      mediaLinks: initialData.mediaLinks || [] 
+    });
+
+    setTouched({
+      title: true,
+      content: true,
+      authors: initialData.authors.length > 0, 
+      links: initialData.links.length > 0  
+    });
+
+    setMediaPreviews(initialData.mediaLinks.map(link => link.url)); 
+    setMediaTypes(initialData.mediaLinks.map(link => link.mediaType));
+  }
+}, [initialData]);
+
 
   const handleAddLink = () => {
     if (linkInput.trim()) {
@@ -78,38 +99,48 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setInternalError(null);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    setTouched({
-      title: true,
-      content: true,
-      authors: true,
-      links: true
-    });
+  setIsLoading(true); 
+  setInternalError(null);
+  setTouched({ title: true, content: true, authors: true, links: true });
 
-    if (!formData.title.trim()) {
-      setInternalError('Title is required');
-      return;
-    }
+  if (!formData.title.trim() || !formData.content.trim() || formData.authors.length === 0) {
+    setInternalError('Please complete all required fields');
+    setIsLoading(false); 
+    return;
+  }
 
-    if (!formData.content.trim()) {
-      setInternalError('Content is required');
-      return;
-    }
+  try {
+    const uploadedLinks: MediaLink[] = await Promise.all(
+      mediaFiles.map(async (file) => ({
+        url: await uploadFile(file),
+        mediaType: file.type.startsWith('video') ? 'video' : 'image'
+      }))
+    );
 
-    if (formData.authors.length === 0) {
-      setInternalError('At least one author is required');
-      return;
-    }
+    const allMediaLinks = [
+      ...formData.mediaLinks,
+      ...uploadedLinks
+    ];
 
-    try {
-      await onSubmit(formData, initialData?.id);
-    } catch (err) {
-      setInternalError(err instanceof Error ? err.message : 'An error occurred');
-    }
-  };
+    await onSubmit(
+      { ...formData, mediaLinks: allMediaLinks },
+      initialData?.id
+    );
+
+    setIsLoading(false); 
+  } catch (err) {
+    console.error('Error in handleSubmit:', err);
+    setInternalError(err instanceof Error ? err.message : 'An error occurred');
+    setIsLoading(false); 
+  }
+};
+
+
+
+
 
   const handleCancel = () => {
     navigate(-1);
@@ -128,7 +159,40 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
     setTouched(prev => ({ ...prev, authors: true }));
   };
 
+  const handleRemoveMedia = (index: number) => {
+  const newFiles = [...mediaFiles];
+  const newPreviews = [...mediaPreviews];
+  const newTypes = [...mediaTypes];
+  const newMediaLinks = [...formData.mediaLinks]; 
+
+  newFiles.splice(index, 1);
+  newPreviews.splice(index, 1);
+  newTypes.splice(index, 1);
+  newMediaLinks.splice(index, 1);
+
+  setMediaFiles(newFiles);
+  setMediaPreviews(newPreviews);
+  setMediaTypes(newTypes);
+  setFormData((prevData) => ({
+    ...prevData,
+    mediaLinks: newMediaLinks, 
+  }));
+};
+
+
   return (
+    
+    <div>
+    {isLoading && (
+      <>
+        <div className="loading-overlay"></div>
+        <div className="loading-spinner-wrapper">
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+          </div>
+        </div>
+      </>
+    )}
     <form onSubmit={handleSubmit} className="analogy-form">
       {error && <div className="error-message">{error}</div>}
 
@@ -233,6 +297,54 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
         )}
       </div>
 
+      <div className="form-group">
+        <label>Media Upload (images/videos) <span className="required">*</span></label>
+        {mediaPreviews.length >= 10 && (
+        <div className="error-message">Max 10 files allowed</div>
+        )}
+
+        <input
+          type="file"
+          accept="image/*,video/*"
+          multiple
+          onChange={(e) => {
+            const files = Array.from(e.target.files || []);
+            
+            if (mediaPreviews.length + files.length > 10) {
+              setInternalError('You can upload up to 10 files only.');
+              return;
+            }
+            const newPreviews = files.map(file => URL.createObjectURL(file));
+            const newTypes = files.map(file => (file.type.startsWith('video') ? 'video' : 'image'));
+
+            setMediaFiles(prevFiles => [...prevFiles, ...files]);  
+            setMediaPreviews(prevPreviews => [...prevPreviews, ...newPreviews]);  
+            setMediaTypes(prevTypes => [...prevTypes, ...newTypes]);  
+          }}
+          disabled={isSubmitting}
+        />
+
+        <div className="media-preview-grid">
+          {mediaPreviews.map((src, i) => (
+            <div key={i} className="media-preview">
+              {mediaTypes[i] === 'video' ? (
+                <video src={src} controls />
+              ) : (
+                <img src={src} alt={`media-${i}`} />
+              )}
+              <button
+                type="button"
+                onClick={() => handleRemoveMedia(i)}
+                className="remove-tag"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+
+      </div>
+
       <div className="form-actions">
         <button type="submit" className={`submit-btn ${isSubmitting ? 'loading' : ''}`} disabled={isSubmitting}>
           {isSubmitting ? (isEditing ? 'Updating...' : 'Submitting...') : (isEditing ? 'Update Analogy' : 'Submit Analogy')}
@@ -242,6 +354,7 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
         </button>
       </div>
     </form>
+    </div>
   );
 };
 
