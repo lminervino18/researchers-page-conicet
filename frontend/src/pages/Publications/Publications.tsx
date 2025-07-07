@@ -3,7 +3,7 @@ import { FC, useState, useEffect } from 'react';
 import MainLayout from '../../layouts/MainLayout';
 import PublicationsList from '../../components/publications/PublicationsList';
 import { Research } from '../../types';
-import { getAllResearches} from '../../api/research';
+import { getAllResearches } from '../../api/research';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import './styles/Publications.css';
@@ -13,6 +13,7 @@ const Publications: FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [downloading, setDownloading] = useState<number | null>(null);
 
   const loadPublications = async () => {
     try {
@@ -33,31 +34,42 @@ const Publications: FC = () => {
   }, []);
 
   const handlePdfView = (id: number) => {
-  const publication = publications.find(p => p.id === id);
-  if (publication?.pdfPath) {
-    window.open(publication.pdfPath, '_blank');
-  } else {
-    setError('No PDF available for this publication');
-  }
-};
+    const publication = publications.find(p => p.id === id);
+    if (publication?.pdfPath) {
+      window.open(publication.pdfPath, '_blank');
+    } else {
+      setError('No PDF available for this publication');
+    }
+  };
 
-const handlePdfDownload = (id: number) => {
-  const publication = publications.find(p => p.id === id);
-  if (publication?.pdfPath) {
-    const link = document.createElement('a');
-    link.href = publication.pdfPath;
-    link.setAttribute('download', `research-${id}.pdf`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  } else {
-    setError('No PDF available for this publication');
-  }
-};
+  const handlePdfDownload = async (id: number) => {
+    const publication = publications.find(p => p.id === id);
+    if (!publication?.pdfPath) {
+      setError('No PDF available for this publication');
+      return;
+    }
 
+    setDownloading(id);
+    try {
+      const response = await fetch(publication.pdfPath);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `research-${id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Error downloading PDF:', err);
+      setError('Failed to download PDF');
+    } finally {
+      setDownloading(null);
+    }
+  };
 
-  // Filtrar publicaciones basado en la búsqueda
-  const filteredPublications = publications.filter(pub => 
+  const filteredPublications = publications.filter(pub =>
     pub.researchAbstract.toLowerCase().includes(searchQuery.toLowerCase()) ||
     pub.authors.some(author => author.toLowerCase().includes(searchQuery.toLowerCase()))
   );
@@ -86,10 +98,11 @@ const handlePdfDownload = (id: number) => {
         ) : error ? (
           <div className="error-state">{error}</div>
         ) : (
-          <PublicationsList 
+          <PublicationsList
             publications={filteredPublications}
             onViewPdf={handlePdfView}
             onDownloadPdf={handlePdfDownload}
+            downloading={downloading}
           />
         )}
       </div>

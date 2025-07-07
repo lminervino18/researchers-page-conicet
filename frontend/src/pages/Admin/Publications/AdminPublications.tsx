@@ -13,6 +13,7 @@ const AdminPublications = () => {
   const [loading, setLoading] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState<number | null>(null);
 
   useEffect(() => {
     loadPublications();
@@ -50,7 +51,7 @@ const AdminPublications = () => {
   const handleDownloadPdf = async (pdfPath: string | undefined, id: number) => {
     try {
       if (!pdfPath) return;
-
+      setDownloading(id);
       const response = await fetch(pdfPath);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -64,7 +65,9 @@ const AdminPublications = () => {
     } catch (err) {
       console.error('Error downloading PDF:', err);
       setError('Failed to download PDF');
-    }
+    }finally {
+    setDownloading(null);
+  }
   };
 
   return (
@@ -123,10 +126,15 @@ const AdminPublications = () => {
                       onClick={() => handleDownloadPdf(publication.pdfPath, publication.id)}
                       className={`action-button ${!publication.pdfPath ? 'disabled' : ''}`}
                       title={publication.pdfPath ? "Download PDF" : "No PDF available"}
-                      disabled={!publication.pdfPath}
+                      disabled={!publication.pdfPath || downloading === publication.id}
                     >
-                      <FontAwesomeIcon icon={faDownload} />
+                      {downloading === publication.id ? (
+                        <span className="loading-spinner small"></span>
+                      ) : (
+                        <FontAwesomeIcon icon={faDownload} />
+                      )}
                     </button>
+
                     <button
                       onClick={() => navigate(`/admin/publications/edit/${publication.id}`)}
                       className="action-button"
