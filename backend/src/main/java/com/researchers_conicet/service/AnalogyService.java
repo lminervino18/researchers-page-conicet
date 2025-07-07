@@ -1,8 +1,10 @@
 package com.researchers_conicet.service;
 
 import com.researchers_conicet.entity.Analogy;
+import com.researchers_conicet.entity.MediaLink;
 import com.researchers_conicet.dto.analogy.AnalogyRequestDTO;
 import com.researchers_conicet.dto.analogy.AnalogyResponseDTO;
+import com.researchers_conicet.dto.analogy.MediaLinkDTO;
 import com.researchers_conicet.repository.AnalogyRepository;
 import com.researchers_conicet.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -103,13 +105,21 @@ public class AnalogyService {
             analogy.setAuthors(requestDTO.getAuthors());
             analogy.setLinks(requestDTO.getLinks());
 
+            analogy.setMediaLinks(
+            requestDTO.getMediaLinks()
+                .stream()
+                .map(dto -> new MediaLink(dto.getUrl(), dto.getMediaType()))
+                .collect(Collectors.toSet())
+            );
+
             Analogy savedAnalogy = analogyRepository.save(analogy);
             log.info("Created analogy with ID: {}", savedAnalogy.getId());
             
             // Initialize lazy collections explicitly
             Hibernate.initialize(savedAnalogy.getAuthors());
             Hibernate.initialize(savedAnalogy.getLinks());
-            
+            Hibernate.initialize(savedAnalogy.getMediaLinks());
+
             return mapToDTO(savedAnalogy);
         } catch (Exception e) {
             log.error("Error creating analogy", e);
@@ -130,6 +140,8 @@ public class AnalogyService {
         // Initialize lazy collections
         Hibernate.initialize(analogy.getAuthors());
         Hibernate.initialize(analogy.getLinks());
+        Hibernate.initialize(analogy.getMediaLinks());
+
         return mapToDTO(analogy);
     }
 
@@ -146,6 +158,8 @@ public class AnalogyService {
                 // Initialize lazy collections for each element
                 Hibernate.initialize(analogy.getAuthors());
                 Hibernate.initialize(analogy.getLinks());
+                Hibernate.initialize(analogy.getMediaLinks());
+
                 return mapToDTO(analogy);
             });
     }
@@ -172,12 +186,22 @@ public class AnalogyService {
             analogy.setAuthors(requestDTO.getAuthors());
             analogy.setLinks(requestDTO.getLinks());
 
+
+            analogy.setMediaLinks(
+            requestDTO.getMediaLinks()
+                .stream()
+                .map(dto -> new MediaLink(dto.getUrl(), dto.getMediaType()))
+                .collect(Collectors.toSet())
+            );
+
             Analogy updatedAnalogy = analogyRepository.save(analogy);
             log.info("Updated analogy with ID: {}", id);
             
             // Initialize lazy collections
             Hibernate.initialize(updatedAnalogy.getAuthors());
             Hibernate.initialize(updatedAnalogy.getLinks());
+            Hibernate.initialize(updatedAnalogy.getMediaLinks());
+
             
             return mapToDTO(updatedAnalogy);
         } catch (Exception e) {
@@ -224,6 +248,8 @@ public class AnalogyService {
             .map(analogy -> {
                 Hibernate.initialize(analogy.getAuthors());
                 Hibernate.initialize(analogy.getLinks());
+                Hibernate.initialize(analogy.getMediaLinks());
+
                 return mapToDTO(analogy);
             })
             .collect(Collectors.toList());
@@ -246,6 +272,8 @@ public class AnalogyService {
             .map(analogy -> {
                 Hibernate.initialize(analogy.getAuthors());
                 Hibernate.initialize(analogy.getLinks());
+                Hibernate.initialize(analogy.getMediaLinks());
+
                 return mapToDTO(analogy);
             })
             .collect(Collectors.toList());
@@ -268,6 +296,8 @@ public class AnalogyService {
             .map(analogy -> {
                 Hibernate.initialize(analogy.getAuthors());
                 Hibernate.initialize(analogy.getLinks());
+                Hibernate.initialize(analogy.getMediaLinks());
+
                 return mapToDTO(analogy);
             })
             .collect(Collectors.toList());
@@ -420,6 +450,19 @@ public class AnalogyService {
         // Dynamically get support count
         dto.setSupportCount(analogy.getSupportEmails().size());
         
+        dto.setMediaLinks(
+        analogy.getMediaLinks()
+            .stream()
+            .map(media -> {
+                MediaLinkDTO dtoItem = new MediaLinkDTO();
+                dtoItem.setUrl(media.getUrl());
+                dtoItem.setMediaType(media.getMediaType());
+                return dtoItem;
+            })
+            .collect(Collectors.toSet())
+         );
+
+
         return dto;
     }
 
