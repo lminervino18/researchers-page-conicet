@@ -98,6 +98,8 @@
 }
 
 .comments-list {
+  max-height: 500px; /* Set a fixed height */
+  overflow-y: auto;  /* Enable vertical scrolling */
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
@@ -241,3 +243,37 @@
   margin-left: 90px;
   border-left: 3px solid var(--primary-color-lightest);
 }
+
+/* Estilo base del botón (sin support) */
+.comment-support-button {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-light); /* color base */
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--border-radius-sm);
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+/* Hover para todos los botones */
+.comment-support-button:hover {
+  color: var(--primary-color);
+  transform: scale(1.05);
+}
+
+/* Cuando está con support */
+.comment-support-button.supported {
+  color: var(--primary-color);
+  background-color: rgba(0, 123, 255, 0.1); 
+  font-weight: bold;
+}
+
+
+
+
+
+

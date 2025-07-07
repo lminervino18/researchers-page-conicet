@@ -1,50 +1,61 @@
-# 🌎 Researchers Page - CONICET
+# Researchers Page - CONICET
 
-Welcome to **Researchers Page - CONICET**, an informative platform where researchers from **CONICET (National Scientific and Technical Research Council of Argentina)** can showcase their work, publications, and scientific contributions.
+Researchers Page - CONICET is a web platform designed to showcase the work of researchers affiliated with CONICET (Consejo Nacional de Investigaciones Científicas y Técnicas, Argentina). It aims to centralize and disseminate scientific production, team information, and opportunities for public engagement.
 
-## 🚀 Project Overview
+---
 
-This platform aims to centralize and display information about researchers, including:
+## Project Overview
 
-- 📄 Scientific publications
-- 🏛️ Institutional affiliations
-- 🎓 Research projects
-- 📢 News and announcements
-- 📬 Contact information
+The platform is structured into the following main sections:
 
-## 🛠️ Technologies Used
+- **Landing Page:** Introductory section presenting the research group and the purpose of the website.
+- **Research Lines:** Details about the scientific areas and research objectives of the group.
+- **Members:** Directory of team members, including their roles, affiliations, and profiles.
+- **Publications:** A catalog of scientific articles and academic contributions by the group.
+- **Experiment Participation:** A space where individuals can register to participate in ongoing research studies.
+- **Analogy Inbox:** A more informal section where researchers can publish thoughts or analogies related to their work. This section includes a basic email-based login system and a comment system.
+- **News:** A section with announcements about courses, events, and updates relevant to the group.
 
-This project is built using a **full-stack approach** with the following technologies:
+Additionally, the homepage features a photo gallery of the research team.
 
-### **Frontend (React + TypeScript)**
+---
 
-- ⚛️ **React** – Modern JavaScript library for building user interfaces
-- 📜 **TypeScript** – Ensures type safety and better development experience
-- 💨 **Vite** – Fast build tool for optimized React applications
-- 🎨 **CSS Modules / TailwindCSS** – For scalable and maintainable styling
-- 🌐 **React Router** – For seamless navigation
-- 🔄 **Axios** – For API communication
+## Technologies Used
 
-### **Backend (Spring Boot + Java)**
+### Frontend (React + TypeScript)
+- **React:** Component-based UI development
+- **TypeScript:** Type-safe JavaScript for enhanced maintainability
+- **Vite:** Build tool for fast development and optimized bundling
+- **CSS Modules / TailwindCSS:** Styling solutions for scalable and reusable design
+- **React Router:** Client-side navigation
+- **Axios:** HTTP client for API communication
 
-- ☕ **Java (Spring Boot)** – Robust backend framework for enterprise applications
-- 🔃 **Spring Data JPA** – Simplified database interaction
-- 🛢️ **MySQL** – Relational database management system
-- 🔑 **Spring Security (Optional)** – To manage authentication and authorization
-- 🔗 **REST API** – To facilitate data exchange between the frontend and backend
+### Backend (Spring Boot + Java)
+- **Spring Boot:** Framework for building RESTful Java applications
+- **Spring Data JPA:** Abstraction layer for database operations
+- **MySQL:** Relational database
+- **Spring Security (optional):** Authentication and authorization layer
+- **REST API:** Interfaces to exchange data between frontend and backend
 
-### **Infrastructure & Deployment**
+---
 
-- ☁️ **Vercel** – Frontend hosting
-- 🏗️ **Amazon EC2** – Backend deployment
-- 🛢️ **Amazon RDS (MySQL)** – Cloud-based database storage
+## Infrastructure and Deployment
 
-### **Development Setup**
+- **Frontend:** Deployed on Vercel
+- **Backend:** Deployed using Railway
+- **Database:** Cloud-based MySQL instance via Railway
+- **Image Storage:** Firebase Storage used for uploading and hosting media assets (e.g., profile pictures, gallery images)
 
-- 🚀 **Dev Script** – Single command to launch all services
-  ```bash
-  # Give execution permissions (first time only)
-  chmod +x start-dev.sh
+---
 
-  # Start all services (MySQL, Backend, Frontend)
-  ./start-dev.sh
+## Development Setup
+
+To run the application locally:
+
+```bash
+# Grant execution permission (first time only)
+chmod +x start-dev.sh
+
+# Launch all services (frontend, backend, database)
+./start-dev.sh
+```

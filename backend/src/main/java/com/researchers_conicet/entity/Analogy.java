@@ -113,4 +113,8 @@ public class Analogy {
     public boolean removeSupportEmail(String email) {
         return supportEmails.remove(email);
     }
+
+    @Transient
+    private int supportCount;
+
 }

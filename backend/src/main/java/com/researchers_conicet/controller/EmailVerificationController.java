@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -31,55 +32,49 @@ public class EmailVerificationController {
 
     private final EmailVerificationService emailVerificationService;
 
-    /**
-     * Constructor for EmailVerificationController
-     *
-     * @param emailVerificationService Service for email verification operations
-     */
     public EmailVerificationController(EmailVerificationService emailVerificationService) {
         this.emailVerificationService = emailVerificationService;
     }
 
-    /**
-     * Checks if an email is registered in the system
-     *
-     * @param email Email address to check
-     * @return ResponseEntity with boolean indicating registration status
-     */
     @GetMapping("/check")
-    public ResponseEntity<Boolean> checkEmailRegistration(
+    public ResponseEntity<EmailVerificationResponseDTO> checkEmailRegistration(
             @RequestParam String email) {
         log.info("Checking email registration: {}", email);
-        return ResponseEntity.ok(emailVerificationService.isEmailRegistered(email));
+        Optional<EmailVerification> verificationOpt = emailVerificationService.getEmailVerification(email);
+
+        EmailVerificationResponseDTO responseDTO = new EmailVerificationResponseDTO();
+        if (verificationOpt.isPresent()) {
+            EmailVerification verification = verificationOpt.get();
+            responseDTO.setEmail(verification.getEmail());
+            responseDTO.setCreatedAt(verification.getCreatedAt());
+            responseDTO.setRegistered(true);
+            responseDTO.setUsername(verification.getUsername());
+        } else {
+            responseDTO.setEmail(email);
+            responseDTO.setRegistered(false);
+            responseDTO.setUsername(null);
+            responseDTO.setCreatedAt(null);
+        }
+
+        return ResponseEntity.ok(responseDTO);
     }
 
-    /**
-     * Registers a new email for verification
-     *
-     * @param requestDTO DTO containing email to register
-     * @return ResponseEntity with registered email details
-     */
     @PostMapping("/register")
     public ResponseEntity<EmailVerificationResponseDTO> registerEmail(
             @RequestBody @Valid EmailVerificationRequestDTO requestDTO) {
         log.info("Registering email: {}", requestDTO.getEmail());
-        
+
         EmailVerification verification = emailVerificationService.registerEmail(requestDTO.getEmail());
-        
+
         EmailVerificationResponseDTO responseDTO = new EmailVerificationResponseDTO();
         responseDTO.setEmail(verification.getEmail());
         responseDTO.setCreatedAt(verification.getCreatedAt());
         responseDTO.setRegistered(true);
-        
+        responseDTO.setUsername(verification.getUsername());
+
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
-    /**
-     * Removes a specific email from verification
-     *
-     * @param email Email address to remove
-     * @return ResponseEntity with no content
-     */
     @DeleteMapping("/remove")
     public ResponseEntity<Void> removeEmail(
             @RequestParam String email) {
@@ -88,13 +83,6 @@ public class EmailVerificationController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Updates the username associated with a specific email
-     *
-     * @param email Email address to modify
-     * @param newUsername New username to set
-     * @return ResponseEntity indicating success or failure
-     */
     @PatchMapping("/{email}/update-username")
     public ResponseEntity<Void> updateUserName(
             @PathVariable String email,
@@ -104,12 +92,6 @@ public class EmailVerificationController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Registers multiple emails for verification
-     *
-     * @param emails List of email addresses to register
-     * @return ResponseEntity with list of registered email verification entities
-     */
     @PostMapping("/register-multiple")
     public ResponseEntity<List<EmailVerification>> registerMultipleEmails(
             @RequestBody List<String> emails) {
@@ -118,12 +100,6 @@ public class EmailVerificationController {
         return ResponseEntity.ok(registeredEmails);
     }
 
-    /**
-     * Removes multiple emails from verification
-     *
-     * @param emails List of email addresses to remove
-     * @return ResponseEntity with no content
-     */
     @DeleteMapping("/remove-multiple")
     public ResponseEntity<Void> removeMultipleEmails(
             @RequestBody List<String> emails) {
@@ -132,24 +108,14 @@ public class EmailVerificationController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Retrieves all registered emails
-     *
-     * @return ResponseEntity with list of registered emails
-     */
     @GetMapping("/all")
     public ResponseEntity<List<String>> getAllRegisteredEmails() {
         List<String> emails = emailVerificationService.getAllRegisteredEmails();
-        return emails.isEmpty() 
-            ? ResponseEntity.noContent().build() 
+        return emails.isEmpty()
+            ? ResponseEntity.noContent().build()
             : ResponseEntity.ok(emails);
     }
 
-    /**
-     * Removes all registered emails
-     *
-     * @return ResponseEntity with no content
-     */
     @DeleteMapping("/all")
     public ResponseEntity<Void> removeAllEmails() {
         log.info("Removing all registered emails");
@@ -157,11 +123,6 @@ public class EmailVerificationController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Counts the number of registered emails
-     *
-     * @return ResponseEntity with the count of registered emails
-     */
     @GetMapping("/count")
     public ResponseEntity<Long> countRegisteredEmails() {
         long count = emailVerificationService.countRegisteredEmails();
@@ -169,18 +130,12 @@ public class EmailVerificationController {
         return ResponseEntity.ok(count);
     }
 
-    /**
-     * Checks registration status for multiple emails
-     *
-     * @param emails List of email addresses to check
-     * @return ResponseEntity with registration status for each email
-     */
     @PostMapping("/check-registration")
-    public ResponseEntity<List<EmailVerificationService.EmailRegistrationStatus>> 
+    public ResponseEntity<List<EmailVerificationService.EmailRegistrationStatus>>
     checkEmailsRegistration(@RequestBody List<String> emails) {
         log.info("Checking registration status for emails: {}", emails);
-        List<EmailVerificationService.EmailRegistrationStatus> statuses = 
-            emailVerificationService.checkEmailsRegistration(emails);
+        List<EmailVerificationService.EmailRegistrationStatus> statuses =
+                emailVerificationService.checkEmailsRegistration(emails);
         return ResponseEntity.ok(statuses);
     }
 }

@@ -1,18 +1,15 @@
-import axios from 'axios';
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 
-// Define the base URL for the email verification API
 const API_BASE_URL = 'http://localhost:8080/api/email-verification';
 
-// Interfaces
 interface EmailVerificationRequest {
   email: string;
 }
 
 interface EmailVerificationResponse {
-  id: number;
   email: string;
-  createdAt: Date;
+  username: string | null;
+  createdAt: string;
   registered: boolean;
 }
 
@@ -21,7 +18,6 @@ interface EmailRegistrationStatus {
   registered: boolean;
 }
 
-// Error handling utility
 const handleApiError = (error: unknown) => {
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError;
@@ -31,10 +27,9 @@ const handleApiError = (error: unknown) => {
   throw error;
 };
 
-// Check if email is registered
-export const checkEmailRegistration = async (email: string): Promise<boolean> => {
+export const checkEmailRegistration = async (email: string): Promise<EmailVerificationResponse> => {
   try {
-    const response = await axios.get<boolean>(`${API_BASE_URL}/check`, {
+    const response = await axios.get<EmailVerificationResponse>(`${API_BASE_URL}/check`, {
       params: { email }
     });
     return response.data;
@@ -44,7 +39,6 @@ export const checkEmailRegistration = async (email: string): Promise<boolean> =>
   }
 };
 
-// Register email for verification
 export const registerEmail = async (email: string): Promise<EmailVerificationResponse> => {
   try {
     const requestData: EmailVerificationRequest = { email };
@@ -64,7 +58,21 @@ export const registerEmail = async (email: string): Promise<EmailVerificationRes
   }
 };
 
-// Register multiple emails
+export const updateUserName = async (email: string, newUsername: string): Promise<void> => {
+  try {
+    await axios.patch(
+      `${API_BASE_URL}/${encodeURIComponent(email)}/update-username`,
+      null,
+      {
+        params: { newUsername }
+      }
+    );
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+};
+
 export const registerMultipleEmails = async (emails: string[]): Promise<EmailVerificationResponse[]> => {
   try {
     const response = await axios.post<EmailVerificationResponse[]>(
@@ -83,7 +91,6 @@ export const registerMultipleEmails = async (emails: string[]): Promise<EmailVer
   }
 };
 
-// Get all registered emails
 export const getAllRegisteredEmails = async (): Promise<string[]> => {
   try {
     const response = await axios.get<string[]>(`${API_BASE_URL}/all`);
@@ -94,7 +101,6 @@ export const getAllRegisteredEmails = async (): Promise<string[]> => {
   }
 };
 
-// Remove email from verification
 export const removeEmail = async (email: string): Promise<void> => {
   try {
     await axios.delete(`${API_BASE_URL}/remove`, {
@@ -105,7 +111,6 @@ export const removeEmail = async (email: string): Promise<void> => {
   }
 };
 
-// Remove multiple emails
 export const removeMultipleEmails = async (emails: string[]): Promise<void> => {
   try {
     await axios.delete(`${API_BASE_URL}/remove-multiple`, {
@@ -116,7 +121,6 @@ export const removeMultipleEmails = async (emails: string[]): Promise<void> => {
   }
 };
 
-// Remove all emails
 export const removeAllEmails = async (): Promise<void> => {
   try {
     await axios.delete(`${API_BASE_URL}/all`);
@@ -125,7 +129,6 @@ export const removeAllEmails = async (): Promise<void> => {
   }
 };
 
-// Count registered emails
 export const countRegisteredEmails = async (): Promise<number> => {
   try {
     const response = await axios.get<number>(`${API_BASE_URL}/count`);
@@ -136,7 +139,6 @@ export const countRegisteredEmails = async (): Promise<number> => {
   }
 };
 
-// Check registration status for multiple emails
 export const checkEmailsRegistration = async (emails: string[]): Promise<EmailRegistrationStatus[]> => {
   try {
     const response = await axios.post<EmailRegistrationStatus[]>(
@@ -155,36 +157,15 @@ export const checkEmailsRegistration = async (emails: string[]): Promise<EmailRe
   }
 };
 
-/**
- * Verify if an email is verified
- * @param email - Email to verify
- * @returns Boolean indicating email verification status
- */
-export const verifyEmail = async (
-  email: string
-): Promise<boolean> => {
-  try {
-    const response = await axios.get<boolean>(
-      `${API_BASE_URL}/verify-email`, 
-      {
-        params: { email }
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error('Error verifying email:', error);
-    throw error;
-  }
-};
-
 export default {
   checkEmailRegistration,
   registerEmail,
+  updateUserName,
   registerMultipleEmails,
+  getAllRegisteredEmails,
   removeEmail,
   removeMultipleEmails,
   removeAllEmails,
-  getAllRegisteredEmails,
   countRegisteredEmails,
   checkEmailsRegistration
 };

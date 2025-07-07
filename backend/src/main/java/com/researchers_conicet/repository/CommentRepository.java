@@ -216,4 +216,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      */
     @Query("SELECT COUNT(DISTINCT email) FROM Comment c JOIN c.supportEmails email WHERE c.id = :commentId")
     int countSupportsByCommentId(@Param("commentId") Long commentId);
+
+    @Query("SELECT c.id FROM Comment c JOIN c.supportEmails e WHERE e = :email")
+    List<Long> findSupportedCommentIdsByEmail(@Param("email") String email);
+
 }

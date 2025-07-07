@@ -401,6 +401,19 @@ public class CommentService {
         return dto;
     }
 
+        /**
+     * Gets the list of comment IDs supported by a specific email
+     *
+     * @param email the user's email
+     * @return list of comment IDs that the user supported
+     */
+    @Transactional(readOnly = true)
+    public List<Long> getSupportedCommentIdsByEmail(String email) {
+        validateEmail(email);
+        return commentRepository.findSupportedCommentIdsByEmail(email);
+    }
+
+
     /**
      * Validates email format
      * 
