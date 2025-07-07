@@ -18,12 +18,12 @@ public class MediaLink {
     /**
      * URL of the media stored in Firebase.
      */
-    @Column(name = "url", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "url", nullable = false, length = 512) // antes era TEXT
     private String url;
 
     /**
      * Type of media ("image" or "video").
      */
-    @Column(name = "media_type", nullable = false)
+    @Column(name = "media_type", nullable = false, length = 50) // más chico también
     private String mediaType;
 }

@@ -96,9 +96,9 @@ public class Analogy {
     @CollectionTable(
         name = "analogy_supports",
         joinColumns = @JoinColumn(name = "analogy_id"),
-        uniqueConstraints = @UniqueConstraint(columnNames = {"analogy_id", "email"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"analogy_id", "support_email"})
     )
-    @Column(name = "email")
+    @Column(name = "support_email")
     private Set<String> supportEmails = new HashSet<>();
 
     /**
