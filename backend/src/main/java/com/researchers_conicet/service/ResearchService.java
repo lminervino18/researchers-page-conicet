@@ -3,16 +3,16 @@ package com.researchers_conicet.service;
 import com.researchers_conicet.dto.research.ResearchRequestDTO;
 import com.researchers_conicet.dto.research.ResearchResponseDTO;
 import com.researchers_conicet.entity.Research;
-import com.researchers_conicet.repository.ResearchRepository;
 import com.researchers_conicet.exception.ResourceNotFoundException;
+import com.researchers_conicet.repository.ResearchRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
-import org.hibernate.Hibernate;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,15 +23,13 @@ import java.util.stream.Collectors;
 public class ResearchService {
 
     private final ResearchRepository researchRepository;
-    private final FileStorageService fileStorageService;
 
     private static final long MAX_PDF_SIZE = 25 * 1024 * 1024;
     private static final int MAX_AUTHORS = 10;
     private static final int MAX_LINKS = 5;
 
-    public ResearchService(ResearchRepository researchRepository, FileStorageService fileStorageService) {
+    public ResearchService(ResearchRepository researchRepository) {
         this.researchRepository = researchRepository;
-        this.fileStorageService = fileStorageService;
     }
 
     @Transactional
@@ -48,9 +46,8 @@ public class ResearchService {
 
             if (pdfFile != null && !pdfFile.isEmpty()) {
                 validatePdfFile(pdfFile);
-                String fileName = fileStorageService.storeFile(pdfFile);
-                String fileUrl = fileStorageService.getFileUrl(fileName);
-                research.setPdfPath(fileUrl);
+                // pdfPath must already be present in DTO or handled via frontend
+                throw new UnsupportedOperationException("File upload must be done via Firebase and URL provided in research links");
             }
 
             Research savedResearch = researchRepository.save(research);
@@ -91,14 +88,7 @@ public class ResearchService {
         try {
             if (pdfFile != null && !pdfFile.isEmpty()) {
                 validatePdfFile(pdfFile);
-
-                if (research.getPdfPath() != null) {
-                    fileStorageService.deleteFile(research.getPdfPath());
-                }
-
-                String fileName = fileStorageService.storeFile(pdfFile);
-                String fileUrl = fileStorageService.getFileUrl(fileName);
-                research.setPdfPath(fileUrl);
+                throw new UnsupportedOperationException("File upload must be done via Firebase and URL provided in research links");
             }
 
             research.setResearchAbstract(requestDTO.getResearchAbstract());
@@ -123,15 +113,6 @@ public class ResearchService {
         Research research = findResearchById(id);
 
         try {
-            if (research.getPdfPath() != null) {
-                try {
-                    fileStorageService.deleteFile(research.getPdfPath());
-                    log.info("Successfully deleted PDF for research ID: {}", id);
-                } catch (Exception e) {
-                    log.warn("Could not delete PDF for research ID: {}. Error: {}", id, e.getMessage());
-                }
-            }
-
             researchRepository.delete(research);
             log.info("Successfully deleted research with ID: {}", id);
         } catch (Exception e) {
