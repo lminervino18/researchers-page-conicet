@@ -5,7 +5,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDvF61-wBXgsVIwaZxdYgwOXDZqpvpuC3E",
   authDomain: "analogy-research-group-page.firebaseapp.com",
   projectId: "analogy-research-group-page",
-  storageBucket: "analogy-research-group-page.appspot.com",
+  storageBucket: "analogy-research-group-page.firebasestorage.app",
   messagingSenderId: "673174100825",
   appId: "1:673174100825:web:431e3e75afea6d3425ca48",
   measurementId: "G-9NRGXDGYZ5"

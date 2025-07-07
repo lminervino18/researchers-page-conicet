@@ -3,7 +3,7 @@ import { FC, useState, useEffect } from 'react';
 import MainLayout from '../../layouts/MainLayout';
 import PublicationsList from '../../components/publications/PublicationsList';
 import { Research } from '../../types';
-import { getAllResearches, viewPdf, downloadPdf } from '../../api/Research';
+import { getAllResearches} from '../../api/research';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import './styles/Publications.css';
@@ -32,33 +32,29 @@ const Publications: FC = () => {
     loadPublications();
   }, []);
 
-  const handlePdfView = async (id: number) => {
-    try {
-      const pdfBlob = await viewPdf(id);
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      window.open(pdfUrl, '_blank');
-    } catch (err) {
-      console.error('Error viewing PDF:', err);
-      setError('Failed to open PDF');
-    }
-  };
+  const handlePdfView = (id: number) => {
+  const publication = publications.find(p => p.id === id);
+  if (publication?.pdfPath) {
+    window.open(publication.pdfPath, '_blank');
+  } else {
+    setError('No PDF available for this publication');
+  }
+};
 
-  const handlePdfDownload = async (id: number) => {
-    try {
-      const pdfBlob = await downloadPdf(id);
-      const url = window.URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `research-${id}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Error downloading PDF:', err);
-      setError('Failed to download PDF');
-    }
-  };
+const handlePdfDownload = (id: number) => {
+  const publication = publications.find(p => p.id === id);
+  if (publication?.pdfPath) {
+    const link = document.createElement('a');
+    link.href = publication.pdfPath;
+    link.setAttribute('download', `research-${id}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  } else {
+    setError('No PDF available for this publication');
+  }
+};
+
 
   // Filtrar publicaciones basado en la búsqueda
   const filteredPublications = publications.filter(pub => 

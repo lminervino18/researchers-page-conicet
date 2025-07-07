@@ -2,7 +2,7 @@
 import { FC, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ResearchForm from '../../../components/publications/ResearchForm';
-import { getResearchById, updateResearch } from '../../../api/Research';
+import { getResearchById, updateResearch } from '../../../api/research';
 import { Research, ResearchDTO } from '../../../types';
 import './styles/EditResearch.css';
 
@@ -28,13 +28,13 @@ const EditResearch: FC = () => {
     loadResearch();
   }, [id]);
 
-  const handleSubmit = async (data: ResearchDTO, file: File | null, _id?: number) => {
+  const handleSubmit = async (data: ResearchDTO & { pdfPath?: string }, _id?: number) => {
     try {
       setIsSubmitting(true);
       setError(null);
 
       if (!id) return;
-      await updateResearch(parseInt(id), data, file || undefined);
+      await updateResearch(parseInt(id), data);
       navigate('/admin/publications');
     } catch (error) {
       console.error('Error updating research:', error);
@@ -43,6 +43,7 @@ const EditResearch: FC = () => {
       setIsSubmitting(false);
     }
   };
+
 
   if (!research) {
     return (

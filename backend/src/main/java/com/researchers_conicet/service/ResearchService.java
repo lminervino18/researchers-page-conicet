@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +23,6 @@ public class ResearchService {
 
     private final ResearchRepository researchRepository;
 
-    private static final long MAX_PDF_SIZE = 25 * 1024 * 1024;
     private static final int MAX_AUTHORS = 10;
     private static final int MAX_LINKS = 5;
 
@@ -33,7 +31,7 @@ public class ResearchService {
     }
 
     @Transactional
-    public ResearchResponseDTO createResearch(ResearchRequestDTO requestDTO, MultipartFile pdfFile) {
+    public ResearchResponseDTO createResearch(ResearchRequestDTO requestDTO) {
         log.info("Creating new research");
 
         validateResearchData(requestDTO);
@@ -43,12 +41,7 @@ public class ResearchService {
             research.setResearchAbstract(requestDTO.getResearchAbstract());
             research.setAuthors(requestDTO.getAuthors());
             research.setLinks(requestDTO.getLinks());
-
-            if (pdfFile != null && !pdfFile.isEmpty()) {
-                validatePdfFile(pdfFile);
-                // pdfPath must already be present in DTO or handled via frontend
-                throw new UnsupportedOperationException("File upload must be done via Firebase and URL provided in research links");
-            }
+            research.setPdfPath(requestDTO.getPdfPath());
 
             Research savedResearch = researchRepository.save(research);
             Hibernate.initialize(savedResearch.getAuthors());
@@ -79,21 +72,17 @@ public class ResearchService {
     }
 
     @Transactional
-    public ResearchResponseDTO updateResearch(Long id, ResearchRequestDTO requestDTO, MultipartFile pdfFile) {
+    public ResearchResponseDTO updateResearch(Long id, ResearchRequestDTO requestDTO) {
         log.info("Updating research with ID: {}", id);
 
         validateResearchData(requestDTO);
         Research research = findResearchById(id);
 
         try {
-            if (pdfFile != null && !pdfFile.isEmpty()) {
-                validatePdfFile(pdfFile);
-                throw new UnsupportedOperationException("File upload must be done via Firebase and URL provided in research links");
-            }
-
             research.setResearchAbstract(requestDTO.getResearchAbstract());
             research.setAuthors(requestDTO.getAuthors());
             research.setLinks(requestDTO.getLinks());
+            research.setPdfPath(requestDTO.getPdfPath());
 
             Research updatedResearch = researchRepository.save(research);
             Hibernate.initialize(updatedResearch.getAuthors());
@@ -169,15 +158,6 @@ public class ResearchService {
     private Research findResearchById(Long id) {
         return researchRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Research not found with id: " + id));
-    }
-
-    private void validatePdfFile(MultipartFile file) {
-        if (!"application/pdf".equals(file.getContentType())) {
-            throw new IllegalArgumentException("Only PDF files are allowed");
-        }
-        if (file.getSize() > MAX_PDF_SIZE) {
-            throw new IllegalArgumentException("PDF file size must not exceed 25MB");
-        }
     }
 
     private void validateResearchData(ResearchRequestDTO requestDTO) {

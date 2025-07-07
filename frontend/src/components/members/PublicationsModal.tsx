@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { Research } from '../../types';
 import PublicationsList from '../publications/PublicationsList';
-import { searchByAuthor, viewPdf, downloadPdf } from '../../api/Research';
+import { searchByAuthor} from '../../api/research';
 import './styles/PublicationsModal.css';
 
 interface PublicationsModalProps {
@@ -52,30 +52,29 @@ const PublicationsModal: FC<PublicationsModalProps> = ({ authorName, onClose }) 
     };
   }, [authorName, onClose]);
 
-  const handleViewPdf = async (id: number) => {
-    try {
-      const pdfBlob = await viewPdf(id);
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      window.open(pdfUrl, '_blank');
-    } catch (error) {
-      console.error('Error viewing PDF:', error);
-    }
-  };
+  const handleViewPdf = (id: number) => {
+  const publication = publications.find(p => p.id === id);
+  if (publication?.pdfPath) {
+    window.open(publication.pdfPath, '_blank');
+  } else {
+    console.error('No PDF URL found for this publication.');
+  }
+};
 
-  const handleDownloadPdf = async (id: number) => {
-    try {
-      const pdfBlob = await downloadPdf(id);
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = pdfUrl;
-      link.download = `publication_${id}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error('Error downloading PDF:', error);
-    }
-  };
+const handleDownloadPdf = (id: number) => {
+  const publication = publications.find(p => p.id === id);
+  if (publication?.pdfPath) {
+    const link = document.createElement('a');
+    link.href = publication.pdfPath;
+    link.download = `publication_${id}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } else {
+    console.error('No PDF URL found for this publication.');
+  }
+};
+
 
   return (
     <div className="publications-modal-overlay">

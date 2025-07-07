@@ -2,18 +2,19 @@ import { FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ResearchDTO, Research } from '../../types';
 import { authors as authorsList } from '../../api/authors';
+import { uploadFile } from '../../api/firebaseUploader';
 import './styles/ResearchForm.css';
 
 interface ResearchFormProps {
-  onSubmit: (data: ResearchDTO, file: File | null, id?: number) => Promise<void>;
+  onSubmit: (data: ResearchDTO & { pdfPath?: string }, id?: number) => Promise<void>;
   initialData?: Research;
   isSubmitting?: boolean;
   error?: string | null;
   isEditing?: boolean;
 }
 
-const ResearchForm: FC<ResearchFormProps> = ({ 
-  onSubmit, 
+const ResearchForm: FC<ResearchFormProps> = ({
+  onSubmit,
   initialData,
   isSubmitting = false,
   error: externalError = null,
@@ -94,7 +95,19 @@ const ResearchForm: FC<ResearchFormProps> = ({
     }
 
     try {
-      await onSubmit(formData, selectedFile, initialData?.id);
+      let pdfPath: string | undefined;
+
+      if (selectedFile) {
+        try {
+          pdfPath = await uploadFile(selectedFile);
+        } catch (firebaseError) {
+          console.error('Firebase upload failed:', firebaseError);
+          setInternalError('Failed to upload PDF to storage. Please try again later.');
+          return;
+        }
+      }
+
+      await onSubmit({ ...formData, pdfPath }, initialData?.id);
     } catch (err) {
       setInternalError(err instanceof Error ? err.message : 'An error occurred');
     }

@@ -9,10 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
 import java.util.List;
@@ -38,39 +36,29 @@ public class ResearchController {
         this.researchService = researchService;
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     public ResponseEntity<ResearchResponseDTO> createResearch(
-        @RequestPart("research") @Valid ResearchRequestDTO requestDTO,
-        @RequestPart(value = "file", required = false) MultipartFile file) {
+        @RequestBody @Valid ResearchRequestDTO requestDTO) {
         log.info("REST request to create Research");
 
-        if ((file == null || file.isEmpty()) &&
+        if ((requestDTO.getPdfPath() == null || requestDTO.getPdfPath().isEmpty()) &&
             (requestDTO.getLinks() == null || requestDTO.getLinks().isEmpty())) {
-            throw new IllegalArgumentException("Either a PDF file or at least one link is required");
-        }
-
-        if (file != null && !file.isEmpty()) {
-            validatePdfFile(file);
+            throw new IllegalArgumentException("Either a PDF path or at least one link is required");
         }
 
         return new ResponseEntity<>(
-            researchService.createResearch(requestDTO, file),
+            researchService.createResearch(requestDTO),
             HttpStatus.CREATED
         );
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping("/{id}")
     public ResponseEntity<ResearchResponseDTO> updateResearch(
         @PathVariable Long id,
-        @RequestPart("research") @Valid ResearchRequestDTO requestDTO,
-        @RequestPart(value = "file", required = false) MultipartFile file) {
+        @RequestBody @Valid ResearchRequestDTO requestDTO) {
         log.info("REST request to update Research : {}", id);
 
-        if (file != null && !file.isEmpty()) {
-            validatePdfFile(file);
-        }
-
-        return ResponseEntity.ok(researchService.updateResearch(id, requestDTO, file));
+        return ResponseEntity.ok(researchService.updateResearch(id, requestDTO));
     }
 
     @GetMapping("/{id}")
@@ -121,12 +109,5 @@ public class ResearchController {
         @RequestParam String query) {
         log.info("REST request to search Researches everywhere: {}", query);
         return ResponseEntity.ok(researchService.searchEverywhere(query));
-    }
-
-    private void validatePdfFile(MultipartFile file) {
-        String contentType = file.getContentType();
-        if (contentType == null || !contentType.equals(MediaType.APPLICATION_PDF_VALUE)) {
-            throw new IllegalArgumentException("Only PDF files are allowed");
-        }
     }
 }

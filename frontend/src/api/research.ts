@@ -1,18 +1,7 @@
-// src/api/research.ts
 import axios from 'axios';
 import { ResearchDTO } from '../types';
 
 const API_BASE_URL = 'http://localhost:8080/api/researches';
-
-// Configuration for PDF handling
-const pdfApi = axios.create({
-  baseURL: 'http://localhost:8080',
-  withCredentials: true,
-  headers: {
-    'Accept': 'application/pdf',
-    'Content-Type': 'application/pdf'
-  }
-});
 
 // Get all publications with pagination
 export const getAllResearches = async (page = 0, size = 10) => {
@@ -57,19 +46,11 @@ export const getResearchById = async (id: number) => {
 };
 
 // Create new research
-export const createResearch = async (data: ResearchDTO, file: File | null) => {
+export const createResearch = async (data: ResearchDTO & { pdfPath?: string }) => {
   try {
-    const formData = new FormData();
-    formData.append('research', new Blob([JSON.stringify(data)], { type: 'application/json' }));
-    
-    // Solo agregamos el archivo si existe
-    if (file) {
-      formData.append('file', file);
-    }
-
-    const response = await axios.post(API_BASE_URL, formData, {
+    const response = await axios.post(API_BASE_URL, data, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': 'application/json'
       }
     });
     return response.data;
@@ -80,17 +61,11 @@ export const createResearch = async (data: ResearchDTO, file: File | null) => {
 };
 
 // Update existing research
-export const updateResearch = async (id: number, data: ResearchDTO, file?: File) => {
+export const updateResearch = async (id: number, data: ResearchDTO & { pdfPath?: string }) => {
   try {
-    const formData = new FormData();
-    formData.append('research', new Blob([JSON.stringify(data)], { type: 'application/json' }));
-    if (file) {
-      formData.append('file', file);
-    }
-
-    const response = await axios.put(`${API_BASE_URL}/${id}`, formData, {
+    const response = await axios.put(`${API_BASE_URL}/${id}`, data, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': 'application/json'
       }
     });
     return response.data;
@@ -100,7 +75,7 @@ export const updateResearch = async (id: number, data: ResearchDTO, file?: File)
   }
 };
 
-// src/api/research.ts
+// Delete research
 export const deleteResearch = async (id: number) => {
   try {
     await axios.delete(`${API_BASE_URL}/${id}`);
@@ -116,37 +91,6 @@ export const deleteResearch = async (id: number) => {
   }
 };
 
-// View PDF
-export const viewPdf = async (id: number) => {
-  try {
-    const response = await pdfApi.get(`/api/researches/view/${id}`, {
-      responseType: 'blob',
-      headers: {
-        'Accept': 'application/pdf'
-      }
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error viewing PDF:', error);
-    throw error;
-  }
-};
-
-// Download PDF
-export const downloadPdf = async (id: number) => {
-  try {
-    const response = await pdfApi.get(`/api/researches/download/${id}`, {
-      responseType: 'blob',
-      headers: {
-        'Accept': 'application/pdf'
-      }
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error downloading PDF:', error);
-    throw error;
-  }
-};
 
 // Search by abstract
 export const searchByAbstract = async (query: string) => {
@@ -181,8 +125,6 @@ export default {
   createResearch,
   updateResearch,
   deleteResearch,
-  viewPdf,
-  downloadPdf,
   searchByAbstract,
   searchByAuthor
 };
