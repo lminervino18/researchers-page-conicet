@@ -23,6 +23,7 @@ const ResearchForm: FC<ResearchFormProps> = ({
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [linkInput, setLinkInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [internalError, setInternalError] = useState<string | null>(null);
   const [touched, setTouched] = useState({
     abstract: false,
@@ -82,45 +83,54 @@ const ResearchForm: FC<ResearchFormProps> = ({
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setInternalError(null);
-    setTouched({ abstract: true, authors: true, links: true, file: true });
+  e.preventDefault();
 
-    if (!formData.researchAbstract.trim()) {
-      setInternalError('Abstract is required');
-      return;
-    }
+  setIsLoading(true);
+  setInternalError(null);
+  setTouched({ abstract: true, authors: true, links: true, file: true });
 
-    if (formData.authors.length === 0) {
-      setInternalError('At least one author is required');
-      return;
-    }
+  if (!formData.researchAbstract.trim()) {
+    setInternalError('Abstract is required');
+    setIsLoading(false);
+    return;
+  }
 
-    if (!isEditing && !selectedFile && formData.links.length === 0) {
-      setInternalError('Either a PDF file or at least one link is required');
-      return;
-    }
+  if (formData.authors.length === 0) {
+    setInternalError('At least one author is required');
+    setIsLoading(false);
+    return;
+  }
 
-    try {
-      let pdfPath: string | undefined;
+  if (!isEditing && !selectedFile && formData.links.length === 0) {
+    setInternalError('Either a PDF file or at least one link is required');
+    setIsLoading(false);
+    return;
+  }
 
-      if (selectedFile && (!initialData || selectedFile.name !== initialData.pdfPath?.split('/').pop())) {
-        try {
-          pdfPath = await uploadFile(selectedFile);
-        } catch (firebaseError) {
-          console.error('Firebase upload failed:', firebaseError);
-          setInternalError('Failed to upload PDF to storage. Please try again later.');
-          return;
-        }
-      } else if (initialData?.pdfPath) {
-        pdfPath = initialData.pdfPath;
+  try {
+    let pdfPath: string | undefined;
+
+    if (selectedFile && (!initialData || selectedFile.name !== initialData.pdfPath?.split('/').pop())) {
+      try {
+        pdfPath = await uploadFile(selectedFile);
+      } catch (firebaseError) {
+        console.error('Firebase upload failed:', firebaseError);
+        setInternalError('Failed to upload PDF to storage. Please try again later.');
+        setIsLoading(false);
+        return;
       }
-
-      await onSubmit({ ...formData, pdfPath }, initialData?.id);
-    } catch (err) {
-      setInternalError(err instanceof Error ? err.message : 'An error occurred');
+    } else if (initialData?.pdfPath) {
+      pdfPath = initialData.pdfPath;
     }
-  };
+
+    await onSubmit({ ...formData, pdfPath }, initialData?.id);
+    setIsLoading(false);
+  } catch (err) {
+    setInternalError(err instanceof Error ? err.message : 'An error occurred');
+    setIsLoading(false);
+  }
+};
+
 
   const handleCancel = () => navigate(-1);
 
@@ -128,11 +138,12 @@ const ResearchForm: FC<ResearchFormProps> = ({
 
   return (
     <>
-      {isSubmitting && (
+      {isLoading && (
         <div className="spinner-overlay">
           <div className="spinner"></div>
         </div>
       )}
+
       <form onSubmit={handleSubmit} className="research-form">
         {error && <div className="error-message">{error}</div>}
 
