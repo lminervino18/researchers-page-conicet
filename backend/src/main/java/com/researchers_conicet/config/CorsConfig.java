@@ -17,8 +17,17 @@ public class CorsConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         
         // Allow frontend URLs
-        corsConfiguration.addAllowedOrigin("http://localhost:5173");
-        corsConfiguration.addAllowedOrigin("http://localhost:5174");
+        String allowedOriginHost = System.getenv("ALLOWED_ORIGIN_HOST");
+        String allowedPort = System.getenv("ALLOWED_PORT");
+        String allowedAltPort = System.getenv("ALLOWED_ALT_PORT");
+        String allowedOrigin = (allowedOriginHost != null && allowedPort != null)
+            ? allowedOriginHost + ":" + allowedPort
+            : "http://localhost:5173";
+        String allowedAltOrigin = (allowedOriginHost != null && allowedAltPort != null)
+            ? allowedOriginHost + ":" + allowedAltPort
+            : "http://localhost:5174";
+        corsConfiguration.addAllowedOrigin(allowedOrigin);
+        corsConfiguration.addAllowedOrigin(allowedAltOrigin);
         
         // Allow common HTTP methods
         corsConfiguration.setAllowedMethods(Arrays.asList(

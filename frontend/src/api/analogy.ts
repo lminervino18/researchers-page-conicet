@@ -1,36 +1,38 @@
-import axios from 'axios';
-import { 
-  Analogy, 
-  AnalogyDTO, 
-  ApiResponse, 
+import axios from "axios";
+import {
+  Analogy,
+  AnalogyDTO,
+  ApiResponse,
   PaginatedResponse,
-  AnalogyFilters
-} from '../types/index';
+  AnalogyFilters,
+} from "../types/index";
 
-const API_BASE_URL = 'http://localhost:8080/api'; // base url from env, e.g. 'http://localhost:8080/api'
-const ANALOGIES_PATH = '/analogies';
+const API_BASE_URL =
+  import.meta.env.API_BASE_URL || "http://localhost:8080/api";
+const ANALOGIES_PATH = "/analogies";
 
 /**
  * Fetch all analogies with pagination
  */
 export const getAllAnalogies = async (
-  page = 0, 
+  page = 0,
   size = 10
 ): Promise<PaginatedResponse<Analogy[]>> => {
   try {
     const response = await axios.get<PaginatedResponse<Analogy[]>>(
-      `${API_BASE_URL}${ANALOGIES_PATH}`, {
+      `${API_BASE_URL}${ANALOGIES_PATH}`,
+      {
         params: {
           page,
           size,
-          sort: 'createdAt',
-          direction: 'DESC'
-        }
+          sort: "createdAt",
+          direction: "DESC",
+        },
       }
     );
     return response.data;
   } catch (error) {
-    console.error('Error fetching analogies:', error);
+    console.error("Error fetching analogies:", error);
     throw error;
   }
 };
@@ -43,13 +45,14 @@ export const searchAnalogies = async (
 ): Promise<ApiResponse<Analogy[]>> => {
   try {
     const response = await axios.get<ApiResponse<Analogy[]>>(
-      `${API_BASE_URL}${ANALOGIES_PATH}/search`, {
-        params: { query }
+      `${API_BASE_URL}${ANALOGIES_PATH}/search`,
+      {
+        params: { query },
       }
     );
     return response.data;
   } catch (error) {
-    console.error('Error searching analogies:', error);
+    console.error("Error searching analogies:", error);
     throw error;
   }
 };
@@ -57,16 +60,14 @@ export const searchAnalogies = async (
 /**
  * Fetch a single analogy by its ID
  */
-export const getAnalogyById = async (
-  id: number
-): Promise<Analogy> => {
+export const getAnalogyById = async (id: number): Promise<Analogy> => {
   try {
     const response = await axios.get<Analogy>(
       `${API_BASE_URL}${ANALOGIES_PATH}/${id}`
     );
     return response.data;
   } catch (error) {
-    console.error('Error fetching analogy:', error);
+    console.error("Error fetching analogy:", error);
     throw error;
   }
 };
@@ -79,15 +80,17 @@ export const createAnalogy = async (
 ): Promise<ApiResponse<Analogy>> => {
   try {
     const response = await axios.post<ApiResponse<Analogy>>(
-      `${API_BASE_URL}${ANALOGIES_PATH}`, data, {
+      `${API_BASE_URL}${ANALOGIES_PATH}`,
+      data,
+      {
         headers: {
-          'Content-Type': 'application/json',
-        }
+          "Content-Type": "application/json",
+        },
       }
     );
     return response.data;
   } catch (error) {
-    console.error('Error creating analogy:', error);
+    console.error("Error creating analogy:", error);
     throw error;
   }
 };
@@ -96,20 +99,22 @@ export const createAnalogy = async (
  * Update an existing analogy
  */
 export const updateAnalogy = async (
-  id: number, 
+  id: number,
   data: AnalogyDTO
 ): Promise<ApiResponse<Analogy>> => {
   try {
     const response = await axios.put<ApiResponse<Analogy>>(
-      `${API_BASE_URL}${ANALOGIES_PATH}/${id}`, data, {
+      `${API_BASE_URL}${ANALOGIES_PATH}/${id}`,
+      data,
+      {
         headers: {
-          'Content-Type': 'application/json',
-        }
+          "Content-Type": "application/json",
+        },
       }
     );
     return response.data;
   } catch (error) {
-    console.error('Error updating analogy:', error);
+    console.error("Error updating analogy:", error);
     throw error;
   }
 };
@@ -123,12 +128,14 @@ export const deleteAnalogy = async (id: number): Promise<void> => {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 500) {
-        throw new Error('Internal server error while deleting analogy. Please try again.');
+        throw new Error(
+          "Internal server error while deleting analogy. Please try again."
+        );
       } else if (error.response?.status === 404) {
-        throw new Error('Analogy not found.');
+        throw new Error("Analogy not found.");
       }
     }
-    throw new Error('Failed to delete analogy');
+    throw new Error("Failed to delete analogy");
   }
 };
 
@@ -140,13 +147,14 @@ export const searchByTitle = async (
 ): Promise<ApiResponse<Analogy[]>> => {
   try {
     const response = await axios.get<ApiResponse<Analogy[]>>(
-      `${API_BASE_URL}${ANALOGIES_PATH}/search/title`, {
-        params: { query }
+      `${API_BASE_URL}${ANALOGIES_PATH}/search/title`,
+      {
+        params: { query },
       }
     );
     return response.data;
   } catch (error) {
-    console.error('Error searching by title:', error);
+    console.error("Error searching by title:", error);
     throw error;
   }
 };
@@ -159,13 +167,14 @@ export const searchByAuthor = async (
 ): Promise<ApiResponse<Analogy[]>> => {
   try {
     const response = await axios.get<ApiResponse<Analogy[]>>(
-      `${API_BASE_URL}${ANALOGIES_PATH}/search/author`, {
-        params: { name }
+      `${API_BASE_URL}${ANALOGIES_PATH}/search/author`,
+      {
+        params: { name },
       }
     );
     return response.data;
   } catch (error) {
-    console.error('Error searching by author:', error);
+    console.error("Error searching by author:", error);
     throw error;
   }
 };
@@ -178,13 +187,14 @@ export const searchWithFilters = async (
 ): Promise<PaginatedResponse<Analogy[]>> => {
   try {
     const response = await axios.get<PaginatedResponse<Analogy[]>>(
-      `${API_BASE_URL}${ANALOGIES_PATH}/search/advanced`, {
-        params: filters
+      `${API_BASE_URL}${ANALOGIES_PATH}/search/advanced`,
+      {
+        params: filters,
       }
     );
     return response.data;
   } catch (error) {
-    console.error('Error searching with filters:', error);
+    console.error("Error searching with filters:", error);
     throw error;
   }
 };
@@ -193,19 +203,20 @@ export const searchWithFilters = async (
  * Add support to an analogy
  */
 export const addSupport = async (
-  analogyId: number, 
+  analogyId: number,
   email: string
 ): Promise<ApiResponse<Analogy>> => {
   try {
     const response = await axios.post<ApiResponse<Analogy>>(
-      `${API_BASE_URL}${ANALOGIES_PATH}/${analogyId}/support`, 
-      null, {
-        params: { email }
+      `${API_BASE_URL}${ANALOGIES_PATH}/${analogyId}/support`,
+      null,
+      {
+        params: { email },
       }
     );
     return response.data;
   } catch (error) {
-    console.error('Error adding support:', error);
+    console.error("Error adding support:", error);
     throw error;
   }
 };
@@ -214,18 +225,19 @@ export const addSupport = async (
  * Remove support from an analogy
  */
 export const removeSupport = async (
-  analogyId: number, 
+  analogyId: number,
   email: string
 ): Promise<ApiResponse<Analogy>> => {
   try {
     const response = await axios.delete<ApiResponse<Analogy>>(
-      `${API_BASE_URL}${ANALOGIES_PATH}/${analogyId}/support`, {
-        params: { email }
+      `${API_BASE_URL}${ANALOGIES_PATH}/${analogyId}/support`,
+      {
+        params: { email },
       }
     );
     return response.data;
   } catch (error) {
-    console.error('Error removing support:', error);
+    console.error("Error removing support:", error);
     throw error;
   }
 };
@@ -233,16 +245,14 @@ export const removeSupport = async (
 /**
  * Get support count for an analogy
  */
-export const getSupportCount = async (
-  analogyId: number
-): Promise<number> => {
+export const getSupportCount = async (analogyId: number): Promise<number> => {
   try {
     const response = await axios.get<number>(
       `${API_BASE_URL}${ANALOGIES_PATH}/${analogyId}/support-count`
     );
     return response.data;
   } catch (error) {
-    console.error('Error getting support count:', error);
+    console.error("Error getting support count:", error);
     throw error;
   }
 };
@@ -251,18 +261,19 @@ export const getSupportCount = async (
  * Check if a user has supported an analogy
  */
 export const checkUserSupport = async (
-  analogyId: number, 
+  analogyId: number,
   email: string
 ): Promise<boolean> => {
   try {
     const response = await axios.get<boolean>(
-      `${API_BASE_URL}${ANALOGIES_PATH}/${analogyId}/has-supported`, {
-        params: { email }
+      `${API_BASE_URL}${ANALOGIES_PATH}/${analogyId}/has-supported`,
+      {
+        params: { email },
       }
     );
     return response.data;
   } catch (error) {
-    console.error('Error checking user support:', error);
+    console.error("Error checking user support:", error);
     throw error;
   }
 };

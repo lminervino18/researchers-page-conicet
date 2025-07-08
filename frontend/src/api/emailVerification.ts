@@ -1,6 +1,8 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError } from "axios";
 
-const API_BASE_URL = 'http://localhost:8080/api/email-verification';
+const API_BASE_URL =
+  (import.meta.env.API_BASE_URL || "http://localhost:8080/api") +
+  "/email-verification";
 
 interface EmailVerificationRequest {
   email: string;
@@ -21,34 +23,22 @@ interface EmailRegistrationStatus {
 const handleApiError = (error: unknown) => {
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError;
-    console.error('API Error:', axiosError.response?.data);
-    throw axiosError.response?.data || new Error('An unexpected error occurred');
+    console.error("API Error:", axiosError.response?.data);
+    throw (
+      axiosError.response?.data || new Error("An unexpected error occurred")
+    );
   }
   throw error;
 };
 
-export const checkEmailRegistration = async (email: string): Promise<EmailVerificationResponse> => {
+export const checkEmailRegistration = async (
+  email: string
+): Promise<EmailVerificationResponse> => {
   try {
-    const response = await axios.get<EmailVerificationResponse>(`${API_BASE_URL}/check`, {
-      params: { email }
-    });
-    return response.data;
-  } catch (error) {
-    handleApiError(error);
-    throw error;
-  }
-};
-
-export const registerEmail = async (email: string): Promise<EmailVerificationResponse> => {
-  try {
-    const requestData: EmailVerificationRequest = { email };
-    const response = await axios.post<EmailVerificationResponse>(
-      `${API_BASE_URL}/register`, 
-      requestData, 
+    const response = await axios.get<EmailVerificationResponse>(
+      `${API_BASE_URL}/check`,
       {
-        headers: {
-          'Content-Type': 'application/json',
-        }
+        params: { email },
       }
     );
     return response.data;
@@ -58,13 +48,37 @@ export const registerEmail = async (email: string): Promise<EmailVerificationRes
   }
 };
 
-export const updateUserName = async (email: string, newUsername: string): Promise<void> => {
+export const registerEmail = async (
+  email: string
+): Promise<EmailVerificationResponse> => {
+  try {
+    const requestData: EmailVerificationRequest = { email };
+    const response = await axios.post<EmailVerificationResponse>(
+      `${API_BASE_URL}/register`,
+      requestData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    throw error;
+  }
+};
+
+export const updateUserName = async (
+  email: string,
+  newUsername: string
+): Promise<void> => {
   try {
     await axios.patch(
       `${API_BASE_URL}/${encodeURIComponent(email)}/update-username`,
       null,
       {
-        params: { newUsername }
+        params: { newUsername },
       }
     );
   } catch (error) {
@@ -73,15 +87,17 @@ export const updateUserName = async (email: string, newUsername: string): Promis
   }
 };
 
-export const registerMultipleEmails = async (emails: string[]): Promise<EmailVerificationResponse[]> => {
+export const registerMultipleEmails = async (
+  emails: string[]
+): Promise<EmailVerificationResponse[]> => {
   try {
     const response = await axios.post<EmailVerificationResponse[]>(
-      `${API_BASE_URL}/register-multiple`, 
+      `${API_BASE_URL}/register-multiple`,
       emails,
       {
         headers: {
-          'Content-Type': 'application/json',
-        }
+          "Content-Type": "application/json",
+        },
       }
     );
     return response.data;
@@ -104,7 +120,7 @@ export const getAllRegisteredEmails = async (): Promise<string[]> => {
 export const removeEmail = async (email: string): Promise<void> => {
   try {
     await axios.delete(`${API_BASE_URL}/remove`, {
-      params: { email }
+      params: { email },
     });
   } catch (error) {
     handleApiError(error);
@@ -114,7 +130,7 @@ export const removeEmail = async (email: string): Promise<void> => {
 export const removeMultipleEmails = async (emails: string[]): Promise<void> => {
   try {
     await axios.delete(`${API_BASE_URL}/remove-multiple`, {
-      data: emails
+      data: emails,
     });
   } catch (error) {
     handleApiError(error);
@@ -139,15 +155,17 @@ export const countRegisteredEmails = async (): Promise<number> => {
   }
 };
 
-export const checkEmailsRegistration = async (emails: string[]): Promise<EmailRegistrationStatus[]> => {
+export const checkEmailsRegistration = async (
+  emails: string[]
+): Promise<EmailRegistrationStatus[]> => {
   try {
     const response = await axios.post<EmailRegistrationStatus[]>(
-      `${API_BASE_URL}/check-registration`, 
+      `${API_BASE_URL}/check-registration`,
       emails,
       {
         headers: {
-          'Content-Type': 'application/json',
-        }
+          "Content-Type": "application/json",
+        },
       }
     );
     return response.data;
@@ -167,5 +185,5 @@ export default {
   removeMultipleEmails,
   removeAllEmails,
   countRegisteredEmails,
-  checkEmailsRegistration
+  checkEmailsRegistration,
 };
