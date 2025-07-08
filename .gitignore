@@ -11,6 +11,7 @@ backend/mvnw
 # Wrapper para Windows
 backend/mvnw.cmd
 backend/*.log
+backend/.env
 
 # Frontend
 frontend/node_modules/   # Dependencias de npm
