@@ -1,4 +1,4 @@
-.analogies-list {
+.analogy-list {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
@@ -30,7 +30,6 @@
 
 .previews {
   display: flex;
-  gap: var(--spacing-md);
   overflow-x: auto;
   margin-bottom: var(--spacing-lg);
 }
@@ -43,8 +42,9 @@
 }
 
 .media-previews {
-  display: flex;
+  display: grid;
   gap: var(--spacing-md);
+  grid-template-columns: repeat(4, 1fr); /* 4 items per row */
   margin-top: var(--spacing-lg);
 }
 
@@ -52,18 +52,12 @@
   cursor: pointer;
 }
 
-.media-preview-image {
-  height: 135px;
-  width: auto;
-  object-fit: contain;
-  border-radius: var(--border-radius-md);
-}
-
+.media-preview-image,
 .media-preview-video iframe {
-  width: 240px;
-  height: 135px;
+  width: 100%; /* Ensures the image and video fit the container */
+  height: 135px; /* Fixed height to maintain the same size across all items */
+  object-fit: cover; /* Cover ensures no white space around the image */
   border-radius: var(--border-radius-md);
-  border: none;
 }
 
 .interaction-buttons {
@@ -110,13 +104,10 @@
   border: 2px solid var(--primary-color);
 }
 
-
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-
-
 
 @media (max-width: 768px) {
   .analogy-card {
@@ -139,12 +130,13 @@
   }
 
   .media-previews {
-    flex-direction: column;
-    gap: var(--spacing-md);
+    grid-template-columns: repeat(2, 1fr); /* 2 items per row on smaller screens */
+    gap: 10px; /* Reduced gap for tighter layout */
   }
 
-  .media-preview-image, .media-preview-video iframe {
+  .media-preview-image,
+  .media-preview-video iframe {
     width: 100%;
-    height: auto;
+    height: 135px; /* Fixed height on smaller screens */
   }
 }
