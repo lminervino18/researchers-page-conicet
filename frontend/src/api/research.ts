@@ -2,13 +2,14 @@ import axios from 'axios';
 import { ResearchDTO } from '../types';
 
 // Use environment variable for API base URL (fallback to localhost if not provided)
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api';
+const API_BASE_URL = import.meta.env.API_BASE_URL || 'http://localhost:8080/api';
 
 // Define the research URL endpoint
-const RESEARCH_URL = '/research';
+const RESEARCH_URL = '/researches';
 
 // Get all publications with pagination
 export const getAllResearches = async (page = 0, size = 10) => {
+  console.log(`Fetching publications from ${API_BASE_URL}${RESEARCH_URL} with page=${page}, size=${size}`);
   try {
     const response = await axios.get(`${API_BASE_URL}${RESEARCH_URL}`, {
       params: {
