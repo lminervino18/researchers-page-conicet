@@ -2,7 +2,8 @@ import axios from "axios";
 import { ApiResponse, PaginatedResponse } from "../types/index";
 
 // Base API URL from environment variable or fallback
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL =
+  import.meta.env.API_BASE_URL || "http://localhost:8080/api";
 const ANALOGIES_PATH = "/analogies";
 const COMMENTS_PATH = "/comments";
 
@@ -43,7 +44,8 @@ export const getCommentsByAnalogy = async (
   analogyId: number,
   page = 0,
   size = 10
-): Promise<PaginatedResponse<Comment>> => { // ✅ <Comment>, NO <Comment[]>
+): Promise<PaginatedResponse<Comment>> => {
+  // ✅ <Comment>, NO <Comment[]>
   const response = await axios.get<PaginatedResponse<Comment>>(
     `${API_BASE_URL}${ANALOGIES_PATH}/${analogyId}${COMMENTS_PATH}`,
     {
@@ -58,7 +60,6 @@ export const getCommentsByAnalogy = async (
   );
   return response.data;
 };
-
 
 export const updateComment = async (
   analogyId: number,
@@ -159,8 +160,6 @@ export const verifyEmailAuthorization = async (
   }
 };
 
-
-
 export const addSupportToComment = async (
   commentId: number,
   email: string
@@ -229,7 +228,6 @@ export const hasEmailSupportedComment = async (
     throw error;
   }
 };
-
 
 export const getSupportedCommentsByEmail = async (
   email: string
