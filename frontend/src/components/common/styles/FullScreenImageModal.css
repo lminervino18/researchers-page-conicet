@@ -1,0 +1,69 @@
+.fullscreen-preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);  /* Fondo negro translúcido */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;  /* Asegurarse de que esté encima de todos los demás elementos */
+  overflow: hidden;
+}
+
+.preview-content {
+  position: relative;
+  background-color: var(--background-color);  /* Fondo de la imagen */
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  max-width: 90%;
+  max-height: 80%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fullscreen-image {
+  width: 100%;
+  height: auto;
+  max-height: 80vh;  /* Limitar la altura máxima de la imagen */
+  object-fit: contain;  /* Asegurarse de que la imagen no se distorsione */
+  border: 5px solid white;  /* Borde blanco alrededor de la imagen */
+}
+
+.close-btn {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+  z-index: 10;
+  transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+  color: var(--primary-color);
+}
+
+.loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 4px solid var(--primary-light);
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
