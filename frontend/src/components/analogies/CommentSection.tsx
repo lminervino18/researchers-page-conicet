@@ -7,7 +7,7 @@ import {
   getCommentsByAnalogy,
   deleteComment,
   createComment,
-} from "../../api/Comment";
+} from "../../api/comment";
 import { Comment } from "../../types";
 import { getColorForName, getInitials } from "../../utils/ColorUtils";
 import ConfirmationModal from "./ConfirmationModal";
@@ -65,18 +65,30 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
   };
 
   const loadSupportData = async (comments: Comment[]) => {
-    if (!user) return;
-    const ids = comments.map((c) => c.id);
-    const counts: Record<number, number> = {};
-    for (const id of ids) {
-      try {
-        counts[id] = await getSupportCountForComment(id);
-      } catch {
-        counts[id] = 0;
-      }
+  const ids = comments.map((c) => c.id);
+  const counts: Record<number, number> = {};
+  
+  for (const id of ids) {
+    try {
+      counts[id] = await getSupportCountForComment(id); // Get support count for each comment
+    } catch {
+      counts[id] = 0; // Fallback to 0 if there's an error
     }
-    setSupportCounts(counts);
-  };
+  }
+
+  setSupportCounts(counts);
+
+  // If user is logged in, load user's supported comments
+  if (user) {
+    try {
+      const ids = await getSupportedCommentsByEmail(user.email);
+      setUserSupportedIds(ids);
+    } catch {
+      setUserSupportedIds([]);
+    }
+  }
+};
+
 
   const loadSupportedIds = async () => {
     if (!user) return;
@@ -138,6 +150,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
     loadSupportedIds();
   }, [user]);
 
+  useEffect(() => {
+    if (comments.length === 0) {
+      loadComments()
+    }
+  }, [comments]); 
+
   const handleSubmit = async (content: string, parentId?: number) => {
   if (!user) {
     if (onRequestLogin) onRequestLogin();
@@ -179,23 +197,27 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
 
 
   const toggleSupport = async (commentId: number) => {
-    if (!user) {
-      if (onRequestLogin) onRequestLogin();
-      return;
+  if (!user) {
+    if (onRequestLogin) onRequestLogin();
+    return;
+  }
+
+  try {
+    if (userSupportedIds.includes(commentId)) {
+      await removeSupportFromComment(commentId, user.email);
+    } else {
+      await addSupportToComment(commentId, user.email);
     }
-    try {
-      if (userSupportedIds.includes(commentId)) {
-        await removeSupportFromComment(commentId, user.email);
-      } else {
-        await addSupportToComment(commentId, user.email);
-      }
-      const updated = await getSupportCountForComment(commentId);
-      setSupportCounts((prev) => ({ ...prev, [commentId]: updated }));
-      await loadSupportedIds();
-    } catch (e) {
-      console.error("Error toggling support:", e);
-    }
-  };
+
+    const updated = await getSupportCountForComment(commentId); // Update support count after toggling
+    setSupportCounts((prev) => ({ ...prev, [commentId]: updated }));
+    
+    await loadSupportedIds(); // Reload the user's supported comments
+  } catch (e) {
+    console.error("Error toggling support:", e);
+  }
+};
+
 
   const flatten = (c: Comment): Comment[] => [c, ...(c.replies?.flatMap(flatten) || [])];
 

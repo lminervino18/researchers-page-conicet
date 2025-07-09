@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import { Author } from '../../api/Authors';
+import { Author } from '../../api/authors';
 import './styles/CoursesModal.css';
 
 interface CoursesModalProps {

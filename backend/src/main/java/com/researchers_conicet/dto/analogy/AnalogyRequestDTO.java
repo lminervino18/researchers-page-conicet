@@ -35,6 +35,12 @@ public class AnalogyRequestDTO {
      */
     private Set<String> links = new HashSet<>();
 
+
+    /**
+     * Collection of Firebase media links (images or videos) sent from the frontend.
+     */
+    private Set<MediaLinkDTO> mediaLinks = new HashSet<>();
+
     /**
      * Number of supports (likes) for the analogy.
      * Optional field, will be managed by the backend.

@@ -75,6 +75,19 @@ public class Analogy {
     @Column(name = "link")
     private Set<String> links = new HashSet<>();
 
+
+    /**
+     * Collection of Firebase media links (images or videos) related to this analogy.
+     * Stored as embeddable objects with media type and URL.
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "analogy_media_links",
+        joinColumns = @JoinColumn(name = "analogy_id")
+    )
+    private Set<MediaLink> mediaLinks = new HashSet<>();
+
+
     /**
      * Collection of emails that have supported this analogy.
      * Prevents multiple supports from the same email.
@@ -83,9 +96,9 @@ public class Analogy {
     @CollectionTable(
         name = "analogy_supports",
         joinColumns = @JoinColumn(name = "analogy_id"),
-        uniqueConstraints = @UniqueConstraint(columnNames = {"analogy_id", "email"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"analogy_id", "support_email"})
     )
-    @Column(name = "email")
+    @Column(name = "support_email")
     private Set<String> supportEmails = new HashSet<>();
 
     /**

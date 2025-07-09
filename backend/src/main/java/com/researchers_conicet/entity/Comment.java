@@ -64,7 +64,7 @@ public class Comment {
     @CollectionTable(
         name = "comment_supports",
         joinColumns = @JoinColumn(name = "comment_id"),
-        uniqueConstraints = @UniqueConstraint(columnNames = {"comment_id", "email"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"comment_id", "support_email"})
     )
     @Column(name = "support_email")
     private Set<String> supportEmails = new HashSet<>();

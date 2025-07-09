@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 import { Analogy } from '../../../types';
-import { getAllAnalogies, deleteAnalogy } from '../../../api/Analogy';
+import { getAllAnalogies, deleteAnalogy } from '../../../api/analogy';
 import './styles/AdminAnalogies.css';
 
 const AdminAnalogys: React.FC = () => {

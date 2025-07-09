@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+
 
 /**
  * Repository interface for Research entity.
@@ -24,12 +24,6 @@ public interface ResearchRepository extends JpaRepository<Research, Long> {
      * Example: "climate" would find all researches mentioning climate in their abstract
      */
     List<Research> findByResearchAbstractContainingIgnoreCase(String text);
-
-    /**
-     * Finds a research by its PDF filename
-     * Useful when checking for duplicate uploads
-     */
-    Optional<Research> findByPdfName(String pdfName);
 
     /**
      * Finds all researches by an exact author name
@@ -114,16 +108,4 @@ public interface ResearchRepository extends JpaRepository<Research, Long> {
            "WHERE LOWER(r.researchAbstract) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Research> findByKeywordInAbstract(@Param("keyword") String keyword, Pageable pageable);
 
-    /**
-     * Finds researches with PDF files larger than specified size
-     * Useful for maintenance and storage management
-     */
-    List<Research> findByPdfSizeGreaterThan(Long size);
-    
-    /**
-     * Finds all researches that have PDF files
-     * Useful for verifying complete uploads
-     */
-    @Query("SELECT r FROM Research r WHERE r.mimeType = 'application/pdf'")
-    List<Research> findAllWithPdfFiles();
 }
