@@ -2,13 +2,13 @@
 import { initializeApp } from "firebase/app";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDvF61-wBXgsVIwaZxdYgwOXDZqpvpuC3E",
-  authDomain: "analogy-research-group-page.firebaseapp.com",
-  projectId: "analogy-research-group-page",
-  storageBucket: "analogy-research-group-page.firebasestorage.app",
-  messagingSenderId: "673174100825",
-  appId: "1:673174100825:web:431e3e75afea6d3425ca48",
-  measurementId: "G-9NRGXDGYZ5"
+  apiKey: import.meta.env.API_KEY,
+  authDomain: import.meta.env.AUTH_DOMAIN,
+  projectId: import.meta.env.PROJECT_ID,
+  storageBucket: import.meta.env.STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.MESSAGING_SENDER_ID,
+  appId: import.meta.env.APP_ID,
+  measurementId: import.meta.env.MEASUREMENT_ID,
 };
 
 export const app = initializeApp(firebaseConfig);
