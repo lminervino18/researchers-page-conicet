@@ -3,7 +3,7 @@ import axios from "axios";
 import { ResearchDTO } from "../types";
 
 const API_BASE_URL =
-  import.meta.env.API_BASE_URL || "http://localhost:8080/api";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
 const RESEARCHES_URL = API_BASE_URL + "/researches";
 
 // Configuration for PDF handling
