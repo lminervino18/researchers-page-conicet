@@ -88,14 +88,7 @@ public class Analogy {
     @Column(name = "email")
     private Set<String> supportEmails = new HashSet<>();
 
-    /**
-     * Automatically sets creation timestamp before persisting.
-     */
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
-
+    
     /**
      * Adds a support email to the analogy.
      * @param email The email to add to supports
@@ -104,7 +97,7 @@ public class Analogy {
     public boolean addSupportEmail(String email) {
         return supportEmails.add(email);
     }
-
+    
     /**
      * Removes a support email from the analogy.
      * @param email The email to remove from supports
@@ -116,5 +109,18 @@ public class Analogy {
 
     @Transient
     private int supportCount;
+    
+    public Analogy() {
+        createdAt = LocalDateTime.now();
+    }
 
+    public Analogy(String title, String content, Set<String> authors, Set<String> links, Set<String> supportEmails) {
+        this.content = content;
+        this.title = title;
+        this.authors = authors != null ? authors : new HashSet<>();
+        this.links = links != null ? links : new HashSet<>();
+        this.supportEmails = supportEmails != null ? supportEmails : new HashSet<>();
+        this.supportCount = supportEmails != null ? supportEmails.size() : 0;
+        this.createdAt = LocalDateTime.now();
+    }
 }
