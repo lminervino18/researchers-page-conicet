@@ -61,7 +61,7 @@ public class ResearchService {
             research.setAuthors(requestDTO.getAuthors());
             research.setLinks(requestDTO.getLinks());
 
-            // Solo procesamos el archivo si se proporciona uno
+            // File is only processed if does exist
             if (pdfFile != null && !pdfFile.isEmpty()) {
                 validatePdfFile(pdfFile);
                 String fileName = fileStorageService.storeFile(pdfFile);

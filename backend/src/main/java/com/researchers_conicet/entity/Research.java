@@ -98,13 +98,20 @@ public class Research {
     )
     @Column(name = "link")
     private Set<String> links = new HashSet<>();
-
-    /**
-     * Automatically sets creation timestamp before persisting.
-     */
-    @PrePersist
-    protected void onCreate() {
+    
+    public Research() {
         createdAt = LocalDateTime.now();
+    }
+
+    public Research(String researchAbstract, Set<String> authors, Set<String> links, String pdfName, Long pdfSize, String mimeType, String pdfPath) {
+        this.researchAbstract = researchAbstract;
+        this.authors = authors != null ? authors : new HashSet<>();
+        this.links = links != null ? links : new HashSet<>();
+        this.createdAt = LocalDateTime.now();
+        this.pdfName = pdfName;
+        this.pdfSize = pdfSize;
+        this.mimeType = mimeType;
+        this.pdfPath = pdfPath;
     }
 
     /**

@@ -123,4 +123,20 @@ public class Analogy {
         this.supportCount = supportEmails != null ? supportEmails.size() : 0;
         this.createdAt = LocalDateTime.now();
     }
+
+    /*
+     * Deep copy constructor for cloning comments
+     * WARNING: This does not create a new row in database, it only clones the object in memory.
+     * @param comment The comment to clone
+     */
+    public Analogy(Analogy analogy) {
+        this.id = analogy.id;
+        this.content = analogy.content;
+        this.title = analogy.title;
+        this.createdAt = analogy.createdAt;
+        this.authors = new HashSet<>(analogy.authors);
+        this.links = new HashSet<>(analogy.links);
+        this.supportEmails = new HashSet<>(analogy.supportEmails);
+        this.supportCount = analogy.supportCount;
+    }
 }
