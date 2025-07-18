@@ -1,27 +1,30 @@
-import axios from 'axios';
-import { ResearchDTO } from '../types';
+import axios from "axios";
+import { ResearchDTO } from "../types";
 
 // Use environment variable for API base URL (fallback to localhost if not provided)
-const API_BASE_URL = import.meta.env.API_BASE_URL || 'http://localhost:8080/api';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
 
 // Define the research URL endpoint
-const RESEARCH_URL = '/researches';
+const RESEARCH_URL = "/researches";
 
 // Get all publications with pagination
 export const getAllResearches = async (page = 0, size = 10) => {
-  console.log(`Fetching publications from ${API_BASE_URL}${RESEARCH_URL} with page=${page}, size=${size}`);
+  console.log(
+    `Fetching publications from ${API_BASE_URL}${RESEARCH_URL} with page=${page}, size=${size}`
+  );
   try {
     const response = await axios.get(`${API_BASE_URL}${RESEARCH_URL}`, {
       params: {
         page,
         size,
-        sort: 'createdAt',
-        direction: 'DESC'
-      }
+        sort: "createdAt",
+        direction: "DESC",
+      },
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching publications:', error);
+    console.error("Error fetching publications:", error);
     throw error;
   }
 };
@@ -30,11 +33,11 @@ export const getAllResearches = async (page = 0, size = 10) => {
 export const searchPublications = async (query: string) => {
   try {
     const response = await axios.get(`${API_BASE_URL}${RESEARCH_URL}/search`, {
-      params: { query }
+      params: { query },
     });
     return response.data;
   } catch (error) {
-    console.error('Error searching publications:', error);
+    console.error("Error searching publications:", error);
     throw error;
   }
 };
@@ -45,37 +48,46 @@ export const getResearchById = async (id: number) => {
     const response = await axios.get(`${API_BASE_URL}${RESEARCH_URL}/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching research:', error);
+    console.error("Error fetching research:", error);
     throw error;
   }
 };
 
 // Create new research
-export const createResearch = async (data: ResearchDTO & { pdfPath?: string }) => {
+export const createResearch = async (
+  data: ResearchDTO & { pdfPath?: string }
+) => {
   try {
     const response = await axios.post(`${API_BASE_URL}${RESEARCH_URL}`, data, {
       headers: {
-        'Content-Type': 'application/json'
-      }
+        "Content-Type": "application/json",
+      },
     });
     return response.data;
   } catch (error) {
-    console.error('Error creating research:', error);
+    console.error("Error creating research:", error);
     throw error;
   }
 };
 
 // Update existing research
-export const updateResearch = async (id: number, data: ResearchDTO & { pdfPath?: string }) => {
+export const updateResearch = async (
+  id: number,
+  data: ResearchDTO & { pdfPath?: string }
+) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}${RESEARCH_URL}/${id}`, data, {
-      headers: {
-        'Content-Type': 'application/json'
+    const response = await axios.put(
+      `${API_BASE_URL}${RESEARCH_URL}/${id}`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
-    });
+    );
     return response.data;
   } catch (error) {
-    console.error('Error updating research:', error);
+    console.error("Error updating research:", error);
     throw error;
   }
 };
@@ -87,24 +99,29 @@ export const deleteResearch = async (id: number) => {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 500) {
-        throw new Error('Internal server error while deleting research. Please try again.');
+        throw new Error(
+          "Internal server error while deleting research. Please try again."
+        );
       } else if (error.response?.status === 404) {
-        throw new Error('Research not found.');
+        throw new Error("Research not found.");
       }
     }
-    throw new Error('Failed to delete research');
+    throw new Error("Failed to delete research");
   }
 };
 
 // Search by abstract
 export const searchByAbstract = async (query: string) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}${RESEARCH_URL}/search/abstract`, {
-      params: { query }
-    });
+    const response = await axios.get(
+      `${API_BASE_URL}${RESEARCH_URL}/search/abstract`,
+      {
+        params: { query },
+      }
+    );
     return response.data;
   } catch (error) {
-    console.error('Error searching by abstract:', error);
+    console.error("Error searching by abstract:", error);
     throw error;
   }
 };
@@ -112,12 +129,15 @@ export const searchByAbstract = async (query: string) => {
 // Search by author
 export const searchByAuthor = async (name: string) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}${RESEARCH_URL}/search/author`, {
-      params: { name }
-    });
+    const response = await axios.get(
+      `${API_BASE_URL}${RESEARCH_URL}/search/author`,
+      {
+        params: { name },
+      }
+    );
     return response.data;
   } catch (error) {
-    console.error('Error searching by author:', error);
+    console.error("Error searching by author:", error);
     throw error;
   }
 };
@@ -130,5 +150,5 @@ export default {
   updateResearch,
   deleteResearch,
   searchByAbstract,
-  searchByAuthor
+  searchByAuthor,
 };
