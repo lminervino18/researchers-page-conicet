@@ -1,5 +1,3 @@
-// backend/src/main/java/com/researchers_conicet/controller/TestController.java
-
 package com.researchers_conicet.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
