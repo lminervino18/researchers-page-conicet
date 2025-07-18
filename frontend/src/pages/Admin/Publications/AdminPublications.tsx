@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilePdf, faEdit, faDownload, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Research } from '../../../types';
-import { getAllResearches, deleteResearch, viewPdf, downloadPdf } from '../../../api/Research';
+import { getAllResearches, deleteResearch } from '../../../api/research';
 import './styles/AdminPublications.css';
 
 const AdminPublications = () => {
@@ -13,6 +13,7 @@ const AdminPublications = () => {
   const [loading, setLoading] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState<number | null>(null);
 
   useEffect(() => {
     loadPublications();
@@ -41,32 +42,32 @@ const AdminPublications = () => {
     }
   };
 
-  const handleViewPdf = async (id: number) => {
-    try {
-      const pdfBlob = await viewPdf(id);
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      window.open(pdfUrl, '_blank');
-    } catch (err) {
-      console.error('Error viewing PDF:', err);
-      setError('Failed to open PDF');
+  const handleViewPdf = (pdfPath: string | undefined) => {
+    if (pdfPath) {
+      window.open(pdfPath, '_blank');
     }
   };
 
-  const handleDownloadPdf = async (id: number) => {
+  const handleDownloadPdf = async (pdfPath: string | undefined, id: number) => {
     try {
-      const pdfBlob = await downloadPdf(id);
-      const url = window.URL.createObjectURL(pdfBlob);
+      if (!pdfPath) return;
+      setDownloading(id);
+      const response = await fetch(pdfPath);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `research-${id}.pdf`);
       document.body.appendChild(link);
       link.click();
-      link.remove();
+      document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error('Error downloading PDF:', err);
       setError('Failed to download PDF');
-    }
+    }finally {
+    setDownloading(null);
+  }
   };
 
   return (
@@ -114,7 +115,7 @@ const AdminPublications = () => {
                   </div>
                   <div className="publication-actions">
                     <button
-                      onClick={() => handleViewPdf(publication.id)}
+                      onClick={() => handleViewPdf(publication.pdfPath)}
                       className={`action-button ${!publication.pdfPath ? 'disabled' : ''}`}
                       title={publication.pdfPath ? "View PDF" : "No PDF available"}
                       disabled={!publication.pdfPath}
@@ -122,13 +123,18 @@ const AdminPublications = () => {
                       <FontAwesomeIcon icon={faFilePdf} />
                     </button>
                     <button
-                      onClick={() => handleDownloadPdf(publication.id)}
+                      onClick={() => handleDownloadPdf(publication.pdfPath, publication.id)}
                       className={`action-button ${!publication.pdfPath ? 'disabled' : ''}`}
                       title={publication.pdfPath ? "Download PDF" : "No PDF available"}
-                      disabled={!publication.pdfPath}
+                      disabled={!publication.pdfPath || downloading === publication.id}
                     >
-                      <FontAwesomeIcon icon={faDownload} />
+                      {downloading === publication.id ? (
+                        <span className="loading-spinner small"></span>
+                      ) : (
+                        <FontAwesomeIcon icon={faDownload} />
+                      )}
                     </button>
+
                     <button
                       onClick={() => navigate(`/admin/publications/edit/${publication.id}`)}
                       className="action-button"

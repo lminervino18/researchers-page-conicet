@@ -129,17 +129,6 @@ export interface ResearchMetadata {
 }
 
 /**
- * PDF file representation
- * @interface PdfFile
- */
-export interface PdfFile {
-  file: File;
-  name: string;
-  size: number;
-  type: string;
-}
-
-/**
  * Section interface for navigation or rendering
  * @interface Section
  */
@@ -149,6 +138,11 @@ export interface Section {
   ref: React.RefObject<HTMLElement | HTMLDivElement>;
 }
 
+export interface MediaLink {
+  url: string;
+  mediaType: string;
+}
+
 /**
  * Analogy entity interface
  * @interface Analogy
@@ -156,10 +150,11 @@ export interface Section {
 export interface Analogy {
   id: number;
   title: string;
-  content?: string;
+  content: string;
   createdAt: string;
   authors: string[];
   links: string[];
+  mediaLinks: MediaLink[]; 
 }
 
 /**
@@ -168,9 +163,10 @@ export interface Analogy {
  */
 export interface AnalogyDTO {
   title: string;
-  content?: string;
+  content: string;
   authors: string[];
   links: string[];
+  mediaLinks: MediaLink[]; // Array of media links with URL and type
 }
 
 /**

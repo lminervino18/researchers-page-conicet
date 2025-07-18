@@ -4,7 +4,7 @@ import {
   checkUserSupport, 
   addSupport, 
   removeSupport 
-} from '../../api/Analogy';
+} from '../../api/analogy';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 import './styles/SupportAnalogyButton.css';

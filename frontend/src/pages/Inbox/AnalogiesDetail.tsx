@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 import { Analogy } from "../../types";
-import { getAnalogyById } from "../../api/Analogy";
-import { authors as authorsList } from "../../api/Authors";
+import { getAnalogyById } from "../../api/analogy";
+import { authors as authorsList } from "../../api/authors";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
@@ -11,8 +11,9 @@ import CommentSection from "../../components/analogies/CommentSection";
 import LoginModal from "../../components/analogies/LoginModal";
 import LogoutConfirmModal from "../../components/analogies/LogoutConfirmModal";
 import { useAuth } from "../../hooks/useAuth";
-import "./styles/AnalogiesDetail.css";
+import FullScreenImageModal from "../../components/common/FullScreenImageModal"; // Import modal component
 import SupportAnalogyButton from "../../components/analogies/SupportAnalogyButton";
+import "./styles/AnalogiesDetail.css";
 
 const AnalogiesDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,6 +23,8 @@ const AnalogiesDetail: React.FC = () => {
   const [analogy, setAnalogy] = useState<Analogy | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [fullscreenMedia, setFullscreenMedia] = useState<string | null>(null); // For full-screen media
+  const [isImageLoading, setIsImageLoading] = useState(false); 
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
@@ -81,6 +84,16 @@ const AnalogiesDetail: React.FC = () => {
     return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
   };
 
+  const openMediaFullscreen = (mediaUrl: string) => {
+    setIsImageLoading(true);
+    setFullscreenMedia(mediaUrl);
+  };
+
+  const closeFullscreenMedia = () => {
+    setFullscreenMedia(null);
+    setIsImageLoading(false);
+  };
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -115,6 +128,14 @@ const AnalogiesDetail: React.FC = () => {
         onClose={() => setIsLoginModalOpen(false)}
         onLogin={handleLogin}
       />
+      {fullscreenMedia && (
+        <FullScreenImageModal
+          imageUrl={fullscreenMedia}
+          isLoading={isImageLoading}
+          onClose={closeFullscreenMedia}
+          onImageLoad={() => setIsImageLoading(false)}
+        />
+      )}
 
       <div className="analogy-detail-page">
         <button className="back-button" onClick={() => navigate(-1)}>
@@ -167,6 +188,40 @@ const AnalogiesDetail: React.FC = () => {
                   </div>
                 ) : null;
               })}
+          </div>
+
+          {/* New section for media links */}
+          <div className="detail-media-links-section">
+            {analogy.mediaLinks.map((media, index) => {
+              if (media.mediaType.includes("video")) {
+                return (
+                  <div
+                    key={index}
+                    className="detail-media-preview"
+                    onClick={() => openMediaFullscreen(media.url)}
+                  >
+                    <video width="100%" height="auto" controls>
+                      <source src={media.url} />
+                    </video>
+                  </div>
+                );
+              } else if (media.mediaType.includes("image")) {
+                return (
+                  <div
+                    key={index}
+                    className="detail-media-preview"
+                    onClick={() => openMediaFullscreen(media.url)}
+                  >
+                    <img
+                      src={media.url}
+                      alt={`Media image ${index + 1}`}
+                      className="detail-media-preview-image"
+                    />
+                  </div>
+                );
+              }
+              return null;
+            })}
           </div>
 
           <div className="external-links">
