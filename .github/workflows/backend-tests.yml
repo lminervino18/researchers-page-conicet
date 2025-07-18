@@ -41,4 +41,5 @@ jobs:
         with:
           files: backend/target/site/jacoco/jacoco.xml
           slug: lminervino18/researchers-page-conicet
-          fail_ci_if_error: true  # Optional: fail if upload fails
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }} # 🔐 Token to bypass rate limits (defined in GitHub repo secrets)
