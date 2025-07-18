@@ -27,6 +27,13 @@ public class AnalogyE2ETest {
             .withUsername("test")
             .withPassword("test");
 
+    @org.junit.jupiter.api.AfterAll
+    static void stopContainer() {
+        if (mysql != null) {
+            mysql.stop();
+        }
+    }
+
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", mysql::getJdbcUrl);

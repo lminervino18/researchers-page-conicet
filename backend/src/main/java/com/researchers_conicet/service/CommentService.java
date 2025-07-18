@@ -334,7 +334,7 @@ public class CommentService {
         }
         
         log.warn("Email {} has not supported this comment", email);
-        throw new IllegalArgumentException(String.format("Email %s has not given support to comment %d", email, commentId));
+        throw new IllegalArgumentException("Email %s has not given support to comment %d".formatted(email, commentId));
     }
 
     /**
@@ -354,8 +354,8 @@ public class CommentService {
         if (parentId != null) {
             parent = commentRepository.findByIdAndAnalogyId(parentId, analogyId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                    String.format("Parent comment (ID: %d) not found for Analogy (ID: %d)",
-                    parentId, analogyId)
+                    "Parent comment (ID: %d) not found for Analogy (ID: %d)".formatted(
+                            parentId, analogyId)
                 ));
         }
 

@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Controller for handling file-related operations
@@ -48,7 +47,7 @@ public class FileController {
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) {
         try {
             // Resolve and normalize the complete file path
-            Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
+            Path filePath = Path.of(uploadDir).resolve(fileName).normalize();
             
             // Create a resource from the file path
             Resource resource = new UrlResource(filePath.toUri());

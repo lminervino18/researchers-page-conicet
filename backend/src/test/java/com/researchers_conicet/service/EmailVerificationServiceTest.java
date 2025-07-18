@@ -7,12 +7,11 @@ import com.researchers_conicet.repository.EmailVerificationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.assertThrows;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
