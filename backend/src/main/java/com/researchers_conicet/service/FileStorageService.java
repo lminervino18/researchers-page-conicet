@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 
@@ -33,7 +32,7 @@ public class FileStorageService {
      * @param uploadDir Directory path from application.properties
      */
     public FileStorageService(@Value("${file.upload-dir}") String uploadDir) {
-        this.fileStorageLocation = Paths.get(uploadDir)
+        this.fileStorageLocation = Path.of(uploadDir)
                 .toAbsolutePath().normalize();
 
         try {

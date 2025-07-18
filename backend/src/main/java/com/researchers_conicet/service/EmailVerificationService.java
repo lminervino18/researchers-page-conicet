@@ -119,7 +119,7 @@ public class EmailVerificationService {
         }
 
         log.warn("Email not found: {}", email);
-        throw new ResourceNotFoundException(String.format("Email %s was not found", email));
+        throw new ResourceNotFoundException("Email %s was not found".formatted(email));
     }
     
     /**

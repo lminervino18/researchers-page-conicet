@@ -59,3 +59,7 @@ chmod +x start-dev.sh
 # Launch all services (frontend, backend, database)
 ./start-dev.sh
 ```
+
+## Codecov
+
+[![codecov](https://codecov.io/github/lminervino18/researchers-page-conicet/graph/badge.svg?token=X5R85NWHR5)](https://codecov.io/github/lminervino18/researchers-page-conicet)

@@ -13,7 +13,7 @@ import java.util.Arrays;
 public class CorsConfig {
 
     @Bean
-    public CorsFilter corsFilter() {
+    CorsFilter corsFilter() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         
         // Allow frontend URLs
