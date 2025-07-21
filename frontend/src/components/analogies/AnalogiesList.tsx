@@ -156,33 +156,53 @@ const AnalogiesList: FC<AnalogiesListProps> = ({ analogies }) => {
 
           <div className="media-previews">
             {analogy.mediaLinks.map((media, index) => {
-              if (media.mediaType.includes('video')) {
-                return (
-                  <div key={index} className="preview">
-                    <iframe
-                      src={media.url}
-                      title="Media video"
-                      allowFullScreen
-                    />
-                  </div>
-                );
-              } else if (media.mediaType.includes('image')) {
-                return (
-                  <div key={index} className="preview" onClick={(e) => {
-                    e.stopPropagation();
-                    openImageFullscreen(media.url);
-                  }}>
-                    <img
-                      src={media.url}
-                      alt="Media image preview"
-                      className="media-preview-image"
-                      onLoad={handleImageLoad}
-                    />
-                  </div>
-                );
-              }
-              return null;
-            })}
+            const isMkv = media.url.toLowerCase().endsWith('.mkv');
+
+            if (isMkv) {
+              return (
+                <div key={index} className="preview">
+                  <p className="mkv-warning">.mkv format not supported for preview</p>
+                  <a
+                    href={media.url}
+                    download
+                    onClick={(e) => e.stopPropagation()}
+                    className="download-button"
+                  >
+                    Download .mkv
+                  </a>
+                </div>
+              );
+            }
+
+            if (media.mediaType.includes('video')) {
+              return (
+                <div key={index} className="preview">
+                  <iframe
+                    src={media.url}
+                    title="Media video"
+                    allowFullScreen
+                  />
+                </div>
+              );
+            } else if (media.mediaType.includes('image')) {
+              return (
+                <div key={index} className="preview" onClick={(e) => {
+                  e.stopPropagation();
+                  openImageFullscreen(media.url);
+                }}>
+                  <img
+                    src={media.url}
+                    alt="Media image preview"
+                    className="media-preview-image"
+                    onLoad={handleImageLoad}
+                  />
+                </div>
+              );
+            }
+
+            return null;
+          })}
+
           </div>
 
           <div 

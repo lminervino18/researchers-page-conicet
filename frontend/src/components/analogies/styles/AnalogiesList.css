@@ -140,3 +140,27 @@
     height: 135px; /* Fixed height on smaller screens */
   }
 }
+
+.mkv-warning {
+  color: var(--text-light);
+  font-size: var(--font-size-small);
+  text-align: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.download-button {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: var(--border-radius-sm);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: var(--font-size-small);
+  transition: background-color 0.2s ease;
+  text-align: center;
+}
+
+.download-button:hover {
+  background-color: var(--primary-dark);
+}
