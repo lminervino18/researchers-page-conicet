@@ -402,9 +402,6 @@ public class AnalogyService {
         if (!StringUtils.hasText(requestDTO.getTitle())) {
             throw new IllegalArgumentException("Analogy title is required");
         }
-        if (!StringUtils.hasText(requestDTO.getContent())) {
-            throw new IllegalArgumentException("Analogy content is required");
-        }
         if (requestDTO.getAuthors() == null || requestDTO.getAuthors().isEmpty()) {
             throw new IllegalArgumentException("At least one author is required");
         }

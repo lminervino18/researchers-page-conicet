@@ -106,7 +106,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   setInternalError(null);
   setTouched({ title: true, content: true, authors: true, links: true });
 
-  if (!formData.title.trim() || !formData.content.trim() || formData.authors.length === 0) {
+  if (!formData.title.trim() || formData.authors.length === 0) {
     setInternalError('Please complete all required fields');
     setIsLoading(false); 
     return;
@@ -221,8 +221,9 @@ const handleSubmit = async (e: React.FormEvent) => {
 
       <div className="form-group">
         <label htmlFor="content">
-          Content <span className="required">*</span>
+          Content <span className="optional">(optional)</span>
         </label>
+
         <textarea
           id="content"
           name="content"
@@ -234,11 +235,8 @@ const handleSubmit = async (e: React.FormEvent) => {
           onBlur={() => setTouched(prev => ({ ...prev, content: true }))}
           disabled={isSubmitting}
           placeholder="Enter analogy content"
-          className={touched.content && !formData.content.trim() ? 'error' : ''}
+          className=""
         />
-        {touched.content && !formData.content.trim() && (
-          <div className="validation-message">Content is required</div>
-        )}
       </div>
 
       <div className="form-group">
