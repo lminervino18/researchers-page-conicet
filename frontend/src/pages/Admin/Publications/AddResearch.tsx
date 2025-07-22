@@ -2,7 +2,7 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ResearchForm from '../../../components/publications/ResearchForm';
-import { createResearch } from '../../../api/Research';
+import { createResearch } from '../../../api/research';
 import { ResearchDTO } from '../../../types';
 import './styles/AddResearch.css';
 
@@ -11,12 +11,12 @@ const AddResearch: FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (data: ResearchDTO, file: File | null, _id?: number) => {
+  const handleSubmit = async (data: ResearchDTO & { pdfPath?: string }, _id?: number) => {
     try {
       setIsSubmitting(true);
       setError(null);
 
-      await createResearch(data, file);
+      await createResearch(data);
       navigate('/admin/publications');
     } catch (error) {
       console.error('Error creating research:', error);

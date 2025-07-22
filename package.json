@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "@types/node": "^22.15.27"
+  },
+  "dependencies": {
+    "firebase": "^11.10.0"
   }
 }

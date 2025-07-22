@@ -41,6 +41,12 @@ public class AnalogyResponseDTO {
     private Set<String> links;
 
     /**
+     * Collection of Firebase media links (images or videos).
+     */
+    private Set<MediaLinkDTO> mediaLinks;
+
+
+    /**
      * Number of supports (likes) for the analogy.
      */
     private Integer supportCount = 0;

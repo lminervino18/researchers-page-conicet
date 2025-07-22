@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface EmailVerificationRepository extends JpaRepository<EmailVerification, Long> {
+public interface EmailVerificationRepository extends JpaRepository<EmailVerification, String> {
 
     /**
      * Checks if an email exists in the verification table

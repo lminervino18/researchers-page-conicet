@@ -12,17 +12,12 @@ import java.util.Set;
 public class ResearchResponseDTO {
     private Long id;
     private String researchAbstract;
-    
-    // PDF-related fields
-    private String pdfName;
+
+    // PDF public URL
     private String pdfPath;
-    private Long pdfSize;
-    private String mimeType;
-    
-    // Metadata
+
     private LocalDateTime createdAt;
-    
-    // Collections
+
     private Set<String> authors;
     private Set<String> links;
 }

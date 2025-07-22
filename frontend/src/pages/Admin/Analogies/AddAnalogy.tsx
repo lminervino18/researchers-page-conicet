@@ -2,7 +2,7 @@
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AnalogyForm from '../../../components/analogies/AnalogyForm';
-import { createAnalogy } from '../../../api/Analogy';
+import { createAnalogy } from '../../../api/analogy';
 import { AnalogyDTO } from '../../../types';
 import './styles/AddAnalogy.css';
 
