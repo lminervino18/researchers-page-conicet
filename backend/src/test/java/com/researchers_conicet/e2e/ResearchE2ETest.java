@@ -80,16 +80,6 @@ public class ResearchE2ETest {
     @BeforeEach
     void cleanDatabase() {
         researchRepository.deleteAll();
-        // try (java.sql.Connection conn = mysql.createConnection("")) {
-        //     try (java.sql.Statement stmt = conn.createStatement()) {
-        //         stmt.execute("SET FOREIGN_KEY_CHECKS=0;");
-        //         stmt.execute("TRUNCATE TABLE research;");
-        //         // Si tienes más tablas relacionadas, agrégalas aquí
-        //         stmt.execute("SET FOREIGN_KEY_CHECKS=1;");
-        //     }
-        // } catch (Exception e) {
-        //     throw new RuntimeException("Error cleaning database", e);
-        // }
     }
 
     @AfterAll
