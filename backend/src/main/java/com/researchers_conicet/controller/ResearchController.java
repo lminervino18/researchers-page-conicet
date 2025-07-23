@@ -65,7 +65,8 @@ public class ResearchController {
         // Validar que haya al menos un PDF o un link
         if ((file == null || file.isEmpty()) && 
             (requestDTO.getLinks() == null || requestDTO.getLinks().isEmpty())) {
-            throw new IllegalArgumentException("Either a PDF file or at least one link is required");
+                log.error("Invalid request: either a PDF file or at least one link is required");
+                throw new IllegalArgumentException("Either a PDF file or at least one link is required");
         }
         
         // Solo validamos el PDF si se proporciona uno
@@ -155,9 +156,9 @@ public class ResearchController {
      */
     @GetMapping("/search/author")
     public ResponseEntity<List<ResearchResponseDTO>> searchByAuthor(
-            @RequestParam String name) {
-        log.info("REST request to search Researches by author: {}", name);
-        return ResponseEntity.ok(researchService.searchByAuthor(name));
+            @RequestParam String query) {
+        log.info("REST request to search Researches by author: {}", query);
+        return ResponseEntity.ok(researchService.searchByAuthor(query));
     }
 
     /**
