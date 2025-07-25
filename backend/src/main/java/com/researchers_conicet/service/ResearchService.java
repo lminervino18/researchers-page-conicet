@@ -162,15 +162,19 @@ public class ResearchService {
 
     private void validateResearchData(ResearchRequestDTO requestDTO) {
         if (!StringUtils.hasText(requestDTO.getResearchAbstract())) {
+            log.error("Invalid request: research abstract is required");
             throw new IllegalArgumentException("Research abstract is required");
         }
         if (requestDTO.getAuthors() == null || requestDTO.getAuthors().isEmpty()) {
+            log.error("Invalid request: at least one author is required");
             throw new IllegalArgumentException("At least one author is required");
         }
         if (requestDTO.getAuthors().size() > MAX_AUTHORS) {
+            log.error("Invalid request: maximum number of authors exceeded");
             throw new IllegalArgumentException("Maximum number of authors exceeded");
         }
         if (requestDTO.getLinks() != null && requestDTO.getLinks().size() > MAX_LINKS) {
+            log.error("Invalid request: maximum number of links exceeded");
             throw new IllegalArgumentException("Maximum number of links exceeded");
         }
     }

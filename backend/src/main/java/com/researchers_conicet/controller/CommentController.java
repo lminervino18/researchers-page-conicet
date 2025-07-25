@@ -275,18 +275,16 @@ public class CommentController {
         return new ResponseEntity<Boolean>(commentService.hasEmailSupported(commentId, email), HttpStatus.OK);
     }
 
-            /**
-         * Retrieves a list of comment IDs supported by the given email
-         *
-         * @param email Email of the user
-         * @return List of comment IDs supported by the user
-         */
-        @GetMapping("/comments/supported")
-        public ResponseEntity<List<Long>> getSupportedCommentIdsByEmail(
-                @RequestParam String email) {
-            log.info("REST request to get supported comment IDs for email: {}", email);
-            return ResponseEntity.ok(commentService.getSupportedCommentIdsByEmail(email));
-        }
-
-
+    /**
+     * Retrieves a list of comment IDs supported by the given email
+     *
+     * @param email Email of the user
+     * @return List of comment IDs supported by the user
+     */
+    @GetMapping("/comments/supported")
+    public ResponseEntity<List<Long>> getSupportedCommentIdsByEmail(
+            @RequestParam String email) {
+        log.info("REST request to get supported comment IDs for email: {}", email);
+        return ResponseEntity.ok(commentService.getSupportedCommentIdsByEmail(email));
+    }
 }

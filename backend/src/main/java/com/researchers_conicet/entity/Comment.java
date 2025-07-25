@@ -69,12 +69,9 @@ public class Comment {
     @Column(name = "support_email")
     private Set<String> supportEmails = new HashSet<>();
     
-    @PrePersist
-    protected void onCreate() {
+    public Comment() {
         createdAt = LocalDateTime.now();
     }
-
-    public Comment() {}
 
     /**
      * 
@@ -90,6 +87,23 @@ public class Comment {
         this.email = email;
         this.analogy = analogy;
         parent.ifPresent(this::setParent);
+        this.createdAt = LocalDateTime.now();
+    }
+
+    /*
+     * Deep copy constructor for cloning comments
+     * WARNING: This does not create a new row in database, it only clones the object in memory.
+     * @param comment The comment to clone
+     */
+    public Comment(Comment comment) {
+        this.id = comment.id;
+        this.content = comment.content;
+        this.userName = comment.userName;
+        this.email = comment.email;
+        this.createdAt = comment.createdAt;
+        this.parent = comment.parent != null ? new Comment(comment.parent) : null;
+        this.analogy = new Analogy(comment.analogy);
+        this.supportEmails = new HashSet<>(comment.supportEmails); // Copy support emails
     }
 
     /**
