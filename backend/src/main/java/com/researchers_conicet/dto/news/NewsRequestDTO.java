@@ -1,4 +1,4 @@
-package com.researchers_conicet.dto.analogy;
+package com.researchers_conicet.dto.news;
 
 import lombok.Data;
 import java.util.HashSet;
@@ -7,36 +7,35 @@ import java.util.Set;
 import com.researchers_conicet.dto.media_link.MediaLinkDTO;
 
 /**
- * Data Transfer Object for creating or updating an analogy.
+ * Data Transfer Object for creating or updating a news article.
  * Excludes auto-generated fields and provides input validation.
  */
 @Data
-public class AnalogyRequestDTO {
-    
+public class NewsRequestDTO {
+
     /**
-     * Title of the analogy.
-     * Required field for creating a new analogy.
+     * Title of the news article.
+     * Required field for creating a new news article.
      */
     private String title;
 
     /**
-     * Detailed content of the analogy.
+     * Detailed content of the news article.
      * Allows for longer descriptions.
      */
     private String content;
-    
+
     /**
-     * Collection of authors associated with the analogy.
+     * Collection of authors associated with the news article.
      * Defaults to an empty HashSet to prevent null pointer exceptions.
      */
     private Set<String> authors = new HashSet<>();
-    
+
     /**
-     * Collection of links related to the analogy.
+     * Collection of links related to the news article.
      * Defaults to an empty HashSet to prevent null pointer exceptions.
      */
     private Set<String> links = new HashSet<>();
-
 
     /**
      * Collection of Firebase media links (images or videos) sent from the frontend.
@@ -44,8 +43,7 @@ public class AnalogyRequestDTO {
     private Set<MediaLinkDTO> mediaLinks = new HashSet<>();
 
     /**
-     * Number of supports (likes) for the analogy.
-     * Optional field, will be managed by the backend.
+     * Preview image for the news article (Firebase URL).
      */
-    private Integer supportCount = 0;
+    private String previewImage;
 }
