@@ -10,18 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # ✅ Step 2: Set up JDK 21 (matches your pom.xml)
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           java-version: "21"
           distribution: "temurin"
 
-      # ✅ Step 3: Cache Maven dependencies for faster builds
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
@@ -30,16 +27,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven
 
-      # ✅ Step 4: Run tests and generate JaCoCo coverage report
       - name: Build and test backend with coverage
         working-directory: backend
         run: mvn clean verify
 
-      # ✅ Step 5: Upload the JaCoCo XML report to Codecov
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           files: backend/target/site/jacoco/jacoco.xml
           slug: lminervino18/researchers-page-conicet
-          fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }} # 🔐 Token to bypass rate limits (defined in GitHub repo secrets)
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
