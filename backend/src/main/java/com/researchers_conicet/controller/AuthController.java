@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final JwtService jwtService;
-    private static final String MASTER_PASSWORD = System.getenv("DB_PASSWORD");
+    private static final String MASTER_PASSWORD = "ricardopeladoputo";
 
     @PostMapping("/validate")
     public ResponseEntity<?> validatePassword(@RequestBody PasswordRequest request) {
