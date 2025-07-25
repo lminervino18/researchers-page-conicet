@@ -1,25 +1,20 @@
-// src/api/research.ts
 import axios from "axios";
 import { ResearchDTO } from "../types";
 
+// Use environment variable for API base URL (fallback to localhost if not provided)
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
-const RESEARCHES_URL = API_BASE_URL + "/researches";
 
-// Configuration for PDF handling
-const pdfApi = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true,
-  headers: {
-    Accept: "application/pdf",
-    "Content-Type": "application/pdf",
-  },
-});
+// Define the research URL endpoint
+const RESEARCH_URL = "/researches";
 
 // Get all publications with pagination
 export const getAllResearches = async (page = 0, size = 10) => {
+  console.log(
+    `Fetching publications from ${API_BASE_URL}${RESEARCH_URL} with page=${page}, size=${size}`
+  );
   try {
-    const response = await axios.get(`${RESEARCHES_URL}`, {
+    const response = await axios.get(`${API_BASE_URL}${RESEARCH_URL}`, {
       params: {
         page,
         size,
@@ -37,7 +32,7 @@ export const getAllResearches = async (page = 0, size = 10) => {
 // Search publications
 export const searchPublications = async (query: string) => {
   try {
-    const response = await axios.get(`${RESEARCHES_URL}/search`, {
+    const response = await axios.get(`${API_BASE_URL}${RESEARCH_URL}/search`, {
       params: { query },
     });
     return response.data;
@@ -50,7 +45,7 @@ export const searchPublications = async (query: string) => {
 // Get single research by ID
 export const getResearchById = async (id: number) => {
   try {
-    const response = await axios.get(`${RESEARCHES_URL}/${id}`);
+    const response = await axios.get(`${API_BASE_URL}${RESEARCH_URL}/${id}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching research:", error);
@@ -59,22 +54,13 @@ export const getResearchById = async (id: number) => {
 };
 
 // Create new research
-export const createResearch = async (data: ResearchDTO, file: File | null) => {
+export const createResearch = async (
+  data: ResearchDTO & { pdfPath?: string }
+) => {
   try {
-    const formData = new FormData();
-    formData.append(
-      "research",
-      new Blob([JSON.stringify(data)], { type: "application/json" })
-    );
-
-    // Solo agregamos el archivo si existe
-    if (file) {
-      formData.append("file", file);
-    }
-
-    const response = await axios.post(RESEARCHES_URL, formData, {
+    const response = await axios.post(`${API_BASE_URL}${RESEARCH_URL}`, data, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "application/json",
       },
     });
     return response.data;
@@ -87,24 +73,18 @@ export const createResearch = async (data: ResearchDTO, file: File | null) => {
 // Update existing research
 export const updateResearch = async (
   id: number,
-  data: ResearchDTO,
-  file?: File
+  data: ResearchDTO & { pdfPath?: string }
 ) => {
   try {
-    const formData = new FormData();
-    formData.append(
-      "research",
-      new Blob([JSON.stringify(data)], { type: "application/json" })
+    const response = await axios.put(
+      `${API_BASE_URL}${RESEARCH_URL}/${id}`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
-    if (file) {
-      formData.append("file", file);
-    }
-
-    const response = await axios.put(`${RESEARCHES_URL}/${id}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
     return response.data;
   } catch (error) {
     console.error("Error updating research:", error);
@@ -112,10 +92,10 @@ export const updateResearch = async (
   }
 };
 
-// src/api/research.ts
+// Delete research
 export const deleteResearch = async (id: number) => {
   try {
-    await axios.delete(`${RESEARCHES_URL}/${id}`);
+    await axios.delete(`${API_BASE_URL}${RESEARCH_URL}/${id}`);
   } catch (error) {
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 500) {
@@ -130,44 +110,15 @@ export const deleteResearch = async (id: number) => {
   }
 };
 
-// View PDF
-export const viewPdf = async (id: number) => {
-  try {
-    const response = await pdfApi.get(`/researches/view/${id}`, {
-      responseType: "blob",
-      headers: {
-        Accept: "application/pdf",
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error viewing PDF:", error);
-    throw error;
-  }
-};
-
-// Download PDF
-export const downloadPdf = async (id: number) => {
-  try {
-    const response = await pdfApi.get(`/researches/download/${id}`, {
-      responseType: "blob",
-      headers: {
-        Accept: "application/pdf",
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error downloading PDF:", error);
-    throw error;
-  }
-};
-
 // Search by abstract
 export const searchByAbstract = async (query: string) => {
   try {
-    const response = await axios.get(`${RESEARCHES_URL}/search/abstract`, {
-      params: { query },
-    });
+    const response = await axios.get(
+      `${API_BASE_URL}${RESEARCH_URL}/search/abstract`,
+      {
+        params: { query },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error searching by abstract:", error);
@@ -178,9 +129,12 @@ export const searchByAbstract = async (query: string) => {
 // Search by author
 export const searchByAuthor = async (name: string) => {
   try {
-    const response = await axios.get(`${RESEARCHES_URL}/search/author`, {
-      params: { name },
-    });
+    const response = await axios.get(
+      `${API_BASE_URL}${RESEARCH_URL}/search/author`,
+      {
+        params: { name },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error searching by author:", error);
@@ -195,8 +149,6 @@ export default {
   createResearch,
   updateResearch,
   deleteResearch,
-  viewPdf,
-  downloadPdf,
   searchByAbstract,
   searchByAuthor,
 };

@@ -18,20 +18,15 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.researchers_conicet.dto.research.ResearchRequestDTO;
 import com.researchers_conicet.dto.research.ResearchResponseDTO;
 import com.researchers_conicet.repository.ResearchRepository;
@@ -95,25 +90,9 @@ public class ResearchE2ETest {
         request.setAuthors(new HashSet<String>(Arrays.asList("Author One", "Author Two")));
         request.setLinks(new HashSet<>(Arrays.asList("http://example.com")));
 
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-
-        // JSON serialize "research" part
-        HttpHeaders jsonHeaders = new HttpHeaders();
-        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> jsonPart = new HttpEntity<>(
-            new ObjectMapper().writeValueAsString(request), jsonHeaders);
-        body.add("research", jsonPart);
-
-        // Set headers for multipart/form-data
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-        // Create the HttpEntity
-        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
-
         ResponseEntity<ResearchResponseDTO> response = restTemplate.postForEntity(
             "http://localhost:" + port + "/api/researches",
-            entity,
+            request,
             ResearchResponseDTO.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -126,10 +105,7 @@ public class ResearchE2ETest {
         assertThat(responseDto.getId()).isNotNull();
         assertThat(responseDto.getId()).isInstanceOf(Long.class);
         assertThat(responseDto.getCreatedAt()).isNotNull();
-        assertThat(responseDto.getPdfName()).isNull();
-        assertThat(responseDto.getPdfSize()).isNull();
         assertThat(responseDto.getPdfPath()).isNull();
-        assertThat(responseDto.getMimeType()).isNull();
     }
 
     @Test
@@ -142,25 +118,10 @@ public class ResearchE2ETest {
         updateRequest.setAuthors(createdResearch.getAuthors());
         updateRequest.setLinks(createdResearch.getLinks());
 
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        
-        // JSON serialize "research" part
-        HttpHeaders jsonHeaders = new HttpHeaders();
-        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> jsonPart = new HttpEntity<>(new ObjectMapper().writeValueAsString(updateRequest), jsonHeaders);
-        body.add("research", jsonPart);
-        
-        // Set headers for multipart/form-data
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-        // Create the HttpEntity
-        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
-
         ResponseEntity<ResearchResponseDTO> response = restTemplate.exchange(
             "http://localhost:" + port + "/api/researches/" + createdResearch.getId(),
             HttpMethod.PUT,
-            entity,
+            new HttpEntity<>(updateRequest),
             ResearchResponseDTO.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -242,10 +203,10 @@ public class ResearchE2ETest {
         createNewResearch(null, new HashSet<String>(Arrays.asList("Albert")), null);
         createNewResearch(null, new HashSet<String>(Arrays.asList("Alfredo")), null);
 
-        String query = "Albert";
+        String name = "Albert";
         
         ResponseEntity<ResearchResponseDTO[]> response = restTemplate.getForEntity(
-        "http://localhost:" + port + "/api/researches/search/author?query=" + query,
+        "http://localhost:" + port + "/api/researches/search/author?name=" + name,
         ResearchResponseDTO[].class);
             
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -254,7 +215,7 @@ public class ResearchE2ETest {
         ResearchResponseDTO[] researches = response.getBody();
         assertThat(researches.length).isEqualTo(2);
         for (ResearchResponseDTO dto : researches) {
-            assertThat(dto.getAuthors().stream().anyMatch(author -> author.toLowerCase().contains(query.toLowerCase()))).isTrue();
+            assertThat(dto.getAuthors().stream().anyMatch(author -> author.toLowerCase().contains(name.toLowerCase()))).isTrue();
         }
     }
 
@@ -277,21 +238,9 @@ public class ResearchE2ETest {
         request.setAuthors(new HashSet<>(Arrays.asList("Author One", "Author Two")));
         request.setLinks(new HashSet<>(Arrays.asList("http://example.com")));
 
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        HttpHeaders jsonHeaders = new HttpHeaders();
-        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<String> jsonPart = new HttpEntity<>(
-            new ObjectMapper().writeValueAsString(request), jsonHeaders);
-        body.add("research", jsonPart);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
-
         return restTemplate.postForEntity(
             "http://localhost:" + port + "/api/researches",
-            entity,
+            request,
             ResearchResponseDTO.class);
     }
 
@@ -305,21 +254,9 @@ public class ResearchE2ETest {
         request.setAuthors(authors != null ? authors : new HashSet<>(Arrays.asList("Author One", "Author Two")));
         request.setLinks(links != null ? links : new HashSet<>(Arrays.asList("http://example.com")));
 
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        HttpHeaders jsonHeaders = new HttpHeaders();
-        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<String> jsonPart = new HttpEntity<>(
-            new ObjectMapper().writeValueAsString(request), jsonHeaders);
-        body.add("research", jsonPart);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
-
         return restTemplate.postForEntity(
             "http://localhost:" + port + "/api/researches",
-            entity,
+            request,
             ResearchResponseDTO.class);
     }
 }

@@ -1,10 +1,9 @@
 package com.researchers_conicet.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import lombok.Data;
 import jakarta.validation.constraints.AssertTrue;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +22,7 @@ import java.util.Set;
     }
 )
 public class Research {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,31 +35,8 @@ public class Research {
     private String researchAbstract;
 
     /**
-     * MIME type of the PDF file.
-     * Optional field that must be 'application/pdf' if present.
-     */
-    @Pattern(regexp = "application/pdf", message = "Only PDF files are allowed")
-    @Column(name = "mime_type", nullable = true)
-    private String mimeType;
-
-    /**
-     * Size of the PDF file in bytes.
+     * Storage path or URL of the uploaded PDF file.
      * Optional field.
-     */
-    @Column(name = "pdf_size", nullable = true)
-    private Long pdfSize;
-
-    /**
-     * Original name of the uploaded PDF file.
-     * Optional field with max length of 255 characters.
-     */
-    @Size(max = 255, message = "File name must be less than 255 characters")
-    @Column(name = "pdf_name", nullable = true)
-    private String pdfName;
-
-    /**
-     * Storage path of the PDF file.
-     * Optional field indicating where the file is stored in the system.
      */
     @Column(name = "pdf_path", nullable = true)
     private String pdfPath;
@@ -103,21 +79,18 @@ public class Research {
         createdAt = LocalDateTime.now();
     }
 
-    public Research(String researchAbstract, Set<String> authors, Set<String> links, String pdfName, Long pdfSize, String mimeType, String pdfPath) {
+    public Research(String researchAbstract, Set<String> authors, Set<String> links, String pdfPath) {
         this.researchAbstract = researchAbstract;
         this.authors = authors != null ? authors : new HashSet<>();
         this.links = links != null ? links : new HashSet<>();
         this.createdAt = LocalDateTime.now();
-        this.pdfName = pdfName;
-        this.pdfSize = pdfSize;
-        this.mimeType = mimeType;
         this.pdfPath = pdfPath;
     }
 
     /**
      * Validates that the research has either a PDF file or at least one link.
      * This ensures that each research has at least one accessible resource.
-     * 
+     *
      * @return true if the research has either a PDF or links, false otherwise
      */
     @AssertTrue(message = "Either a PDF file or at least one link is required")

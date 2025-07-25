@@ -1,6 +1,5 @@
 package com.researchers_conicet.service;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -19,7 +18,6 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.researchers_conicet.dto.research.ResearchRequestDTO;
 import com.researchers_conicet.dto.research.ResearchResponseDTO;
@@ -38,9 +36,6 @@ public class ResearchServiceTest {
     @Mock
     private ResearchRepository repository;
 
-    @Mock
-    private FileStorageService fileStorageService;
-
     @InjectMocks
     private ResearchService service;
 
@@ -49,34 +44,20 @@ public class ResearchServiceTest {
             "Abstract",
             new HashSet<>(Arrays.asList("Author 1", "Author 2")),
             new HashSet<>(Arrays.asList("https://example")),
-            PDF_NAME,
-            PDF_SIZE,
-            MIME_TYPE,
             PDF_PATH_ROOT + PDF_NAME
         );
         return research;
     }
 
-    private MultipartFile getMockFile() {
-        MultipartFile mockFile = mock(MultipartFile.class);
-        when(mockFile.getOriginalFilename()).thenReturn(PDF_NAME);
-        when(mockFile.getContentType()).thenReturn(MIME_TYPE);
-        when(mockFile.isEmpty()).thenReturn(false);
-        when(mockFile.getSize()).thenReturn(PDF_SIZE); // 1 KB
-        return mockFile;
-    }
-
     @Test
     void createResearch_shouldReturnCreatedResearchResponse() {
-        String pdfName = "file_example.pdf";
-        String mimeType = "application/pdf";
-        Long pdfSize = 1024L; // 1 KB
-        String pdfPath = "uploads/" + pdfName;
+        String pdfPath = "uploads/" + PDF_NAME;
         // Creates Request DTO for research
         ResearchRequestDTO requestDto = new ResearchRequestDTO();
         requestDto.setResearchAbstract("Abstract");
         requestDto.setAuthors(new HashSet<String>(Arrays.asList("Author 1", "Author 2")));
         requestDto.setLinks(new HashSet<String>(Arrays.asList(("https://example"))));
+        requestDto.setPdfPath(pdfPath);
         
         // Mock repository.save retreive
         Long id = 1L;
@@ -86,15 +67,7 @@ public class ResearchServiceTest {
             return arg;
         });
 
-        // Mock fileStorageService
-        when(fileStorageService.storeFile(ArgumentMatchers.any(MultipartFile.class)))
-            .thenReturn("https://example.com/file.pdf");
-        when(fileStorageService.getFileUrl("https://example.com/file.pdf")).thenReturn(pdfPath);
-        
-        // Mock the file
-        MultipartFile mockFile = getMockFile();
-
-        ResearchResponseDTO result = service.createResearch(requestDto, mockFile);
+        ResearchResponseDTO result = service.createResearch(requestDto);
 
         // Assert that the returned DTO is not null
         assertThat(result).isNotNull();
@@ -103,10 +76,7 @@ public class ResearchServiceTest {
         ResearchResponseDTO responseDto = new ResearchResponseDTO();
         responseDto.setId(id);
         responseDto.setResearchAbstract("Abstract");
-        responseDto.setPdfName(pdfName);
         responseDto.setPdfPath(pdfPath);
-        responseDto.setPdfSize(pdfSize);
-        responseDto.setMimeType(mimeType);
         responseDto.setAuthors(new HashSet<String>(Arrays.asList("Author 1", "Author 2")));
         responseDto.setLinks(new HashSet<String>(Arrays.asList(("https://example"))));
         responseDto.setCreatedAt(result.getCreatedAt());
@@ -115,15 +85,13 @@ public class ResearchServiceTest {
         assertThat(result).isEqualTo(responseDto);
         // Assert it throws IllegalArgumentException with empty abstract
         requestDto.setResearchAbstract("");
-        assertThrows(IllegalArgumentException.class, () -> service.createResearch(requestDto, mockFile));
+        assertThrows(IllegalArgumentException.class, () -> service.createResearch(requestDto));
     }
 
     @Test
     void getResearch_shouldReturnExistintResearchResponse() {
         Long id = 1L;
         String pdfName = "file_example.pdf";
-        String mimeType = "application/pdf";
-        Long pdfSize = 1024L; // 1 KB
         String pdfPath = "uploads/" + pdfName;
 
         Research research = createMockResearch();
@@ -137,10 +105,7 @@ public class ResearchServiceTest {
         ResearchResponseDTO responseDto = new ResearchResponseDTO();
         responseDto.setId(id);
         responseDto.setResearchAbstract(research.getResearchAbstract());
-        responseDto.setPdfName(pdfName);
         responseDto.setPdfPath(pdfPath);
-        responseDto.setPdfSize(pdfSize);
-        responseDto.setMimeType(mimeType);
         responseDto.setAuthors(research.getAuthors());
         responseDto.setLinks(research.getLinks());
         responseDto.setCreatedAt(research.getCreatedAt());
@@ -156,17 +121,17 @@ public class ResearchServiceTest {
     @Test
     void updateAnalogy_shouldReturnUpdatedAnalogyResponse() {
         Long id = 1L;
+        String pdfPath = PDF_PATH_ROOT + PDF_NAME;
 
         // Creates Request DTO for research
         ResearchRequestDTO requestDto = new ResearchRequestDTO();
         requestDto.setResearchAbstract("Updated Abstract");
         requestDto.setAuthors(new HashSet<String>(Arrays.asList("New Author 1", "New Author 2")));
         requestDto.setLinks(new HashSet<String>(Arrays.asList(("https://newexample"))));
+        requestDto.setPdfPath(pdfPath);
 
         Research research = createMockResearch();
         research.setId(id);
-        MultipartFile mockFile = getMockFile();
-        String pdfPath = PDF_PATH_ROOT + mockFile.getOriginalFilename();
 
         when(repository.findById(research.getId())).thenReturn(Optional.of(research));
 
@@ -175,24 +140,16 @@ public class ResearchServiceTest {
             return arg;
         });
 
-        when(fileStorageService.storeFile(ArgumentMatchers.any(MultipartFile.class)))
-            .thenReturn("https://example.com/file.pdf");
-        when(fileStorageService.getFileUrl("https://example.com/file.pdf")).thenReturn(pdfPath);
-
         // Create expected Response DTO 
         ResearchResponseDTO responseDto = new ResearchResponseDTO();
         responseDto.setId(id);
         responseDto.setResearchAbstract(requestDto.getResearchAbstract());
         responseDto.setAuthors(requestDto.getAuthors());
         responseDto.setLinks(requestDto.getLinks());
-        responseDto.setPdfName(mockFile.getOriginalFilename());
-        responseDto.setPdfSize(mockFile.getSize());
-        responseDto.setMimeType(mockFile.getContentType());
         responseDto.setPdfPath(pdfPath);
         responseDto.setCreatedAt(research.getCreatedAt());
 
-
-        ResearchResponseDTO result = service.updateResearch(id, requestDto, mockFile);
+        ResearchResponseDTO result = service.updateResearch(id, requestDto);
 
         assertThat(result).isNotNull();
         assertThat(result).isEqualTo(responseDto);

@@ -7,7 +7,7 @@ import {
   removeAllEmails,
   registerMultipleEmails,
   removeEmail
-} from '../../../api/EmailVerification'
+} from '../../../api/emailVerification'
 import './styles/AdminEmails.css';
 
 const AdminEmails: React.FC = () => {
