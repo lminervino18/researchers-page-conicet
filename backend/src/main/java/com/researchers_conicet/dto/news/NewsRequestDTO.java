@@ -39,6 +39,7 @@ public class NewsRequestDTO {
 
     /**
      * Collection of Firebase media links (images or videos) sent from the frontend.
+     * Defaults to an empty HashSet to prevent null pointer exceptions.
      */
     private Set<MediaLinkDTO> mediaLinks = new HashSet<>();
 

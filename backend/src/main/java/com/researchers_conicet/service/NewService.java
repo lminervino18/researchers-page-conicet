@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 import org.hibernate.Hibernate;
 
 import java.util.List;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 /**
@@ -59,8 +60,9 @@ public class NewService {
             news.setAuthors(requestDTO.getAuthors());
             news.setLinks(requestDTO.getLinks());
 
+            // Asegúrate de que mediaLinks no sea null
             news.setMediaLinks(
-                requestDTO.getMediaLinks()
+                requestDTO.getMediaLinks() == null ? new HashSet<>() : requestDTO.getMediaLinks()
                     .stream()
                     .map(dto -> new MediaLink(dto.getUrl(), dto.getMediaType()))
                     .collect(Collectors.toSet())
@@ -144,8 +146,9 @@ public class NewService {
 
             news.getMediaLinks().clear();
 
+            // Asegúrate de que mediaLinks no sea null
             news.setMediaLinks(
-                requestDTO.getMediaLinks()
+                requestDTO.getMediaLinks() == null ? new HashSet<>() : requestDTO.getMediaLinks()
                     .stream()
                     .map(dto -> new MediaLink(dto.getUrl(), dto.getMediaType()))
                     .collect(Collectors.toSet())
@@ -167,26 +170,21 @@ public class NewService {
         }
     }
 
-    /**
-     * Deletes a news article
-     * 
-     * @param id News article identifier
-     * @throws ResourceNotFoundException if news article not found
-     */
     @Transactional
     public void deleteNew(Long id) {
-        log.info("Deleting news article with ID: {}", id);
+    log.info("Deleting news article with ID: {}", id);
 
-        New news = findNewById(id);
+    New news = findNewById(id);  
 
-        try {
-            newRepository.delete(news);
-            log.info("Deleted news article with ID: {}", id);
-        } catch (Exception e) {
-            log.error("Error deleting news article with ID: {}", id, e);
-            throw new ResourceNotFoundException("Failed to delete news article", e);
-        }
+    if (news == null) {
+        throw new ResourceNotFoundException("News article not found with id: " + id);
     }
+
+    newRepository.delete(news);  // Elimina el artículo
+    log.info("Deleted news article with ID: {}", id);
+}
+
+
 
     /**
      * Searches news articles by title content
@@ -268,26 +266,27 @@ public class NewService {
      * @return News response DTO
      */
     private NewsResponseDTO mapToDTO(New news) {
-        NewsResponseDTO dto = new NewsResponseDTO();
-        dto.setId(news.getId());
-        dto.setTitle(news.getTitle());
-        dto.setContent(news.getContent());
-        dto.setCreatedAt(news.getCreatedAt());
-        dto.setAuthors(news.getAuthors());
-        dto.setLinks(news.getLinks());
+    NewsResponseDTO dto = new NewsResponseDTO();
+    dto.setId(news.getId());
+    dto.setTitle(news.getTitle());
+    dto.setContent(news.getContent());
+    dto.setCreatedAt(news.getCreatedAt());
+    dto.setAuthors(news.getAuthors());
+    dto.setLinks(news.getLinks());
 
-        dto.setMediaLinks(
-            news.getMediaLinks()
-                .stream()
-                .map(media -> {
-                    MediaLinkDTO dtoItem = new MediaLinkDTO();
-                    dtoItem.setUrl(media.getUrl());
-                    dtoItem.setMediaType(media.getMediaType());
-                    return dtoItem;
-                })
-                .collect(Collectors.toSet())
-        );
+    dto.setMediaLinks(
+        news.getMediaLinks() == null ? new HashSet<>() : news.getMediaLinks()
+            .stream()
+            .map(media -> {
+                MediaLinkDTO dtoItem = new MediaLinkDTO();
+                dtoItem.setUrl(media.getUrl());
+                dtoItem.setMediaType(media.getMediaType());
+                return dtoItem;
+            })
+            .collect(Collectors.toSet())
+    );
 
-        return dto;
-    }
+    return dto;
+}
+
 }
