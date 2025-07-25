@@ -4,7 +4,7 @@ import com.researchers_conicet.entity.Analogy;
 import com.researchers_conicet.entity.MediaLink;
 import com.researchers_conicet.dto.analogy.AnalogyRequestDTO;
 import com.researchers_conicet.dto.analogy.AnalogyResponseDTO;
-import com.researchers_conicet.dto.analogy.MediaLinkDTO;
+import com.researchers_conicet.dto.media_link.MediaLinkDTO;
 import com.researchers_conicet.repository.AnalogyRepository;
 import com.researchers_conicet.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;

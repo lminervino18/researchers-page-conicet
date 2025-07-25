@@ -4,6 +4,8 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import com.researchers_conicet.dto.media_link.MediaLinkDTO;
+
 /**
  * Data Transfer Object for returning analogy information.
  * Includes all fields needed for frontend display.
