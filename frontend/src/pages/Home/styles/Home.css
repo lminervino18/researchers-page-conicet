@@ -158,6 +158,87 @@
   margin: 0 auto;
 }
 
+/* Gallery Section */
+.gallery-section {
+  padding: 60px 20px;
+  background-color: #ffffff;
+}
+
+.gallery-content {
+  max-width: 1200px; /* Mismo ancho máximo que las otras secciones */
+  margin: 0 auto;
+  text-align: center;
+}
+
+.gallery-content h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #333;
+}
+
+.gallery-content p {
+  font-size: var(--font-size-large);
+  color: var(--text-light);
+  line-height: var(--line-height-base);
+  max-width: 800px;
+  margin: 0 auto;
+  margin-bottom: revert-layer;
+}
+
+/* Masonry Grid */
+.masonry-grid {
+  display: flex;
+  margin-left: -10px;
+  width: auto;
+}
+
+.masonry-grid_column {
+  padding-left: 10px;
+  background-clip: padding-box;
+}
+
+.masonry-item {
+  position: relative;
+  margin-bottom: 10px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f0f0f0;
+}
+
+.masonry-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.masonry-item:hover img {
+  transform: scale(1.05);
+}
+
+.masonry-item .photo-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+  color: white;
+  padding: 20px 10px 10px;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.masonry-item .photo-overlay p {
+  color: white;
+  margin: 1;
+  font-size: 1.2rem;
+}
+
+.masonry-item:hover .photo-overlay {
+  transform: translateY(0);
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .hero-content {
