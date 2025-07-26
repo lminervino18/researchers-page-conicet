@@ -1,5 +1,5 @@
 // src/pages/home/Home.tsx
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import MainLayout from "../../layouts/MainLayout";
 import landingImage from "../../assets/landing-page/landing-example.jpeg";
 import "./styles/Home.css";
@@ -14,6 +14,20 @@ const breakpointColumns = {
 };
 
 const Home: FC = () => {
+  const [showFullGallery, setShowFullGallery] = useState(false);
+
+  useEffect(() => {
+    if (showFullGallery) {
+      document.body.classList.add("modal-open");
+    } else {
+      document.body.classList.remove("modal-open");
+    }
+
+    return () => {
+      document.body.classList.remove("modal-open");
+    };
+  }, [showFullGallery]);
+
   return (
     <MainLayout>
       <div className="home-container">
@@ -65,27 +79,94 @@ const Home: FC = () => {
           <div className="gallery-content">
             <h2>Lab Gallery</h2>
             <p>Explore our research environment and team activities</p>
-            <Masonry
-              breakpointCols={breakpointColumns}
-              className="masonry-grid"
-              columnClassName="masonry-grid_column"
-            >
-              {photos.map((photo, index) => (
-                <div key={index} className="masonry-item">
-                  <img
-                    src={photo.src}
-                    alt={photo.alt || `Photo ${index + 1}`}
-                    loading="lazy"
-                  />
-                  <div className="photo-overlay">
-                    <p>{photo.alt || `Photo ${index + 1}`}</p>
-                  </div>
-                </div>
-              ))}
-            </Masonry>
+            <div className="gallery-preview-container">
+              <div className="gallery-preview">
+                <Masonry
+                  breakpointCols={breakpointColumns}
+                  className="masonry-grid"
+                  columnClassName="masonry-grid_column"
+                >
+                  {photos.map((photo, index) => (
+                    <div key={index} className="masonry-item">
+                      <img
+                        src={photo.src}
+                        alt={photo.alt || `Photo ${index + 1}`}
+                        loading="lazy"
+                      />
+                      <div className="photo-overlay">
+                        <p>{photo.alt || `Photo ${index + 1}`}</p>
+                      </div>
+                    </div>
+                  ))}
+                </Masonry>
+              </div>
+              <div className="gallery-gradient-overlay">
+                <button
+                  className="view-more-button"
+                  onClick={() => setShowFullGallery(true)}
+                  aria-label="Ver más fotos"
+                >
+                  <span>Más</span>
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
         </section>
       </div>
+
+      {/* Full Gallery Modal */}
+      {showFullGallery && (
+        <div
+          className="gallery-modal"
+          onClick={() => setShowFullGallery(false)}
+        >
+          <div
+            className="gallery-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="modal-close-button"
+              onClick={() => setShowFullGallery(false)}
+              aria-label="Cerrar galería"
+            >
+              ×
+            </button>
+            <h2>Galería Completa</h2>
+            <div className="gallery-modal-scroll">
+              <Masonry
+                breakpointCols={breakpointColumns}
+                className="masonry-grid"
+                columnClassName="masonry-grid_column"
+              >
+                {photos.map((photo, index) => (
+                  <div key={index} className="masonry-item">
+                    <img
+                      src={photo.src}
+                      alt={photo.alt || `Photo ${index + 1}`}
+                      loading="lazy"
+                    />
+                    <div className="photo-overlay">
+                      <p>{photo.alt || `Photo ${index + 1}`}</p>
+                    </div>
+                  </div>
+                ))}
+              </Masonry>
+            </div>
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 };
