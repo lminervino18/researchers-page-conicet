@@ -12,6 +12,9 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -186,6 +189,8 @@ class NewServiceTest {
         // Test delete operation
         service.deleteNew(id);
 
+        when(repository.findById(id)).thenReturn(Optional.empty());
+
         // Verify repository delete is called
         assertThrows(ResourceNotFoundException.class, () -> service.getNew(id));
     }
@@ -194,8 +199,22 @@ class NewServiceTest {
     void searchByTitle_shouldReturnAListOfNewsWithTextInTitle() {
         String text = "Test";
 
-        New news1 = new New("Test News Title 1", "Test Content 1", new HashSet<>(Arrays.asList("Author 1")), new HashSet<>(Arrays.asList("https://link.com")), new HashSet<>());
-        New news2 = new New("Test News Title 2", "Test Content 2", new HashSet<>(Arrays.asList("Author 2")), new HashSet<>(Arrays.asList("https://link.com")), new HashSet<>());
+        Set<String> previewImages = new HashSet<>(Arrays.asList("https://preview.com"));
+
+        New news1 = new New(
+            "Test News Title 1",
+            "Test Content 1",
+            new HashSet<>(Arrays.asList("Author 1")),
+            new HashSet<>(Arrays.asList("https://link.com")),
+            previewImages
+        );
+        New news2 = new New(
+            "Test News Title 2",
+            "Test Content 2",
+            new HashSet<>(Arrays.asList("Author 2")),
+            new HashSet<>(Arrays.asList("https://link.com")),
+            previewImages
+        );
 
         List<New> newsList = Arrays.asList(news1, news2);
 
@@ -209,12 +228,28 @@ class NewServiceTest {
     }
 
 
+
     @Test
     void searchEverywhere_shouldReturnAListOfNewsWithTextAnywhere() {
         String text = "Test";
+
+        Set<String> previewImages = new HashSet<>(Arrays.asList("https://preview.com"));
+
         List<New> newsList = Arrays.asList(
-            new New("Test News Title", "Content with Test", new HashSet<>(Arrays.asList("Author 1")), new HashSet<>(Arrays.asList("https://link.com")), new HashSet<>()),
-            new New("Real News Title", "Content without search term", new HashSet<>(Arrays.asList("Author 2")), new HashSet<>(Arrays.asList("https://link.com")), new HashSet<>())
+            new New(
+                "Test News Title",
+                "Content with Test",
+                new HashSet<>(Arrays.asList("Author 1")),
+                new HashSet<>(Arrays.asList("https://link.com")),
+                previewImages
+            ),
+            new New(
+                "Real News Title",
+                "Content without search term",
+                new HashSet<>(Arrays.asList("Author 2")),
+                new HashSet<>(Arrays.asList("https://link.com")),
+                previewImages
+            )
         );
 
         when(repository.searchEverywhere(text)).thenReturn(newsList);
@@ -223,7 +258,69 @@ class NewServiceTest {
 
         // Assert the result is not null and the correct data is returned
         assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.size()).isEqualTo(2);
         assertThat(result.get(0).getTitle()).contains("Test");
     }
+
+    @Test
+    void getAllNews_shouldReturnPaginatedResults() {
+        Set<String> previewImages = new HashSet<>(Arrays.asList("https://preview.com"));
+
+        New news = new New(
+            "Paginated Title",
+            "Paginated Content",
+            new HashSet<>(Arrays.asList("Author")),
+            new HashSet<>(Arrays.asList("https://link.com")),
+            previewImages
+        );
+
+        List<New> content = Arrays.asList(news);
+        Page<New> page = new PageImpl<>(content);
+
+        when(repository.findAll(ArgumentMatchers.any(Pageable.class))).thenReturn(page);
+
+        Page<NewsResponseDTO> result = service.getAllNews(Pageable.ofSize(10));
+
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().get(0).getTitle()).isEqualTo("Paginated Title");
+    }
+
+    @Test
+    void createNew_shouldThrowException_whenTooManyAuthors() {
+        NewsRequestDTO requestDto = new NewsRequestDTO();
+        requestDto.setTitle("News with too many authors");
+        requestDto.setContent("Content");
+
+        Set<String> authors = new HashSet<>();
+        for (int i = 1; i <= 11; i++) {
+            authors.add("Author " + i);
+        }
+
+        requestDto.setAuthors(authors);
+        requestDto.setLinks(new HashSet<>());
+        requestDto.setMediaLinks(new HashSet<>());
+
+        assertThrows(IllegalArgumentException.class, () -> service.createNew(requestDto));
+    }
+
+    @Test
+    void createNew_shouldThrowException_whenTooManyLinks() {
+        NewsRequestDTO requestDto = new NewsRequestDTO();
+        requestDto.setTitle("News with too many links");
+        requestDto.setContent("Content");
+        requestDto.setAuthors(new HashSet<>(Arrays.asList("Author 1")));
+
+        Set<String> links = new HashSet<>();
+        for (int i = 1; i <= 6; i++) {
+            links.add("https://example" + i + ".com");
+        }
+
+        requestDto.setLinks(links);
+        requestDto.setMediaLinks(new HashSet<>());
+
+        assertThrows(IllegalArgumentException.class, () -> service.createNew(requestDto));
+    }
+
+    
 }

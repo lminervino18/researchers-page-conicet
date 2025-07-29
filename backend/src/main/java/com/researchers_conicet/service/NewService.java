@@ -180,7 +180,7 @@ public class NewService {
         throw new ResourceNotFoundException("News article not found with id: " + id);
     }
 
-    newRepository.delete(news);  // Elimina el artículo
+    newRepository.delete(news);  
     log.info("Deleted news article with ID: {}", id);
 }
 
