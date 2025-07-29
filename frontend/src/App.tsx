@@ -16,6 +16,7 @@ import AdminExperiments from "./pages/Admin/Experiments/AdminExperiments";
 import AddAnalogy  from "./pages/Admin/Analogies/AddAnalogy";
 import EditAnalogy from "./pages/Admin/Analogies/EditAnalogy";
 import AdminEmails from "./pages/Admin/Emails/AdminEmails";
+import AdminNews from "./pages/Admin/News/AdminNews";
 import AnalogiesDetail from './pages/Inbox/AnalogiesDetail';
 
 // Protected Route Component
@@ -111,6 +112,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <AdminEmails />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/news" 
+          element={
+            <ProtectedRoute>
+              <AdminNews />
             </ProtectedRoute>
           } 
         />

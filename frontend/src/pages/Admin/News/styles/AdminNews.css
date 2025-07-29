@@ -1,0 +1,61 @@
+@import '../../styles/AdminCommonStyles.css';
+
+.admin-news-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.admin-news-card {
+    background-color: var(--background-color);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-lg);
+    transition: all var(--transition-fast);
+}
+
+.admin-news-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.news-info {
+    flex: 1;
+    max-width: 70%;
+}
+
+.news-admin-title {
+    color: var(--text-color);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    font-weight: bold;
+}
+
+.news-authors {
+    color: var(--text-light);
+    font-size: var(--font-size-small);
+    margin-bottom: var(--spacing-xs);
+}
+
+.news-links {
+    color: var(--text-light);
+    font-size: var(--font-size-small);
+}
+
+.no-news {
+    text-align: center;
+    color: var(--text-light);
+    padding: var(--spacing-xl);
+    font-size: var(--font-size-large);
+}
+
+.news-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
