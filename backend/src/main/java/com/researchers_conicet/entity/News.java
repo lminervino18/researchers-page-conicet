@@ -14,12 +14,12 @@ import java.util.Set;
 @Entity
 @Data
 @Table(
-    name = "new", // Cambié el nombre de la tabla a 'new'
+    name = "news", // Cambié el nombre de la tabla a 'ne
     indexes = {
         @Index(name = "idx_new_created_at", columnList = "created_at")
     }
 )
-public class New {
+public class News {
 
     /**
      * Unique identifier for the news article.
@@ -96,11 +96,11 @@ public class New {
     @Transient
     private int mediaCount;
 
-    public New() {
+    public News() {
         createdAt = LocalDateTime.now();
     }
 
-    public New(String title, String content, Set<String> authors, Set<String> links, Set<String> previewImage) {
+    public News(String title, String content, Set<String> authors, Set<String> links, Set<String> previewImage) {
         this.content = content;
         this.title = title;
         this.authors = authors != null ? authors : new HashSet<>();
@@ -114,7 +114,7 @@ public class New {
      * WARNING: This does not create a new row in database, it only clones the object in memory.
      * @param news The news article to clone
      */
-    public New(New news) {
+    public News(News news) {
         this.id = news.id;
         this.content = news.content;
         this.title = news.title;

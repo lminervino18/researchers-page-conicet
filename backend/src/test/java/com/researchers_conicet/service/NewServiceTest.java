@@ -1,10 +1,10 @@
 package com.researchers_conicet.service;
 
-import com.researchers_conicet.entity.New;
+import com.researchers_conicet.entity.News;
 import com.researchers_conicet.dto.news.NewsRequestDTO;
 import com.researchers_conicet.dto.news.NewsResponseDTO;
 import com.researchers_conicet.dto.media_link.MediaLinkDTO;
-import com.researchers_conicet.repository.NewRepository;
+import com.researchers_conicet.repository.NewsRepository;
 import com.researchers_conicet.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,13 +30,13 @@ import static org.mockito.Mockito.when;
 class NewServiceTest {
 
     @Mock
-    private NewRepository repository;
+    private NewsRepository repository;
 
     @InjectMocks
-    private NewService service;
+    private NewsService service;
 
     @Test
-    void createNew_shouldReturnCreatedNewsResponse() {
+    void createNews_shouldReturnCreatedNewsResponse() {
         // Create NewsRequestDTO for news
         NewsRequestDTO requestDto = new NewsRequestDTO();
         requestDto.setTitle("News Title");
@@ -54,13 +54,13 @@ class NewServiceTest {
 
         // Mock repository.save
         Long id = 1L;
-        when(repository.save(ArgumentMatchers.any(New.class))).thenAnswer(invocation -> {
-            New arg = invocation.getArgument(0);
+        when(repository.save(ArgumentMatchers.any(News.class))).thenAnswer(invocation -> {
+            News arg = invocation.getArgument(0);
             arg.setId(id);
             return arg;
         });
 
-        NewsResponseDTO result = service.createNew(requestDto);
+        NewsResponseDTO result = service.createNews(requestDto);
 
         // Assert the returned DTO is not null
         assertThat(result).isNotNull();
@@ -80,7 +80,7 @@ class NewServiceTest {
     }
 
     @Test
-    void createNew_shouldThrowException_whenTitleIsEmpty() {
+    void createNews_shouldThrowException_whenTitleIsEmpty() {
         NewsRequestDTO requestDto = new NewsRequestDTO();
         requestDto.setTitle(""); // Empty title
         requestDto.setContent("News Content");
@@ -88,15 +88,15 @@ class NewServiceTest {
         requestDto.setLinks(new HashSet<>(Arrays.asList("https://example.com")));
         requestDto.setMediaLinks(new HashSet<>()); // Ensuring mediaLinks is not null
 
-        // Assert that createNew throws IllegalArgumentException due to empty title
-        assertThrows(IllegalArgumentException.class, () -> service.createNew(requestDto));
+        // Assert that createNews throws IllegalArgumentException due to empty title
+        assertThrows(IllegalArgumentException.class, () -> service.createNews(requestDto));
     }
 
     @Test
     void getNew_shouldReturnExistingNewsResponse() {
         Long id = 1L;
 
-        New news = new New();
+        News news = new News();
         news.setId(id);
         news.setTitle("News Title");
         news.setContent("News Content");
@@ -106,7 +106,7 @@ class NewServiceTest {
 
         when(repository.findById(id)).thenReturn(Optional.of(news));
 
-        NewsResponseDTO result = service.getNew(id);
+        NewsResponseDTO result = service.getNews(id);
 
         // Expected Response DTO
         NewsResponseDTO responseDto = new NewsResponseDTO();
@@ -134,7 +134,7 @@ class NewServiceTest {
 
         // Test for non-existing news should throw ResourceNotFoundException
         when(repository.findById(2L)).thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> service.getNew(2L));
+        assertThrows(ResourceNotFoundException.class, () -> service.getNews(2L));
     }
 
     @Test
@@ -149,7 +149,7 @@ class NewServiceTest {
         requestDto.setLinks(new HashSet<>(Arrays.asList("https://newexample.com")));
         requestDto.setMediaLinks(new HashSet<>()); // Ensuring mediaLinks is not null
 
-        New news = new New();
+        News news = new News();
         news.setId(id);
         news.setTitle("News Title");
         news.setContent("News Content");
@@ -158,9 +158,9 @@ class NewServiceTest {
         news.setMediaLinks(new HashSet<>()); // Ensuring mediaLinks is not null
 
         when(repository.findById(id)).thenReturn(Optional.of(news));
-        when(repository.save(ArgumentMatchers.any(New.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(repository.save(ArgumentMatchers.any(News.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        NewsResponseDTO result = service.updateNew(id, requestDto);
+        NewsResponseDTO result = service.updateNews(id, requestDto);
 
         // Expected Response DTO
         NewsResponseDTO responseDto = new NewsResponseDTO();
@@ -181,18 +181,18 @@ class NewServiceTest {
     void deleteNew_shouldDeleteExistingNews() {
         Long id = 1L;
 
-        New news = new New();
+        News news = new News();
         news.setId(id);
 
         when(repository.findById(id)).thenReturn(Optional.of(news));
 
         // Test delete operation
-        service.deleteNew(id);
+        service.deleteNews(id);
 
         when(repository.findById(id)).thenReturn(Optional.empty());
 
         // Verify repository delete is called
-        assertThrows(ResourceNotFoundException.class, () -> service.getNew(id));
+        assertThrows(ResourceNotFoundException.class, () -> service.getNews(id));
     }
 
     @Test
@@ -201,14 +201,14 @@ class NewServiceTest {
 
         Set<String> previewImages = new HashSet<>(Arrays.asList("https://preview.com"));
 
-        New news1 = new New(
+        News news1 = new News(
             "Test News Title 1",
             "Test Content 1",
             new HashSet<>(Arrays.asList("Author 1")),
             new HashSet<>(Arrays.asList("https://link.com")),
             previewImages
         );
-        New news2 = new New(
+        News news2 = new News(
             "Test News Title 2",
             "Test Content 2",
             new HashSet<>(Arrays.asList("Author 2")),
@@ -216,7 +216,7 @@ class NewServiceTest {
             previewImages
         );
 
-        List<New> newsList = Arrays.asList(news1, news2);
+        List<News> newsList = Arrays.asList(news1, news2);
 
         when(repository.findByTitleContainingIgnoreCase(text)).thenReturn(newsList);
 
@@ -235,15 +235,15 @@ class NewServiceTest {
 
         Set<String> previewImages = new HashSet<>(Arrays.asList("https://preview.com"));
 
-        List<New> newsList = Arrays.asList(
-            new New(
+        List<News> newsList = Arrays.asList(
+            new News(
                 "Test News Title",
                 "Content with Test",
                 new HashSet<>(Arrays.asList("Author 1")),
                 new HashSet<>(Arrays.asList("https://link.com")),
                 previewImages
             ),
-            new New(
+            new News(
                 "Real News Title",
                 "Content without search term",
                 new HashSet<>(Arrays.asList("Author 2")),
@@ -266,7 +266,7 @@ class NewServiceTest {
     void getAllNews_shouldReturnPaginatedResults() {
         Set<String> previewImages = new HashSet<>(Arrays.asList("https://preview.com"));
 
-        New news = new New(
+        News news = new News(
             "Paginated Title",
             "Paginated Content",
             new HashSet<>(Arrays.asList("Author")),
@@ -274,8 +274,8 @@ class NewServiceTest {
             previewImages
         );
 
-        List<New> content = Arrays.asList(news);
-        Page<New> page = new PageImpl<>(content);
+        List<News> content = Arrays.asList(news);
+        Page<News> page = new PageImpl<>(content);
 
         when(repository.findAll(ArgumentMatchers.any(Pageable.class))).thenReturn(page);
 
@@ -287,7 +287,7 @@ class NewServiceTest {
     }
 
     @Test
-    void createNew_shouldThrowException_whenTooManyAuthors() {
+    void createNews_shouldThrowException_whenTooManyAuthors() {
         NewsRequestDTO requestDto = new NewsRequestDTO();
         requestDto.setTitle("News with too many authors");
         requestDto.setContent("Content");
@@ -301,11 +301,11 @@ class NewServiceTest {
         requestDto.setLinks(new HashSet<>());
         requestDto.setMediaLinks(new HashSet<>());
 
-        assertThrows(IllegalArgumentException.class, () -> service.createNew(requestDto));
+        assertThrows(IllegalArgumentException.class, () -> service.createNews(requestDto));
     }
 
     @Test
-    void createNew_shouldThrowException_whenTooManyLinks() {
+    void createNews_shouldThrowException_whenTooManyLinks() {
         NewsRequestDTO requestDto = new NewsRequestDTO();
         requestDto.setTitle("News with too many links");
         requestDto.setContent("Content");
@@ -319,7 +319,7 @@ class NewServiceTest {
         requestDto.setLinks(links);
         requestDto.setMediaLinks(new HashSet<>());
 
-        assertThrows(IllegalArgumentException.class, () -> service.createNew(requestDto));
+        assertThrows(IllegalArgumentException.class, () -> service.createNews(requestDto));
     }
 
     

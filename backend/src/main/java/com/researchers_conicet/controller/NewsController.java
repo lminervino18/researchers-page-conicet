@@ -1,6 +1,6 @@
 package com.researchers_conicet.controller;
 
-import com.researchers_conicet.service.NewService;
+import com.researchers_conicet.service.NewsService;
 import com.researchers_conicet.dto.news.NewsRequestDTO; 
 import com.researchers_conicet.dto.news.NewsResponseDTO; 
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 /**
- * REST Controller for managing new article publications.
+ * REST Controller for managing news article publications.
  * Provides endpoints for CRUD operations and searches.
  */
 @Slf4j
@@ -33,47 +33,42 @@ import java.util.List;
         HttpHeaders.CACHE_CONTROL
     }
 )
-public class NewController {
+public class NewsController {
 
-    private final NewService newService;
+    private final NewsService newsService;
 
-    public NewController(NewService newService) {
-        this.newService = newService;
+    public NewsController(NewsService newsService) {
+        this.newsService = newsService;
     }
 
     /**
-     * Creates a new article publication
-     * 
-     * @param requestDTO New article data in JSON format
-     * @return Created new article details
+     * Creates a news article
      */
-   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<NewsResponseDTO> createNew(
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<NewsResponseDTO> createNews(
             @RequestBody @Valid NewsRequestDTO requestDTO) {
-        log.info("REST request to create New article: {}", requestDTO);
+        log.info("REST request to create news article: {}", requestDTO);
         try {
-            NewsResponseDTO response = newService.createNew(requestDTO);
+            NewsResponseDTO response = newsService.createNews(requestDTO);
             log.info("News article created successfully with ID: {}", response.getId());
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception ex) {
             log.error("Error creating news article: " + ex.getMessage(), ex);
-            // Esto es para ver exactamente qué clase de excepción lanza el backend
             throw ex;
         }
     }
 
-
     /**
-     * Updates an existing new article publication
+     * Updates an existing news article
      */
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<NewsResponseDTO> updateNew(
+    public ResponseEntity<NewsResponseDTO> updateNews(
             @PathVariable Long id,
             @RequestBody @Valid NewsRequestDTO requestDTO) {
-        log.info("REST request to update New article : {}", id);
+        log.info("REST request to update news article : {}", id);
 
         try {
-            NewsResponseDTO updatedNews = newService.updateNew(id, requestDTO);
+            NewsResponseDTO updatedNews = newsService.updateNews(id, requestDTO);
             return ResponseEntity.ok(updatedNews);
         } catch (Exception ex) {
             log.error("Error updating news article with ID: {}", id, ex);
@@ -82,13 +77,13 @@ public class NewController {
     }
 
     /**
-     * Retrieves a specific new article publication by ID
+     * Retrieves a specific news article by ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<NewsResponseDTO> getNew(@PathVariable Long id) {
-        log.info("REST request to get New article : {}", id);
+    public ResponseEntity<NewsResponseDTO> getNews(@PathVariable Long id) {
+        log.info("REST request to get news article : {}", id);
         try {
-            NewsResponseDTO news = newService.getNew(id);
+            NewsResponseDTO news = newsService.getNews(id);
             return ResponseEntity.ok(news);
         } catch (Exception ex) {
             log.error("Error retrieving news article with ID: {}", id, ex);
@@ -97,12 +92,7 @@ public class NewController {
     }
 
     /**
-     * Retrieves all new articles with pagination and sorting
-     * 
-     * @param page Page number (0-based)
-     * @param size Items per page
-     * @param sort Sort field
-     * @param direction Sort direction (ASC/DESC)
+     * Retrieves all news articles with pagination and sorting
      */
     @GetMapping
     public ResponseEntity<Page<NewsResponseDTO>> getAllNews(
@@ -110,25 +100,25 @@ public class NewController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sort,
             @RequestParam(defaultValue = "DESC") String direction) {
-        log.info("REST request to get all New articles");
+        log.info("REST request to get all news articles");
         PageRequest pageRequest = PageRequest.of(
             page, 
             size, 
             Sort.Direction.fromString(direction), 
             sort
         );
-        Page<NewsResponseDTO> newsPage = newService.getAllNews(pageRequest);
+        Page<NewsResponseDTO> newsPage = newsService.getAllNews(pageRequest);
         return ResponseEntity.ok(newsPage);
     }
 
     /**
-     * Deletes a new article publication
+     * Deletes a news article
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNew(@PathVariable Long id) {
-        log.info("REST request to delete New article : {}", id);
+    public ResponseEntity<Void> deleteNews(@PathVariable Long id) {
+        log.info("REST request to delete news article : {}", id);
         try {
-            newService.deleteNew(id);
+            newsService.deleteNews(id);
             return ResponseEntity.noContent().build();
         } catch (Exception ex) {
             log.error("Error deleting news article with ID: {}", id, ex);
@@ -137,14 +127,14 @@ public class NewController {
     }
 
     /**
-     * Searches new articles by title content
+     * Searches news articles by title content
      */
     @GetMapping("/search/title")
     public ResponseEntity<List<NewsResponseDTO>> searchByTitle(
             @RequestParam String query) {
-        log.info("REST request to search New articles by title: {}", query);
+        log.info("REST request to search news articles by title: {}", query);
         try {
-            List<NewsResponseDTO> result = newService.searchByTitle(query);
+            List<NewsResponseDTO> result = newsService.searchByTitle(query);
             return ResponseEntity.ok(result);
         } catch (Exception ex) {
             log.error("Error searching news articles by title", ex);
@@ -158,9 +148,9 @@ public class NewController {
     @GetMapping("/search")
     public ResponseEntity<List<NewsResponseDTO>> searchEverywhere(
             @RequestParam String query) {
-        log.info("REST request to search New articles everywhere: {}", query);
+        log.info("REST request to search news articles everywhere: {}", query);
         try {
-            List<NewsResponseDTO> result = newService.searchEverywhere(query);
+            List<NewsResponseDTO> result = newsService.searchEverywhere(query);
             return ResponseEntity.ok(result);
         } catch (Exception ex) {
             log.error("Error performing global search for news articles", ex);
