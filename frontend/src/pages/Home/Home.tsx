@@ -1,10 +1,17 @@
 // src/pages/home/Home.tsx
-import { FC, useEffect, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import MainLayout from "../../layouts/MainLayout";
 import landingImage from "../../assets/landing-page/landing-example.jpeg";
 import "./styles/Home.css";
 import photos from "../../utils/photos";
 import Masonry from "react-masonry-css";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+
+import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
+import "yet-another-react-lightbox/plugins/thumbnails.css";
 
 const breakpointColumns = {
   default: 4,
@@ -15,6 +22,8 @@ const breakpointColumns = {
 
 const Home: FC = () => {
   const [showFullGallery, setShowFullGallery] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
     if (showFullGallery) {
@@ -27,6 +36,11 @@ const Home: FC = () => {
       document.body.classList.remove("modal-open");
     };
   }, [showFullGallery]);
+
+  const handleImageClick = (index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
 
   return (
     <MainLayout>
@@ -151,7 +165,11 @@ const Home: FC = () => {
                 columnClassName="masonry-grid_column"
               >
                 {photos.map((photo, index) => (
-                  <div key={index} className="masonry-item">
+                  <div
+                    key={index}
+                    className="masonry-item clickable"
+                    onClick={() => handleImageClick(index)}
+                  >
                     <img
                       src={photo.src}
                       alt={photo.alt || `Photo ${index + 1}`}
@@ -167,6 +185,28 @@ const Home: FC = () => {
           </div>
         </div>
       )}
+
+      {/* Lightbox */}
+      <Lightbox
+        open={lightboxOpen}
+        close={() => setLightboxOpen(false)}
+        index={lightboxIndex}
+        slides={photos}
+        plugins={[Fullscreen, Zoom, Thumbnails]}
+        thumbnails={{
+          position: "bottom",
+          width: 120,
+          height: 80,
+          border: 2,
+          borderRadius: 4,
+          padding: 4,
+          gap: 16,
+        }}
+        zoom={{
+          maxZoomPixelRatio: 3,
+          zoomInMultiplier: 2,
+        }}
+      />
     </MainLayout>
   );
 };

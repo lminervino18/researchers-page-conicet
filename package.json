@@ -3,6 +3,7 @@
     "@types/node": "^22.15.27"
   },
   "dependencies": {
-    "firebase": "^11.10.0"
+    "firebase": "^11.10.0",
+    "yet-another-react-lightbox": "^3.25.0"
   }
 }

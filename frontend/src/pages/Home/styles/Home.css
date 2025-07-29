@@ -165,7 +165,7 @@
 }
 
 .gallery-content {
-  max-width: 1200px; /* Mismo ancho máximo que las otras secciones */
+  max-width: 1200px;
   margin: 0 auto;
   text-align: center;
 }
@@ -390,6 +390,63 @@
 .modal-close-button:hover {
   background: #f0f0f0;
   color: #333;
+}
+
+.masonry-item.clickable {
+  cursor: pointer;
+}
+
+.masonry-item.clickable img {
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.masonry-item.clickable:hover img {
+  transform: scale(1.05);
+  filter: brightness(0.95);
+}
+
+/* Add zoom icon in hover */
+.masonry-item.clickable::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cpath d='m21 21-4.35-4.35'%3E%3C/path%3E%3Cpath d='M11 8v6M8 11h6'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 24px 24px;
+}
+
+.masonry-item.clickable:hover::after {
+  opacity: 1;
+}
+
+.yarl__root {
+  z-index: 10000;
+}
+
+.yarl__navigation_prev,
+.yarl__navigation_next {
+  color: white;
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+}
+
+.yarl__thumbnails_thumbnail {
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.yarl__thumbnails_thumbnail_active {
+  opacity: 1;
+  border-color: white !important;
 }
 
 /* Responsive adjustments */
