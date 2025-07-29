@@ -60,7 +60,7 @@ public class NewService {
             news.setAuthors(requestDTO.getAuthors());
             news.setLinks(requestDTO.getLinks());
 
-            // Asegúrate de que mediaLinks no sea null
+            
             news.setMediaLinks(
                 requestDTO.getMediaLinks() == null ? new HashSet<>() : requestDTO.getMediaLinks()
                     .stream()
@@ -71,6 +71,7 @@ public class NewService {
             news.setPreviewImage(requestDTO.getPreviewImage());
 
             New savedNews = newRepository.save(news);
+            newRepository.flush();
             log.info("Created news article with ID: {}", savedNews.getId());
 
             // Initialize lazy collections explicitly
@@ -193,7 +194,7 @@ public class NewService {
      * @return List of matching news response DTOs
      * @throws IllegalArgumentException if search text is empty
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public List<NewsResponseDTO> searchByTitle(String text) {
         if (!StringUtils.hasText(text)) {
             throw new IllegalArgumentException("Search text cannot be empty");
@@ -273,6 +274,7 @@ public class NewService {
     dto.setCreatedAt(news.getCreatedAt());
     dto.setAuthors(news.getAuthors());
     dto.setLinks(news.getLinks());
+    dto.setPreviewImage(news.getPreviewImage());
 
     dto.setMediaLinks(
         news.getMediaLinks() == null ? new HashSet<>() : news.getMediaLinks()
