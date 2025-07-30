@@ -18,6 +18,9 @@ import EditAnalogy from "./pages/Admin/Analogies/EditAnalogy";
 import AdminEmails from "./pages/Admin/Emails/AdminEmails";
 import AdminNews from "./pages/Admin/News/AdminNews";
 import AnalogiesDetail from './pages/Inbox/AnalogiesDetail';
+import AddNews from "./pages/Admin/News/AddNews";
+import EditNews from "./pages/Admin/News/EditNews";
+
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -123,6 +126,23 @@ const App = () => {
             </ProtectedRoute>
           } 
         />
+        <Route 
+          path="/admin/news/add" 
+          element={
+            <ProtectedRoute>
+              <AddNews />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/news/edit/:id" 
+          element={
+            <ProtectedRoute>
+              <EditNews />
+            </ProtectedRoute>
+          } 
+        />
+
       </Routes>
     </Router>
   );
