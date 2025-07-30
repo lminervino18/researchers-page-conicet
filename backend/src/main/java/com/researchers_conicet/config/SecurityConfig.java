@@ -30,7 +30,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/email-verification/**").permitAll()
-                .requestMatchers("/api/comments/**").permitAll()            
+                .requestMatchers("/api/comments/**").permitAll()
+                .requestMatchers("api/gallery/**").permitAll()           
                 // Private Routes
                 .requestMatchers("/api/admin/**").authenticated()
                 .anyRequest().authenticated()
