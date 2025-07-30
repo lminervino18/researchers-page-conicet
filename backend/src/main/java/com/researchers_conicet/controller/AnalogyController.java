@@ -19,7 +19,7 @@ import java.util.Set;
 
 /**
  * REST Controller for managing analogy publications.
- * Provides endpoints for CRUD operations, searches, and support management.
+ * Provides endpoints for CRUD operations, searches, support management, and file handling.
  */
 @Slf4j
 @RestController

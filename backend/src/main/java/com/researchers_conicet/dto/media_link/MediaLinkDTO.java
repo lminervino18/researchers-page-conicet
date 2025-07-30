@@ -1,4 +1,4 @@
-package com.researchers_conicet.dto.analogy;
+package com.researchers_conicet.dto.media_link;
 
 import lombok.Data;
 
