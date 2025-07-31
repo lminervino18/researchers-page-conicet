@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.researchers_conicet.dto.gallery.GalleryImageDTO;
 import com.researchers_conicet.dto.gallery.GalleryUpdateDTO;
 import com.researchers_conicet.entity.GalleryImage;
+import com.researchers_conicet.exception.ResourceNotFoundException;
 import com.researchers_conicet.repository.GalleryRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +30,10 @@ public class GalleryService {
     }
 
     /**
-     * Creates a new analogy
+     * Creates a new gallery image
      * 
-     * @param requestDTO Data transfer object containing analogy details
-     * @return Response DTO with created analogy details
-     * @throws IllegalArgumentException if validation fails
+     * @param requestDTO Data transfer object containing image details
+     * @return Gallery Image with created image details
      */
     @Transactional
     public GalleryImage createGalleryImage(GalleryImageDTO request) {
@@ -52,9 +52,9 @@ public class GalleryService {
     }
 
     @Transactional
-    public GalleryImage updateLegend(String url, GalleryUpdateDTO update) {
+    public GalleryImage updateGalleryImage(String url, GalleryUpdateDTO update) {
         GalleryImage image = repository.findById(url)
-                .orElseThrow(() -> new IllegalArgumentException("Image not found with url: " + url));
+                .orElseThrow(() -> new ResourceNotFoundException("Image not found with url: " + url));
         image.setLegend(update.getLegend());
         try {
             GalleryImage updatedImage = repository.save(image);
@@ -68,10 +68,11 @@ public class GalleryService {
 
     @Transactional
     public void deleteGalleryImage(String url) {
-        GalleryImage image = repository.findById(url)
-                .orElseThrow(() -> new IllegalArgumentException("Image not found with url: " + url));
+        if (!repository.existsById(url)) {
+            throw new ResourceNotFoundException("Image not found with url: " + url);
+        }
         try {
-            repository.delete(image);
+            repository.deleteById(url);
             log.info("Deleted gallery image with url: {}", url);
         } catch (Exception e) {
             log.error("Error deleting gallery image", e);
@@ -81,7 +82,7 @@ public class GalleryService {
 
     public GalleryImage getGalleryImage(String url) {
         GalleryImage image = repository.findById(url)
-                .orElseThrow(() -> new IllegalArgumentException("Image not found with url: " + url));
+                .orElseThrow(() -> new ResourceNotFoundException("Image not found with url: " + url));
         return image;
     }
 

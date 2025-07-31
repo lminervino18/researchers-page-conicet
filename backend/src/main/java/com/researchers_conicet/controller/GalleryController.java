@@ -92,11 +92,11 @@ public class GalleryController {
      * Updates the legend of an existing gallery image
      */
     @PatchMapping("/by-url")
-    public ResponseEntity<GalleryImage> updateLegend(
+    public ResponseEntity<GalleryImage> updateGalleryImage(
             @RequestParam String url,
             @RequestBody GalleryUpdateDTO update) {
         log.info("REST request to patch the legend of the GalleryImage : {}", url);
-        GalleryImage updated = service.updateLegend(url, update);
+        GalleryImage updated = service.updateGalleryImage(url, update);
         return ResponseEntity.ok(updated);
     }
 
