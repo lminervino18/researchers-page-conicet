@@ -298,8 +298,19 @@ const NewsForm: FC<NewsFormProps> = ({
                     src={src}
                     alt={`media-${i}`}
                     className={selectedPreviewIndex === i ? 'selected-preview' : ''}
-                    onClick={() => setSelectedPreviewIndex(i)}
-                  />
+                    onClick={() => {
+                      if (selectedPreviewIndex === i) {
+                        // Deselecciona si ya está seleccionada
+                        setSelectedPreviewIndex(null);
+                        setFormData(prev => ({ ...prev, previewImage: '' }));
+                      } else {
+                        // Selecciona nueva preview
+                        setSelectedPreviewIndex(i);
+                        setFormData(prev => ({ ...prev, previewImage: formData.mediaLinks[i]?.url || '' }));
+                      }
+                    }}
+/>
+
                 )}
                 <button type="button" className="remove-tag" onClick={() => handleRemoveMedia(i)}>×</button>
               </div>
