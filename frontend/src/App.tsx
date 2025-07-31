@@ -16,7 +16,14 @@ import AdminExperiments from "./pages/Admin/Experiments/AdminExperiments";
 import AddAnalogy  from "./pages/Admin/Analogies/AddAnalogy";
 import EditAnalogy from "./pages/Admin/Analogies/EditAnalogy";
 import AdminEmails from "./pages/Admin/Emails/AdminEmails";
+import AdminNews from "./pages/Admin/News/AdminNews";
 import AnalogiesDetail from './pages/Inbox/AnalogiesDetail';
+import AddNews from "./pages/Admin/News/AddNews";
+import EditNews from "./pages/Admin/News/EditNews";
+
+// Nuevas importaciones para noticias públicas
+import NewsSection from "./pages/News/NewsSection";
+import NewsDetail from "./pages/News/NewsDetail";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -39,6 +46,10 @@ const App = () => {
         <Route path="/participation" element={<Participation />} />
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/analogies/:id" element={<AnalogiesDetail />} />
+
+        {/* Noticias públicas */}
+        <Route path="/news" element={<NewsSection />} />
+        <Route path="/news/:id" element={<NewsDetail />} />
 
         {/* Admin Routes */}
         <Route path="/admin/login" element={<Login />} />
@@ -82,7 +93,7 @@ const App = () => {
             </ProtectedRoute>
           } 
         />
-         <Route 
+        <Route 
           path="/admin/analogies/add" 
           element={
             <ProtectedRoute>
@@ -90,7 +101,7 @@ const App = () => {
             </ProtectedRoute>
           } 
         />
-         <Route 
+        <Route 
           path="/admin/analogies/edit/:id" 
           element={
             <ProtectedRoute>
@@ -111,6 +122,30 @@ const App = () => {
           element={
             <ProtectedRoute>
               <AdminEmails />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/news" 
+          element={
+            <ProtectedRoute>
+              <AdminNews />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/news/add" 
+          element={
+            <ProtectedRoute>
+              <AddNews />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/news/edit/:id" 
+          element={
+            <ProtectedRoute>
+              <EditNews />
             </ProtectedRoute>
           } 
         />

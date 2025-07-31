@@ -1,12 +1,10 @@
 /* pages/Admin/Dashboard.css */
 
-/* Main container for the dashboard */
 .dashboard-container {
   min-height: 100vh;
   background-color: var(--secondary-background);
 }
 
-/* Header styling with flex layout */
 .dashboard-header {
   background-color: var(--background-color);
   padding: var(--spacing-md) var(--spacing-lg);
@@ -16,14 +14,12 @@
   align-items: center;
 }
 
-/* Header title styling */
 .dashboard-header h1 {
   color: var(--text-color);
   font-size: var(--font-size-xl);
   margin: 0;
 }
 
-/* Logout button with error color scheme */
 .logout-button {
   background-color: var(--error-color);
   color: var(--background-color);
@@ -34,79 +30,88 @@
   transition: background-color var(--transition-fast);
 }
 
-/* Hover effect for logout button */
 .logout-button:hover {
   background-color: var(--error-color);
   opacity: 0.9;
 }
 
-/* Main content area with max width and centered */
 .dashboard-content {
   padding: var(--spacing-lg);
   max-width: var(--max-width);
   margin: 0 auto;
 }
 
-/* Container for dashboard action buttons */
 .dashboard-buttons {
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: var(--spacing-xl); /* Large spacing between buttons */
+  align-items: stretch;
+  gap: var(--spacing-xl);
   margin: var(--spacing-xl) auto;
-  width: 100%; /* Full width container */
+  width: 100%;
   padding: 0 var(--spacing-lg);
 }
 
-/* Individual dashboard button styling */
 .dashboard-button {
   background-color: var(--primary-color);
   color: var(--background-color);
-  padding: var(--spacing-xl) var(--spacing-lg); /* Large padding for bigger buttons */
   border: none;
   border-radius: var(--border-radius-lg);
-  font-size: var(--font-size-xl); /* Larger text */
+  font-size: var(--font-size-xl);
+  font-weight: bold;
+  text-align: center;
   cursor: pointer;
   transition: all var(--transition-fast);
-  flex: 1; /* Equal width distribution */
-  max-width: 300px; /* Maximum button width */
-  min-height: 200px; /* Fixed minimum height */
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-xl);
+
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  box-shadow: var(--shadow-md);
+
+  flex: 1 1 0;
+  min-height: 200px;
+  max-width: 300px;
 }
 
-/* Hover effect for dashboard buttons */
+.dashboard-button span {
+  display: block;
+  padding: 0 var(--spacing-sm);
+  line-height: 1.4;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
 .dashboard-button:hover {
   background-color: var(--primary-dark);
-  transform: translateY(-5px); /* Slight lift effect */
+  transform: translateY(-5px);
   box-shadow: var(--shadow-lg);
 }
 
-/* Responsive design for tablets */
+/* Responsive: tablet */
 @media (max-width: 1024px) {
   .dashboard-buttons {
-      gap: var(--spacing-lg); /* Reduced spacing for smaller screens */
+    gap: var(--spacing-lg);
   }
 
   .dashboard-button {
-      padding: var(--spacing-lg);
-      min-height: 150px; /* Smaller height for tablets */
+    padding: var(--spacing-lg);
+    min-height: 160px;
   }
 }
 
-/* Responsive design for mobile devices */
+/* Responsive: mobile */
 @media (max-width: 768px) {
   .dashboard-buttons {
-      flex-direction: column; /* Stack buttons vertically */
-      align-items: center;
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .dashboard-button {
-      width: 100%;
-      max-width: 400px; /* Wider buttons on mobile */
-      min-height: 120px; /* Reduced height for mobile */
+    width: 100%;
+    max-width: 400px;
+    min-height: 140px;
   }
 }
