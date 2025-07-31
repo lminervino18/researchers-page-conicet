@@ -1,97 +1,82 @@
 import axios from "axios";
-import {
-  News,
-  NewsDTO,
-  ApiResponse,
-  PaginatedResponse,
-} from "../types";
+import { News, NewsDTO, PaginatedResponse } from "../types";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
 const NEWS_PATH = "/news";
 
 /**
- * Fetch all news with pagination
+ * Centralized error handler that always throws
  */
-export const getAllNews = async (
-  page = 0,
-  size = 10
-): Promise<PaginatedResponse<News[]>> => {
+const handleError = (error: unknown): never => {
+  if (axios.isAxiosError(error)) {
+    const backendMessage =
+      error.response?.data?.message || error.response?.data?.error;
+    throw new Error(backendMessage || error.message);
+  }
+  throw error;
+};
+
+/**
+ * Generic API call wrapper to simplify requests and handle errors consistently
+ */
+async function apiCall<T>(promise: Promise<{ data: T }>): Promise<T> {
   try {
-    const response = await axios.get<PaginatedResponse<News[]>>(
-      `${API_BASE_URL}${NEWS_PATH}`,
-      {
-        params: {
-          page,
-          size,
-          sort: "createdAt",
-          direction: "DESC",
-        },
-      }
-    );
+    const response = await promise;
     return response.data;
   } catch (error) {
-    console.error("Error fetching news:", error);
-    throw error;
+    handleError(error);
+    throw error; 
   }
+}
+
+
+/**
+ * Fetch all news with pagination
+ */
+export const getAllNews = (
+  page = 0,
+  size = 10
+): Promise<PaginatedResponse<News>> => {
+  return apiCall(
+    axios.get(`${API_BASE_URL}${NEWS_PATH}`, {
+      params: {
+        page,
+        size,
+        sort: "createdAt",
+        direction: "DESC",
+      },
+    })
+  );
 };
 
 /**
  * Fetch a single news article by ID
  */
-export const getNewsById = async (id: number): Promise<News> => {
-  try {
-    const response = await axios.get<News>(
-      `${API_BASE_URL}${NEWS_PATH}/${id}`
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching news by ID:", error);
-    throw error;
-  }
+export const getNewsById = (id: number): Promise<News> => {
+  return apiCall(axios.get(`${API_BASE_URL}${NEWS_PATH}/${id}`));
 };
 
 /**
  * Create a new news article
  */
-export const createNews = async (
-  data: NewsDTO
-): Promise<ApiResponse<News>> => {
-  try {
-    const response = await axios.post<ApiResponse<News>>(
-      `${API_BASE_URL}${NEWS_PATH}`,
-      data,
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error creating news:", error);
-    throw error;
-  }
+export const createNews = (data: NewsDTO): Promise<News> => {
+  return apiCall(
+    axios.post(`${API_BASE_URL}${NEWS_PATH}`, data, {
+      headers: { "Content-Type": "application/json" },
+    })
+  );
 };
 
 /**
  * Update an existing news article
  */
-export const updateNews = async (
-  id: number,
-  data: NewsDTO
-): Promise<ApiResponse<News>> => {
-  try {
-    const response = await axios.put<ApiResponse<News>>(
-      `${API_BASE_URL}${NEWS_PATH}/${id}`,
-      data,
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error updating news:", error);
-    throw error;
-  }
+export const updateNews = (id: number, data: NewsDTO): Promise<News> => {
+  return apiCall(
+    axios.put(`${API_BASE_URL}${NEWS_PATH}/${id}`, data, {
+      headers: { "Content-Type": "application/json" },
+    })
+  );
 };
 
 /**
@@ -115,41 +100,23 @@ export const deleteNews = async (id: number): Promise<void> => {
 /**
  * Search news by title
  */
-export const searchNewsByTitle = async (
-  query: string
-): Promise<ApiResponse<News[]>> => {
-  try {
-    const response = await axios.get<ApiResponse<News[]>>(
-      `${API_BASE_URL}${NEWS_PATH}/search/title`,
-      {
-        params: { query },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error searching news by title:", error);
-    throw error;
-  }
+export const searchNewsByTitle = (query: string): Promise<News[]> => {
+  return apiCall(
+    axios.get(`${API_BASE_URL}${NEWS_PATH}/search/title`, {
+      params: { query },
+    })
+  );
 };
 
 /**
  * Global search (title, authors, etc.)
  */
-export const searchNewsEverywhere = async (
-  query: string
-): Promise<ApiResponse<News[]>> => {
-  try {
-    const response = await axios.get<ApiResponse<News[]>>(
-      `${API_BASE_URL}${NEWS_PATH}/search`,
-      {
-        params: { query },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error in global news search:", error);
-    throw error;
-  }
+export const searchNewsEverywhere = (query: string): Promise<News[]> => {
+  return apiCall(
+    axios.get(`${API_BASE_URL}${NEWS_PATH}/search`, {
+      params: { query },
+    })
+  );
 };
 
 export default {
