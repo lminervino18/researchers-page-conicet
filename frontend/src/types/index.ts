@@ -78,9 +78,9 @@ export interface BaseSearchFilters {
  * @enum ResearchStatus
  */
 export enum ResearchStatus {
-  DRAFT = 'draft',
-  PUBLISHED = 'published',
-  ARCHIVED = 'archived'
+  DRAFT = "draft",
+  PUBLISHED = "published",
+  ARCHIVED = "archived",
 }
 
 /**
@@ -154,7 +154,7 @@ export interface Analogy {
   createdAt: string;
   authors: string[];
   links: string[];
-  mediaLinks: MediaLink[]; 
+  mediaLinks: MediaLink[];
 }
 
 /**
@@ -213,6 +213,24 @@ export interface CommentResponseDTO extends Comment {
   children?: Comment[];
   childrenCount?: number;
 }
+/**
+ * Gallery image entity interface
+ * @interface GalleryImage
+ */
+export interface GalleryImage {
+  src: string;
+  alt: string;
+  createdAt: string;
+}
+
+/**
+ * Data Transfer Object for creating a gallery image
+ * @interface GalleryImageDTO
+ */
+export interface GalleryImageDTO {
+  url: string;
+  legend: string;
+}
 
 /**
  * Utility type for nullable values
@@ -266,7 +284,11 @@ export class ApiResponseHandler<T> {
       return this.response.content;
     }
 
-    if (this.response.data && typeof this.response.data === 'object' && 'content' in this.response.data) {
+    if (
+      this.response.data &&
+      typeof this.response.data === "object" &&
+      "content" in this.response.data
+    ) {
       const contentData = (this.response.data as { content?: T[] }).content;
       return contentData || [];
     }
@@ -287,11 +309,13 @@ export class ApiResponseHandler<T> {
    * @returns Pagination parameters
    */
   getPagination(): PaginationParams {
-    return this.response.pagination ?? {
-      page: 0,
-      limit: 10,
-      total: 0
-    };
+    return (
+      this.response.pagination ?? {
+        page: 0,
+        limit: 10,
+        total: 0,
+      }
+    );
   }
 
   /**
@@ -299,6 +323,8 @@ export class ApiResponseHandler<T> {
    * @returns Error message or null
    */
   getErrorMessage(): Nullable<string> {
-    return this.isSuccessful() ? null : this.response.message ?? 'Unknown error occurred';
+    return this.isSuccessful()
+      ? null
+      : this.response.message ?? "Unknown error occurred";
   }
 }

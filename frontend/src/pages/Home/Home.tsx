@@ -3,10 +3,11 @@ import { FC, useState, useEffect } from "react";
 import MainLayout from "../../layouts/MainLayout";
 import landingImage from "../../assets/landing-page/landing-example.jpeg";
 import "./styles/Home.css";
-import photos from "../../utils/photos";
 import Masonry from "react-masonry-css";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
+import { GalleryImage } from "../../types";
+import { getAllGalleryImages } from "../../api/gallery";
 
 import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
@@ -21,9 +22,12 @@ const breakpointColumns = {
 };
 
 const Home: FC = () => {
+  const [images, setImages] = useState<GalleryImage[]>([]);
   const [showFullGallery, setShowFullGallery] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (showFullGallery) {
@@ -37,10 +41,49 @@ const Home: FC = () => {
     };
   }, [showFullGallery]);
 
+  useEffect(() => {
+    const fetchGalleryImages = async () => {
+      try {
+        setIsLoading(true);
+        const fetchedImages = await getAllGalleryImages();
+        setImages(fetchedImages);
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Error fetching gallery images:", err);
+        setError("Error loading images");
+        setIsLoading(false);
+      }
+    };
+
+    fetchGalleryImages();
+  }, []);
+
   const handleImageClick = (index: number) => {
     setLightboxIndex(index);
     setLightboxOpen(true);
   };
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Loading gallery...</p>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <MainLayout>
+        <div className="error-container">
+          <p>{error}</p>
+          <button onClick={() => window.location.reload()}>Retry</button>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -100,15 +143,15 @@ const Home: FC = () => {
                   className="masonry-grid"
                   columnClassName="masonry-grid_column"
                 >
-                  {photos.map((photo, index) => (
-                    <div key={index} className="masonry-item">
+                  {images.map((image, index) => (
+                    <div key={image.src} className="masonry-item">
                       <img
-                        src={photo.src}
-                        alt={photo.alt || `Photo ${index + 1}`}
+                        src={image.src}
+                        alt={image.alt || `Photo ${index + 1}`}
                         loading="lazy"
                       />
-                      <div className="photo-overlay">
-                        <p>{photo.alt || `Photo ${index + 1}`}</p>
+                      <div className="image-overlay">
+                        <p>{image.alt || `Photo ${index + 1}`}</p>
                       </div>
                     </div>
                   ))}
@@ -164,19 +207,19 @@ const Home: FC = () => {
                 className="masonry-grid"
                 columnClassName="masonry-grid_column"
               >
-                {photos.map((photo, index) => (
+                {images.map((image, index) => (
                   <div
                     key={index}
                     className="masonry-item clickable"
                     onClick={() => handleImageClick(index)}
                   >
                     <img
-                      src={photo.src}
-                      alt={photo.alt || `Photo ${index + 1}`}
+                      src={image.src}
+                      alt={image.alt || `Photo ${index + 1}`}
                       loading="lazy"
                     />
-                    <div className="photo-overlay">
-                      <p>{photo.alt || `Photo ${index + 1}`}</p>
+                    <div className="image-overlay">
+                      <p>{image.alt || `Photo ${index + 1}`}</p>
                     </div>
                   </div>
                 ))}
@@ -191,7 +234,7 @@ const Home: FC = () => {
         open={lightboxOpen}
         close={() => setLightboxOpen(false)}
         index={lightboxIndex}
-        slides={photos}
+        slides={images}
         plugins={[Fullscreen, Zoom, Thumbnails]}
         thumbnails={{
           position: "bottom",
