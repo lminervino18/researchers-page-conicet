@@ -22,6 +22,7 @@ import AddAnalogy from "./pages/Admin/Analogies/AddAnalogy";
 import EditAnalogy from "./pages/Admin/Analogies/EditAnalogy";
 import AdminEmails from "./pages/Admin/Emails/AdminEmails";
 import AnalogiesDetail from "./pages/Inbox/AnalogiesDetail";
+import AdminGallery from "./pages/Admin/Gallery/AdminGallery";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -116,6 +117,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <AdminEmails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/gallery"
+          element={
+            <ProtectedRoute>
+              <AdminGallery />
             </ProtectedRoute>
           }
         />
