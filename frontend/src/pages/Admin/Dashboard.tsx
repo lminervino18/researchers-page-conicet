@@ -1,12 +1,12 @@
-import { useNavigate } from 'react-router-dom';
-import './styles/Dashboard.css';
+import { useNavigate } from "react-router-dom";
+import "./styles/Dashboard.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    navigate('/admin/login');
+    localStorage.removeItem("adminToken");
+    navigate("/admin/login");
   };
 
   return (
@@ -19,29 +19,35 @@ const Dashboard = () => {
       </header>
       <main className="dashboard-content">
         <div className="dashboard-buttons">
-          <button 
-            onClick={() => navigate('/admin/publications')} 
+          <button
+            onClick={() => navigate("/admin/publications")}
             className="dashboard-button"
           >
             Publications
           </button>
-          <button 
-            onClick={() => navigate('/admin/analogies')} 
+          <button
+            onClick={() => navigate("/admin/analogies")}
             className="dashboard-button"
           >
             Analogies
           </button>
-          <button 
-            onClick={() => navigate('/admin/experiments')} 
+          <button
+            onClick={() => navigate("/admin/experiments")}
             className="dashboard-button"
           >
             Experiments
           </button>
-          <button 
-            onClick={() => navigate('/admin/emails')} 
+          <button
+            onClick={() => navigate("/admin/emails")}
             className="dashboard-button"
           >
             Email Management
+          </button>
+          <button
+            onClick={() => navigate("/admin/gallery")}
+            className="dashboard-button"
+          >
+            Lab Gallery
           </button>
         </div>
       </main>

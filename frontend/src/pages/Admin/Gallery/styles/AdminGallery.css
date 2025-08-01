@@ -1,0 +1,163 @@
+.gallery-section {
+  padding: 60px 20px;
+  background-color: #ffffff;
+}
+
+.gallery-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.gallery-content h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #333;
+}
+
+.gallery-content p {
+  font-size: var(--font-size-large);
+  color: var(--text-light);
+  line-height: var(--line-height-base);
+  max-width: 800px;
+  margin: 0 auto;
+  margin-bottom: revert-layer;
+}
+
+/* Masonry Grid */
+.masonry-grid {
+  display: flex;
+  margin-left: -10px;
+  width: auto;
+}
+
+.masonry-grid_column {
+  padding-left: 10px;
+  background-clip: padding-box;
+}
+
+.masonry-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.masonry-item:hover img {
+  transform: scale(1.05);
+}
+
+.masonry-item .photo-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+  color: white;
+  padding: 20px 10px 10px;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.masonry-item .photo-overlay p {
+  color: white;
+  margin: 1;
+  font-size: 1.2rem;
+}
+
+.masonry-item:hover .photo-overlay {
+  transform: translateY(0);
+}
+
+.masonry-item {
+  position: relative;
+  margin-bottom: 15px;
+  transition: transform 0.3s ease;
+}
+
+.masonry-item.selected::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+
+.photo-actions {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 10px;
+  z-index: 2;
+}
+
+.photo-actions button {
+  padding: 10px;
+  background: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.photo-actions .edit-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.photo-actions .delete-btn {
+  background-color: #ff4d4d;
+  color: white;
+}
+
+.photo-actions .delete-btn:hover {
+  background-color: #ff2222;
+}
+
+.edit-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.edit-modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+}
+
+.edit-modal-content input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.edit-modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.edit-modal-actions button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

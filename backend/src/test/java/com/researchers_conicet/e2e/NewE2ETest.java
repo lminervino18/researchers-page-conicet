@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -34,6 +33,7 @@ import com.researchers_conicet.utils.RestResponsePage;
 @Testcontainers
 public class NewE2ETest {
 
+    @SuppressWarnings("resource")
     @Container
     private static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:5.7.42")
         .withDatabaseName("testdb")
