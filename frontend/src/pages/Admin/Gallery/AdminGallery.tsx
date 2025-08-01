@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import "./styles/AdminGallery.css";
@@ -25,9 +25,26 @@ const AdminGallery: FC = () => {
   const [editMode, setEditMode] = useState(false);
   const [newAlt, setNewAlt] = useState("");
 
+  const galleryRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     loadGallery();
-  }, []);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        galleryRef.current &&
+        !galleryRef.current.contains(event.target as Node) &&
+        !editMode
+      ) {
+        setSelectedImage(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [editMode]);
 
   const loadGallery = async () => {
     try {
@@ -40,7 +57,8 @@ const AdminGallery: FC = () => {
     }
   };
 
-  const handlePhotoClick = (image: Photo) => {
+  const handleImageClick = (image: Photo, e: React.MouseEvent) => {
+    e.stopPropagation();
     setSelectedImage(image);
   };
 
@@ -91,7 +109,7 @@ const AdminGallery: FC = () => {
           Add New Image
         </button>
       </header>
-      <main className="admin-page-content">
+      <main className="admin-page-content" ref={galleryRef}>
         {error && <div className="error-message">{error}</div>}
 
         {loading ? (
@@ -109,7 +127,7 @@ const AdminGallery: FC = () => {
                   className={`masonry-item ${
                     selectedImage?.src === image.src ? "selected" : ""
                   }`}
-                  onClick={() => handlePhotoClick(image)}
+                  onClick={(e) => handleImageClick(image, e)}
                 >
                   <img
                     src={image.src}
@@ -150,8 +168,20 @@ const AdminGallery: FC = () => {
 
         {/* Legend editing modal */}
         {editMode && selectedImage && (
-          <div className="edit-modal">
-            <div className="edit-modal-content">
+          <div
+            className="edit-modal"
+            onClick={(e) => {
+              // Cerrar el modal si se hace clic fuera del contenido
+              if (e.target === e.currentTarget) {
+                setEditMode(false);
+                setNewAlt("");
+              }
+            }}
+          >
+            <div
+              className="edit-modal-content"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h2>Edit Image Label</h2>
               <input
                 type="text"
