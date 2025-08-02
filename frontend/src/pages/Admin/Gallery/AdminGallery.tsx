@@ -6,7 +6,7 @@ import "./styles/AdminGallery.css";
 import photos from "../../../utils/photos";
 import { useNavigate } from "react-router-dom";
 import Masonry from "react-masonry-css";
-import { getAllGalleryImages } from "../../../api/gallery";
+import { createGalleryImage, getAllGalleryImages } from "../../../api/gallery";
 import { Photo } from "react-photo-album";
 
 const breakpointColumns = {
@@ -25,7 +25,15 @@ const AdminGallery: FC = () => {
   const [editMode, setEditMode] = useState(false);
   const [newAlt, setNewAlt] = useState("");
 
+  // Upload image modal states
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadAlt, setUploadAlt] = useState("");
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
   const galleryRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadGallery();
@@ -60,6 +68,55 @@ const AdminGallery: FC = () => {
   const handleImageClick = (image: Photo, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedImage(image);
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      setSelectedFile(files[0]);
+    }
+  };
+
+  const handleFileUpload = async () => {
+    if (!selectedFile) {
+      setUploadError("Please select an image");
+      return;
+    }
+
+    setUploadLoading(true);
+    setUploadError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("image", selectedFile);
+      formData.append("alt", uploadAlt);
+
+      // Dummy functionality
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      console.debug("Image loaded");
+
+      // // Call backend and firbase apis to store the new image
+      // const uploadedImage = await createGalleryImage(formData);
+
+      // // Add image to gallery
+      // setImages((prev) => [
+      //   ...prev,
+      //   {
+      //     src: uploadedImage.url,
+      //     alt: uploadAlt,
+      //   } as Photo,
+      // ]);
+
+      // Reset states
+      setUploadModalOpen(false);
+      setSelectedFile(null);
+      setUploadAlt("");
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      setUploadError("Failed to upload image");
+    } finally {
+      setUploadLoading(false);
+    }
   };
 
   const handleUpdateAlt = () => {
@@ -102,10 +159,7 @@ const AdminGallery: FC = () => {
           Back to Dashboard
         </button>
         <h1>Gallery Management</h1>
-        <button
-          onClick={() => navigate("/admin/publications/add")}
-          className="add-button"
-        >
+        <button onClick={() => setUploadModalOpen(true)} className="add-button">
           Add New Image
         </button>
       </header>
@@ -113,7 +167,7 @@ const AdminGallery: FC = () => {
         {error && <div className="error-message">{error}</div>}
 
         {loading ? (
-          <div className="loading">Loading publications...</div>
+          <div className="loading">Loading images...</div>
         ) : (
           <div className="gallery-content">
             <Masonry
@@ -134,11 +188,11 @@ const AdminGallery: FC = () => {
                     alt={image.alt || `Photo ${index + 1}`}
                     loading="lazy"
                   />
-                  <div className="photo-overlay">
+                  <div className="image-overlay">
                     <p>{image.alt || `Photo ${index + 1}`}</p>
                   </div>
                   {selectedImage?.src === image.src && (
-                    <div className="photo-actions">
+                    <div className="image-actions">
                       <button
                         className="edit-btn"
                         onClick={(e) => {
@@ -171,7 +225,6 @@ const AdminGallery: FC = () => {
           <div
             className="edit-modal"
             onClick={(e) => {
-              // Cerrar el modal si se hace clic fuera del contenido
               if (e.target === e.currentTarget) {
                 setEditMode(false);
                 setNewAlt("");
@@ -204,6 +257,64 @@ const AdminGallery: FC = () => {
           </div>
         )}
       </main>
+
+      {/* Upload image modal */}
+      {uploadModalOpen && (
+        <div className="upload-modal" onClick={() => setUploadModalOpen(false)}>
+          <div
+            className="upload-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2>Upload New Image</h2>
+
+            <div className="file-input-container">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                accept="image/*"
+                style={{ display: "none" }}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="select-file-btn"
+              >
+                {selectedFile ? selectedFile.name : "Select Image"}
+              </button>
+            </div>
+
+            <input
+              type="text"
+              value={uploadAlt}
+              onChange={(e) => setUploadAlt(e.target.value)}
+              placeholder="Image description (optional)"
+              className="alt-input"
+            />
+
+            {uploadError && <div className="upload-error">{uploadError}</div>}
+
+            <div className="upload-modal-actions">
+              <button
+                onClick={handleFileUpload}
+                disabled={!selectedFile || uploadLoading}
+                className="confirm-btn"
+              >
+                {uploadLoading ? "Uploading..." : "Confirm"}
+              </button>
+              <button
+                onClick={() => {
+                  setUploadModalOpen(false);
+                  setSelectedFile(null);
+                  setUploadAlt("");
+                }}
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

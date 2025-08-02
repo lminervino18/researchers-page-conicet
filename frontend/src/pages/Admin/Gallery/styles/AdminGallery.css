@@ -48,7 +48,7 @@
   transform: scale(1.05);
 }
 
-.masonry-item .photo-overlay {
+.masonry-item .image-overlay {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -60,13 +60,13 @@
   transition: transform 0.3s ease;
 }
 
-.masonry-item .photo-overlay p {
+.masonry-item .image-overlay p {
   color: white;
   margin: 1;
   font-size: 1.2rem;
 }
 
-.masonry-item:hover .photo-overlay {
+.masonry-item:hover .image-overlay {
   transform: translateY(0);
 }
 
@@ -87,7 +87,7 @@
   z-index: 1;
 }
 
-.photo-actions {
+.image-actions {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -97,7 +97,7 @@
   z-index: 2;
 }
 
-.photo-actions button {
+.image-actions button {
   padding: 10px;
   background: white;
   border: none;
@@ -106,16 +106,16 @@
   transition: background-color 0.3s ease;
 }
 
-.photo-actions .edit-btn:hover {
+.image-actions .edit-btn:hover {
   background-color: #e0e0e0;
 }
 
-.photo-actions .delete-btn {
+.image-actions .delete-btn {
   background-color: #ff4d4d;
   color: white;
 }
 
-.photo-actions .delete-btn:hover {
+.image-actions .delete-btn:hover {
   background-color: #ff2222;
 }
 
@@ -160,4 +160,85 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.upload-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.upload-modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.file-input-container {
+  margin-bottom: 20px;
+}
+
+.select-file-btn {
+  background-color: #f0f0f0;
+  border: 2px dashed #ccc;
+  padding: 15px;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.select-file-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.alt-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.upload-modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.confirm-btn,
+.cancel-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.confirm-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.confirm-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.upload-error {
+  color: red;
+  margin-bottom: 15px;
 }
