@@ -12,6 +12,7 @@ const Navbar: FC = () => {
     { id: 'lab', title: 'Research Lines', path: '/lab' },
     { id: 'members', title: 'Members', path: '/members' },
     { id: 'publications', title: 'Publications', path: '/publications' },
+    { id: 'news', title: 'News', path: '/news' },
     { id: 'participation', title: 'Experiment Participations', path: '/participation' },
     { id: 'inbox', title: 'Analogy Inbox', path: '/inbox' }
   ];

@@ -23,25 +23,31 @@ const Dashboard = () => {
             onClick={() => navigate('/admin/publications')} 
             className="dashboard-button"
           >
-            Publications
+            <span>Publications</span>
           </button>
           <button 
             onClick={() => navigate('/admin/analogies')} 
             className="dashboard-button"
           >
-            Analogies
+            <span>Analogies</span>
           </button>
           <button 
             onClick={() => navigate('/admin/experiments')} 
             className="dashboard-button"
           >
-            Experiments
+            <span>Experiments</span>
+          </button>
+          <button 
+            onClick={() => navigate('/admin/news')} 
+            className="dashboard-button"
+          >
+            <span>News</span>
           </button>
           <button 
             onClick={() => navigate('/admin/emails')} 
             className="dashboard-button"
           >
-            Email Management
+            <span>Email Management</span>
           </button>
         </div>
       </main>

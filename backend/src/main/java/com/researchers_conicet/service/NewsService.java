@@ -206,6 +206,7 @@ public class NewsService {
         }
     }
 
+
     /**
      * Maps News entity to NewsResponseDTO
      */
