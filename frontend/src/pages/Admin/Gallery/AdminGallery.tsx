@@ -34,7 +34,7 @@ const AdminGallery: FC = () => {
   // Upload image modal states
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploadAlt, setUploadAlt] = useState("");
+  const [legend, setLegend] = useState("");
   const [uploadLoading, setUploadLoading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -101,7 +101,7 @@ const AdminGallery: FC = () => {
       const url: string = await uploadFile(selectedFile);
       const galleryImageRequest: GalleryImageRequestDTO = {
         url,
-        legend: uploadAlt,
+        legend,
       };
 
       // Call backend and firbase apis to store the new image
@@ -123,7 +123,7 @@ const AdminGallery: FC = () => {
       // Reset states
       setUploadModalOpen(false);
       setSelectedFile(null);
-      setUploadAlt("");
+      setLegend("");
     } catch (error) {
       console.error("Error uploading image:", error);
       setUploadError("Failed to upload image");
@@ -294,8 +294,8 @@ const AdminGallery: FC = () => {
 
             <input
               type="text"
-              value={uploadAlt}
-              onChange={(e) => setUploadAlt(e.target.value)}
+              value={legend}
+              onChange={(e) => setLegend(e.target.value)}
               placeholder="Image description (optional)"
               className="alt-input"
             />
@@ -314,7 +314,7 @@ const AdminGallery: FC = () => {
                 onClick={() => {
                   setUploadModalOpen(false);
                   setSelectedFile(null);
-                  setUploadAlt("");
+                  setLegend("");
                 }}
                 className="cancel-btn"
               >
