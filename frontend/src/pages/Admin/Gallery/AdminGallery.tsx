@@ -3,11 +3,12 @@ import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import "./styles/AdminGallery.css";
 
-import photos from "../../../utils/photos";
 import { useNavigate } from "react-router-dom";
 import Masonry from "react-masonry-css";
 import { createGalleryImage, getAllGalleryImages } from "../../../api/gallery";
 import { Photo } from "react-photo-album";
+import { uploadFile } from "../../../api/firebaseUploader";
+import { GalleryImageRequestDTO } from "../../../types";
 
 const breakpointColumns = {
   default: 4,
@@ -20,7 +21,7 @@ const AdminGallery: FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [images, setImages] = useState<Photo[]>(photos);
+  const [images, setImages] = useState<Photo[]>([]);
   const [selectedImage, setSelectedImage] = useState<Photo | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [newAlt, setNewAlt] = useState("");
@@ -56,7 +57,11 @@ const AdminGallery: FC = () => {
 
   const loadGallery = async () => {
     try {
+      console.debug("fetching all gallery images");
       const images = await getAllGalleryImages(); // will be used later
+      setImages(
+        images.map((image) => ({ src: image.src, alt: image.alt } as Photo))
+      );
     } catch (error) {
       console.error("Error loading images:", error);
       setError("Failed to load images");
@@ -78,6 +83,7 @@ const AdminGallery: FC = () => {
   };
 
   const handleFileUpload = async () => {
+    console.debug("Uploading new image!");
     if (!selectedFile) {
       setUploadError("Please select an image");
       return;
@@ -87,25 +93,27 @@ const AdminGallery: FC = () => {
     setUploadError(null);
 
     try {
-      const formData = new FormData();
-      formData.append("image", selectedFile);
-      formData.append("alt", uploadAlt);
+      const url: string = await uploadFile(selectedFile);
+      const galleryImageRequest: GalleryImageRequestDTO = {
+        url,
+        legend: uploadAlt,
+      };
 
-      // Dummy functionality
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-      console.debug("Image loaded");
-
-      // // Call backend and firbase apis to store the new image
-      // const uploadedImage = await createGalleryImage(formData);
-
-      // // Add image to gallery
-      // setImages((prev) => [
-      //   ...prev,
-      //   {
-      //     src: uploadedImage.url,
-      //     alt: uploadAlt,
-      //   } as Photo,
-      // ]);
+      // Call backend and firbase apis to store the new image
+      console.debug("Creating the new GalleryImage!");
+      const uploadedImage = await createGalleryImage(galleryImageRequest);
+      // TODO: print message warning image wasn’t uploaded?
+      if (uploadedImage) {
+        // Add image to gallery
+        setImages((prev) => [
+          ...prev,
+          {
+            src: uploadedImage.src,
+            alt: uploadedImage.alt,
+          } as Photo,
+        ]);
+        console.debug("Image uploaded");
+      }
 
       // Reset states
       setUploadModalOpen(false);

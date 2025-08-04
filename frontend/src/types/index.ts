@@ -225,11 +225,21 @@ export interface GalleryImage {
 
 /**
  * Data Transfer Object for creating a gallery image
- * @interface GalleryImageDTO
+ * @interface GalleryImageRequestDTO
  */
-export interface GalleryImageDTO {
+export interface GalleryImageRequestDTO {
   url: string;
   legend: string;
+}
+
+/**
+ * Data Transfer Object of a gallery image received
+ * @interface GalleryImageResponseDTO
+ */
+export interface GalleryImageResponseDTO {
+  url: string;
+  legend: string;
+  createdAt: string;
 }
 
 /**
