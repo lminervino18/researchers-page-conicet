@@ -87,14 +87,14 @@ public class GalleryE2ETest {
     private GalleryImageDTO createDto() {
         var dto = new GalleryImageDTO();
         dto.setUrl("example.jpg");
-        dto.setLegend("Test legend");
+        dto.setCaption("Test caption");
         return dto;
     }
 
-    private GalleryImageDTO createDto(String url, String legend) {
+    private GalleryImageDTO createDto(String url, String caption) {
         var dto = new GalleryImageDTO();
         dto.setUrl(url != null ? url : "example.jpg");
-        dto.setLegend(legend != null ? legend : "Test legend");
+        dto.setCaption(caption != null ? caption : "Test caption");
         return dto;
     }
 
@@ -105,8 +105,8 @@ public class GalleryE2ETest {
         return response.getBody();
     }
 
-    private GalleryImage createGalleryImage(String url, String legend) {
-        var dto = createDto(url, legend);
+    private GalleryImage createGalleryImage(String url, String caption) {
+        var dto = createDto(url, caption);
         ResponseEntity<GalleryImage> response = restTemplate.postForEntity(baseUrl(), dto, GalleryImage.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         return response.getBody();
@@ -122,7 +122,7 @@ public class GalleryE2ETest {
         
         GalleryImage result = response.getBody();
         assertThat(result.getUrl()).isEqualTo(request.getUrl());
-        assertThat(result.getLegend()).isEqualTo(request.getLegend());
+        assertThat(result.getCaption()).isEqualTo(request.getCaption());
         assertThat(result.getCreatedAt()).isInstanceOf(LocalDateTime.class);
     }
 
@@ -137,7 +137,7 @@ public class GalleryE2ETest {
         GalleryImage result = response.getBody();
         created.setCreatedAt(result.getCreatedAt()); // Set createdAt to match the response format
         assertThat(result.getUrl()).isEqualTo(created.getUrl());
-        assertThat(result.getLegend()).isEqualTo(created.getLegend());
+        assertThat(result.getCaption()).isEqualTo(created.getCaption());
         assertThat(result.getCreatedAt()).isEqualTo(created.getCreatedAt());
     }
 
@@ -146,7 +146,7 @@ public class GalleryE2ETest {
         GalleryImage created = createGalleryImage();
 
         GalleryImageDTO updateDto = new GalleryImageDTO();
-        updateDto.setLegend("Updated legend");
+        updateDto.setCaption("Updated caption");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -165,14 +165,14 @@ public class GalleryE2ETest {
         GalleryImage result = response.getBody();
         result.setCreatedAt(created.getCreatedAt());
         assertThat(result.getUrl()).isEqualTo(created.getUrl());
-        assertThat(result.getLegend()).isEqualTo(updateDto.getLegend());
+        assertThat(result.getCaption()).isEqualTo(updateDto.getCaption());
         assertThat(result.getCreatedAt()).isEqualTo(created.getCreatedAt());
     }
 
     @Test
     void shouldGetAllImages() {
-        createGalleryImage("example1.jpg", "This legend is for example 1");
-        createGalleryImage("example2.jpg", "This legend is for example 2");
+        createGalleryImage("example1.jpg", "This caption is for example 1");
+        createGalleryImage("example2.jpg", "This caption is for example 2");
 
         ResponseEntity<RestResponsePage<GalleryImage>> response = restTemplate.exchange(
                 baseUrl() + "?page=0&size=10&sort=createdAt&direction=DESC",

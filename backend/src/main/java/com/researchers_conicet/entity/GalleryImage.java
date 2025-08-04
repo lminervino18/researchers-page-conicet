@@ -28,10 +28,10 @@ public class GalleryImage {
     private String url;
 
     /**
-     * Legend of the image.
+     * Caption of the image.
      */
-    @Column(name = "legend", length = 512) // antes era TEXT
-    private String legend;
+    @Column(name = "caption", length = 512) // antes era TEXT
+    private String caption;
 
     /**
      * Timestamp when the image was created.
@@ -43,9 +43,9 @@ public class GalleryImage {
         this.createdAt = LocalDateTime.now();
     }
 
-    public GalleryImage(String url, String legend) {
+    public GalleryImage(String url, String caption) {
         this.url = url;
-        this.legend = legend;
+        this.caption = caption;
         this.createdAt = LocalDateTime.now();
     }
 }

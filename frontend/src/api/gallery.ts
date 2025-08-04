@@ -14,7 +14,7 @@ function fromDtoToGalleryImage(dto: GalleryImageResponseDTO): GalleryImage {
   console.debug("Transforming the gallery image: ", dto);
   return {
     src: dto.url,
-    alt: dto.legend,
+    alt: dto.caption,
     createdAt: dto.createdAt,
   };
 }
@@ -26,7 +26,7 @@ function getGalleryImages(data: unknown): GalleryImageResponseDTO[] {
     // Check if it's an array of gallery images
     return data.every(
       (item) =>
-        item && typeof item === "object" && "url" in item && "legend" in item
+        item && typeof item === "object" && "url" in item && "caption" in item
     )
       ? (data as GalleryImageResponseDTO[])
       : [];
@@ -46,7 +46,7 @@ function getGalleryImages(data: unknown): GalleryImageResponseDTO[] {
             item &&
             typeof item === "object" &&
             "url" in item &&
-            "legend" in item
+            "caption" in item
         )
       ) {
         return content as GalleryImageResponseDTO[];
@@ -65,7 +65,7 @@ function getGalleryImages(data: unknown): GalleryImageResponseDTO[] {
             item &&
             typeof item === "object" &&
             "url" in item &&
-            "legend" in item
+            "caption" in item
         )
       ) {
         return innerData as GalleryImageResponseDTO[];
@@ -134,12 +134,12 @@ export const getAllGalleryImages = async (
 
 export const updateGalleryImage = async (
   url: string,
-  legend: string
+  caption: string
 ): Promise<GalleryImage | null> => {
   try {
     const response = await axios.patch<GalleryImageResponseDTO>(
       `${API_BASE_URL}${GALLERY_PATH}/by-url?url=${encodeURIComponent(url)}`,
-      { legend },
+      { caption },
       {
         headers: {
           "Content-Type": "application/json",

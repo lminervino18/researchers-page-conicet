@@ -13,7 +13,7 @@ public class GalleryImageDTO {
     private String url;
 
     /**
-     * Legend of the image.
+     * Caption of the image.
      */
-    private String legend;
+    private String caption;
 }

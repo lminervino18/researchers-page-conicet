@@ -229,7 +229,7 @@ export interface GalleryImage {
  */
 export interface GalleryImageRequestDTO {
   url: string;
-  legend: string;
+  caption: string;
 }
 
 /**
@@ -238,10 +238,9 @@ export interface GalleryImageRequestDTO {
  */
 export interface GalleryImageResponseDTO {
   url: string;
-  legend: string;
+  caption: string;
   createdAt: string;
 }
-
 
 export interface News {
   id: number;

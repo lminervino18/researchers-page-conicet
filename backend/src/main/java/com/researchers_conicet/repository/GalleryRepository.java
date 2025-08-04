@@ -45,12 +45,12 @@ public interface GalleryRepository extends JpaRepository<GalleryImage, String> {
     int deleteByUrls(@Param("urls") List<String> urls);
 
     /**
-     * Update legend for an image (with @Modifying for UPDATE queries).
+     * Update caption for an image (with @Modifying for UPDATE queries).
      * @param url URL of the image
-     * @param newLegend New legend text
+     * @param newCaption New caption text
      */
     @Modifying
     @Transactional
-    @Query("UPDATE GalleryImage g SET g.legend = :newLegend WHERE g.url = :url")
-    void updateImageLegend(@Param("url") String url, @Param("newLegend") String newLegend);
+    @Query("UPDATE GalleryImage g SET g.caption = :newCaption WHERE g.url = :url")
+    void updateImageCaption(@Param("url") String url, @Param("newCaption") String newCaption);
 }

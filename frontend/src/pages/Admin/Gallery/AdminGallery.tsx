@@ -34,7 +34,7 @@ const AdminGallery: FC = () => {
   // Upload image modal states
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [legend, setLegend] = useState("");
+  const [caption, setCaption] = useState("");
   const [uploadLoading, setUploadLoading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -101,7 +101,7 @@ const AdminGallery: FC = () => {
       const url: string = await uploadFile(selectedFile);
       const galleryImageRequest: GalleryImageRequestDTO = {
         url,
-        legend,
+        caption,
       };
 
       // Call backend and firbase apis to store the new image
@@ -123,7 +123,7 @@ const AdminGallery: FC = () => {
       // Reset states
       setUploadModalOpen(false);
       setSelectedFile(null);
-      setLegend("");
+      setCaption("");
     } catch (error) {
       console.error("Error uploading image:", error);
       setUploadError("Failed to upload image");
@@ -229,7 +229,7 @@ const AdminGallery: FC = () => {
           </div>
         )}
 
-        {/* Legend editing modal */}
+        {/* Caption editing modal */}
         {editMode && selectedImage && (
           <div
             className="edit-modal"
@@ -294,8 +294,8 @@ const AdminGallery: FC = () => {
 
             <input
               type="text"
-              value={legend}
-              onChange={(e) => setLegend(e.target.value)}
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
               placeholder="Image description (optional)"
               className="alt-input"
             />
@@ -314,7 +314,7 @@ const AdminGallery: FC = () => {
                 onClick={() => {
                   setUploadModalOpen(false);
                   setSelectedFile(null);
-                  setLegend("");
+                  setCaption("");
                 }}
                 className="cancel-btn"
               >

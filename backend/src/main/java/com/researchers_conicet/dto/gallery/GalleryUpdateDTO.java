@@ -9,7 +9,7 @@ import lombok.Data;
 public class GalleryUpdateDTO {
 
     /**
-     * Legend of the image.
+     * Caption of the image.
      */
-    private String legend;
+    private String caption;
 }

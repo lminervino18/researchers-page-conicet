@@ -39,7 +39,7 @@ public class GalleryService {
     public GalleryImage createGalleryImage(GalleryImageDTO request) {
         GalleryImage image = new GalleryImage();
         image.setUrl(request.getUrl());
-        image.setLegend(request.getLegend());
+        image.setCaption(request.getCaption());
 
         try {
             GalleryImage savedImage = repository.save(image);
@@ -55,14 +55,14 @@ public class GalleryService {
     public GalleryImage updateGalleryImage(String url, GalleryUpdateDTO update) {
         GalleryImage image = repository.findById(url)
                 .orElseThrow(() -> new ResourceNotFoundException("Image not found with url: " + url));
-        image.setLegend(update.getLegend());
+        image.setCaption(update.getCaption());
         try {
             GalleryImage updatedImage = repository.save(image);
-            log.info("Updated legend for image with url: {}", updatedImage.getUrl());
+            log.info("Updated caption for image with url: {}", updatedImage.getUrl());
             return updatedImage;
         } catch (Exception e) {
-            log.error("Error updating legend for image", e);
-            throw new RuntimeException("Failed to update legend", e);
+            log.error("Error updating caption for image", e);
+            throw new RuntimeException("Failed to update caption", e);
         }
     }
 

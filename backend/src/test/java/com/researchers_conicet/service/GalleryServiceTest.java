@@ -38,7 +38,7 @@ public class GalleryServiceTest {
     void createGalleryImage_shouldReturnCreatedGalleryImage() {
         GalleryImageDTO request = new GalleryImageDTO();
         request.setUrl("example.jpg");
-        request.setLegend("Test legend");
+        request.setCaption("Test caption");
 
         when(repository.save(ArgumentMatchers.any(GalleryImage.class))).thenAnswer(invocation -> {
             GalleryImage arg = invocation.getArgument(0);
@@ -48,7 +48,7 @@ public class GalleryServiceTest {
 
         GalleryImage result = service.createGalleryImage(request);
         assertThat(result.getUrl()).isEqualTo("example.jpg");
-        assertThat(result.getLegend()).isEqualTo("Test legend");
+        assertThat(result.getCaption()).isEqualTo("Test caption");
         assertThat(result.getCreatedAt()).isInstanceOf(LocalDateTime.class);
     }
 
@@ -56,23 +56,23 @@ public class GalleryServiceTest {
     void updateGalleryImage_shouldReturnUpdatedGalleryImage() {
         String url = "example.jpg";
         GalleryUpdateDTO update = new GalleryUpdateDTO();
-        update.setLegend("Updated legend");
+        update.setCaption("Updated caption");
 
-        GalleryImage existingImage = new GalleryImage(url, "Old legend");
+        GalleryImage existingImage = new GalleryImage(url, "Old caption");
 
         when(repository.findById(url)).thenReturn(Optional.of(existingImage));
         when(repository.save(ArgumentMatchers.any(GalleryImage.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         GalleryImage result = service.updateGalleryImage(url, update);
         assertThat(result.getUrl()).isEqualTo(url);
-        assertThat(result.getLegend()).isEqualTo("Updated legend");
+        assertThat(result.getCaption()).isEqualTo("Updated caption");
     }
 
     @Test
     void updateGalleryImage_shouldThrowExceptionWhenImageNotFound() {
         String url = "nonexistent.jpg";
         GalleryUpdateDTO update = new GalleryUpdateDTO();
-        update.setLegend("Updated legend");
+        update.setCaption("Updated caption");
 
         when(repository.findById(url)).thenReturn(Optional.empty());
 
@@ -82,13 +82,13 @@ public class GalleryServiceTest {
     @Test
     void getGalleryImage_shouldReturnGalleryImage() {
         String url = "example.jpg";
-        GalleryImage existingImage = new GalleryImage(url, "Test legend");
+        GalleryImage existingImage = new GalleryImage(url, "Test caption");
 
         when(repository.findById(url)).thenReturn(Optional.of(existingImage));
 
         GalleryImage result = service.getGalleryImage(url);
         assertThat(result.getUrl()).isEqualTo(url);
-        assertThat(result.getLegend()).isEqualTo("Test legend");
+        assertThat(result.getCaption()).isEqualTo("Test caption");
     }
 
     @Test
@@ -102,8 +102,8 @@ public class GalleryServiceTest {
 
     @Test
     void getAllImages_shouldReturnAllGalleryImages() {
-        GalleryImage image1 = new GalleryImage("image1.jpg", "Legend 1");
-        GalleryImage image2 = new GalleryImage("image2.jpg", "Legend 2");
+        GalleryImage image1 = new GalleryImage("image1.jpg", "Caption 1");
+        GalleryImage image2 = new GalleryImage("image2.jpg", "Caption 2");
 
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.fromString("DESC"), "createdAt");
         List<GalleryImage> images = Arrays.asList(image1, image2);
