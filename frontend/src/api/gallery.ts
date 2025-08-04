@@ -153,3 +153,23 @@ export const updateGalleryImage = async (
     throw error;
   }
 };
+
+export const deleteGalleryImage = async (url: string): Promise<void> => {
+  try {
+    await axios.delete<GalleryImageResponseDTO>(
+      `${API_BASE_URL}${GALLERY_PATH}/by-url?url=${encodeURIComponent(url)}`
+    );
+  } catch (error) {
+    console.error("Error deleting gallery image:", error);
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 500) {
+        throw new Error(
+          "Internal server error while deleting gallery image. Please try again."
+        );
+      } else if (error.response?.status === 404) {
+        throw new Error("GalleryImage not found.");
+      }
+    }
+    throw error;
+  }
+};

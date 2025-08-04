@@ -9,6 +9,7 @@ import {
   createGalleryImage,
   getAllGalleryImages,
   updateGalleryImage,
+  deleteGalleryImage,
 } from "../../../api/gallery";
 import { Photo } from "react-photo-album";
 import { uploadFile } from "../../../api/firebaseUploader";
@@ -137,7 +138,6 @@ const AdminGallery: FC = () => {
         image.src === selectedImage.src ? { ...image, alt: newAlt } : image
       );
 
-      // Should call to backend api
       console.log("Updating alt:", newAlt);
       await updateGalleryImage(selectedImage.src, newAlt);
 
@@ -148,17 +148,17 @@ const AdminGallery: FC = () => {
     }
   };
 
-  const handleDeleteImage = () => {
+  const handleDeleteImage = async () => {
     if (selectedImage) {
       const updatedPhotos = images.filter(
         (image) => image.src !== selectedImage.src
       );
 
+      console.log("Deleting image:", selectedImage.src);
+      await deleteGalleryImage(selectedImage.src);
+
       setImages(updatedPhotos);
       setSelectedImage(null);
-
-      // Should call to backend api
-      console.log("Deleting image:", selectedImage.src);
     }
   };
 
@@ -196,13 +196,9 @@ const AdminGallery: FC = () => {
                   }`}
                   onClick={(e) => handleImageClick(image, e)}
                 >
-                  <img
-                    src={image.src}
-                    alt={image.alt || `Photo ${index + 1}`}
-                    loading="lazy"
-                  />
+                  <img src={image.src} alt={image.alt} loading="lazy" />
                   <div className="image-overlay">
-                    <p>{image.alt || `Photo ${index + 1}`}</p>
+                    <p>{image.alt}</p>
                   </div>
                   {selectedImage?.src === image.src && (
                     <div className="image-actions">
