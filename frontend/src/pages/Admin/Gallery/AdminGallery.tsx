@@ -5,7 +5,11 @@ import "./styles/AdminGallery.css";
 
 import { useNavigate } from "react-router-dom";
 import Masonry from "react-masonry-css";
-import { createGalleryImage, getAllGalleryImages } from "../../../api/gallery";
+import {
+  createGalleryImage,
+  getAllGalleryImages,
+  updateGalleryImage,
+} from "../../../api/gallery";
 import { Photo } from "react-photo-album";
 import { uploadFile } from "../../../api/firebaseUploader";
 import { GalleryImageRequestDTO } from "../../../types";
@@ -127,19 +131,20 @@ const AdminGallery: FC = () => {
     }
   };
 
-  const handleUpdateAlt = () => {
+  const handleUpdateAlt = async () => {
     if (selectedImage) {
       const updatedPhotos = images.map((image) =>
         image.src === selectedImage.src ? { ...image, alt: newAlt } : image
       );
 
+      // Should call to backend api
+      console.log("Updating alt:", newAlt);
+      await updateGalleryImage(selectedImage.src, newAlt);
+
       setImages(updatedPhotos);
       setEditMode(false);
       setNewAlt("");
       setSelectedImage(null);
-
-      // Should call to backend api
-      console.log("Updating alt:", newAlt);
     }
   };
 

@@ -127,7 +127,29 @@ export const getAllGalleryImages = async (
 
     return images.map(fromDtoToGalleryImage);
   } catch (error) {
-    console.error("Error en la solicitud de galería:", error);
+    console.error("Error getting all the gallery images:", error);
+    throw error;
+  }
+};
+
+export const updateGalleryImage = async (
+  url: string,
+  legend: string
+): Promise<GalleryImage | null> => {
+  try {
+    const response = await axios.patch<GalleryImageResponseDTO>(
+      `${API_BASE_URL}${GALLERY_PATH}/by-url?url=${encodeURIComponent(url)}`,
+      { legend },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return response.data ? fromDtoToGalleryImage(response.data) : null;
+  } catch (error) {
+    console.error("Error updating gallery image:", error);
     throw error;
   }
 };

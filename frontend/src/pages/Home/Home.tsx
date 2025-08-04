@@ -143,15 +143,11 @@ const Home: FC = () => {
                   className="masonry-grid"
                   columnClassName="masonry-grid_column"
                 >
-                  {images.map((image, index) => (
+                  {images.map((image) => (
                     <div key={image.src} className="masonry-item">
-                      <img
-                        src={image.src}
-                        alt={image.alt || `Photo ${index + 1}`}
-                        loading="lazy"
-                      />
+                      <img src={image.src} alt={image.alt} loading="lazy" />
                       <div className="image-overlay">
-                        <p>{image.alt || `Photo ${index + 1}`}</p>
+                        <p>{image.alt}</p>
                       </div>
                     </div>
                   ))}
