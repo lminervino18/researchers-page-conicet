@@ -157,9 +157,9 @@ const Home: FC = () => {
                 <button
                   className="view-more-button"
                   onClick={() => setShowFullGallery(true)}
-                  aria-label="Ver más fotos"
+                  aria-label="View more"
                 >
-                  <span>Más</span>
+                  <span>More</span>
                   <svg
                     width="24"
                     height="24"
@@ -192,11 +192,11 @@ const Home: FC = () => {
             <button
               className="modal-close-button"
               onClick={() => setShowFullGallery(false)}
-              aria-label="Cerrar galería"
+              aria-label="Close Gallery"
             >
               ×
             </button>
-            <h2>Galería Completa</h2>
+            <h2>Full Gallery</h2>
             <div className="gallery-modal-scroll">
               <Masonry
                 breakpointCols={breakpointColumns}
