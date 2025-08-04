@@ -22,6 +22,7 @@ frontend/uploads
 # Sistema
 .env            # Variables de entorno sensibles
 .env.local      # Variables de entorno específicas de la máquina
+node_modules
 
 # Scripts
 start-dev.sh
@@ -30,5 +31,5 @@ test-endpoints.sh
 # Prompt Text
 prompt.txt
 
-// Coverage binary
+# Coverage binary
 codecov
