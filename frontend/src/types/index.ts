@@ -242,6 +242,27 @@ export interface GalleryImageResponseDTO {
   createdAt: string;
 }
 
+
+export interface News {
+  id: number;
+  title: string;
+  content: string;
+  createdAt: string;
+  authors: string[];
+  links: string[];
+  mediaLinks: MediaLink[];
+  previewImage: string;
+}
+
+export interface NewsDTO {
+  title: string;
+  content: string;
+  authors: string[];
+  links: string[];
+  mediaLinks: MediaLink[];
+  previewImage: string;
+}
+
 /**
  * Utility type for nullable values
  * @type Nullable
