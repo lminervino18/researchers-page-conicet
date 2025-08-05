@@ -17,6 +17,24 @@
   text-align: left;
 }
 
+.analogy-description,
+.analogy-preview-title {
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: var(--line-height-base);
+}
+
+.analogy-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+
+
 .links {
   display: flex;
   gap: 12px;
