@@ -156,12 +156,20 @@ const ResearchForm: FC<ResearchFormProps> = ({
             name="abstract"
             value={formData.researchAbstract}
             onChange={(e) => {
-              setFormData(prev => ({ ...prev, researchAbstract: e.target.value }));
-              setTouched(prev => ({ ...prev, abstract: true }));
+              if (e.target.value.length <= 1000) { // Limite de 1000 caracteres
+                setFormData(prev => ({ ...prev, researchAbstract: e.target.value }));
+                setTouched(prev => ({ ...prev, abstract: true }));
+              }
             }}
+            maxLength={1000}
             disabled={isSubmitting}
             placeholder="Enter research abstract"
           />
+          <div className="char-counter">
+            {formData.researchAbstract.length} / 1000 characters
+          </div>
+
+
           {touched.abstract && !formData.researchAbstract.trim() && (
             <div className="validation-message">Abstract is required</div>
           )}
