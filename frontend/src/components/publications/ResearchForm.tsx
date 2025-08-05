@@ -148,8 +148,8 @@ const ResearchForm: FC<ResearchFormProps> = ({
         {error && <div className="error-message">{error}</div>}
 
         <div className="form-group">
-          <label htmlFor="abstract">
-            Abstract <span className="required">*</span>
+          <label htmlFor="reference">
+            Reference <span className="required">*</span>
           </label>
           <textarea
             id="abstract"
