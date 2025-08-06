@@ -21,6 +21,14 @@ const PublicationsList: FC<PublicationsListProps> = ({
 }) => {
   const [activeSourcesId, setActiveSourcesId] = useState<number | null>(null);
 
+  // Utility: truncate text by number of words
+  const truncateByWords = (text: string, wordLimit: number) => {
+    if (!text) return '';
+    const words = text.split(/\s+/);
+    if (words.length <= wordLimit) return text;
+    return words.slice(0, wordLimit).join(' ') + '...';
+  };
+
   return (
     <div className="publications-list">
       {publications.length === 0 ? (
@@ -30,14 +38,16 @@ const PublicationsList: FC<PublicationsListProps> = ({
           <div key={publication.id} className="publication-card">
             <div className="publication-content">
               <div className="publication-main">
-                <p className="publication-abstract">{publication.researchAbstract}</p>
+                <p className="publication-abstract">
+                  {truncateByWords(publication.researchAbstract, 30)}
+                </p>
                 {publication.links.length > 0}
               </div>
               <div className="publication-actions">
                 <button
                   className={`action-button ${!publication.pdfPath ? 'disabled' : ''}`}
                   onClick={() => onViewPdf(publication.id)}
-                  title={publication.pdfPath ? "View PDF" : "No PDF available"}
+                  title={publication.pdfPath ? 'View PDF' : 'No PDF available'}
                   disabled={!publication.pdfPath}
                 >
                   <FontAwesomeIcon icon={faFilePdf} />
@@ -45,7 +55,7 @@ const PublicationsList: FC<PublicationsListProps> = ({
                 <button
                   className={`action-button ${!publication.pdfPath ? 'disabled' : ''}`}
                   onClick={() => onDownloadPdf(publication.id)}
-                  title={publication.pdfPath ? "Download PDF" : "No PDF available"}
+                  title={publication.pdfPath ? 'Download PDF' : 'No PDF available'}
                   disabled={!publication.pdfPath || downloading === publication.id}
                 >
                   {downloading === publication.id ? (
@@ -57,7 +67,7 @@ const PublicationsList: FC<PublicationsListProps> = ({
                 <button
                   className={`action-button ${!publication.links.length ? 'disabled' : ''}`}
                   onClick={() => setActiveSourcesId(publication.id)}
-                  title={publication.links.length ? "View Sources" : "No sources available"}
+                  title={publication.links.length ? 'View Sources' : 'No sources available'}
                   disabled={!publication.links.length}
                 >
                   <FontAwesomeIcon icon={faLink} />
@@ -70,7 +80,7 @@ const PublicationsList: FC<PublicationsListProps> = ({
 
       {activeSourcesId && (
         <SourcesModal
-          sources={publications.find(p => p.id === activeSourcesId)?.links || []}
+          sources={publications.find((p) => p.id === activeSourcesId)?.links || []}
           onClose={() => setActiveSourcesId(null)}
         />
       )}

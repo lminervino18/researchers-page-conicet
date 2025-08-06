@@ -38,7 +38,7 @@ const CoursesModal: FC<CoursesModalProps> = ({ member, onClose }) => {
           &times;
         </button>
         <div className="courses-modal-content">
-          <h2>Courses Taught</h2>
+          <h2>Teaching</h2>
           <h3>{member.firstName} {member.lastName}</h3>
           
           {member.courses.length > 0 ? (

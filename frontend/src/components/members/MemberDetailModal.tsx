@@ -19,18 +19,18 @@ const MemberDetailModal: FC<MemberDetailModalProps> = ({ member, onClose }) => {
         onClose();
       }
     };
-  
+
     const handleClickOutside = (event: MouseEvent) => {
       const modal = document.querySelector('.member-detail-modal');
-      if (modal && !modal.contains(event.target as Node) && 
+      if (modal && !modal.contains(event.target as Node) &&
           !showCoursesModal && !showPublicationsModal) {
         onClose();
       }
     };
-  
+
     document.addEventListener('keydown', handleEscapeKey);
     document.addEventListener('mousedown', handleClickOutside);
-  
+
     return () => {
       document.removeEventListener('keydown', handleEscapeKey);
       document.removeEventListener('mousedown', handleClickOutside);
@@ -53,6 +53,9 @@ const MemberDetailModal: FC<MemberDetailModalProps> = ({ member, onClose }) => {
     setShowPublicationsModal(false);
   };
 
+  const roleLabel =
+    member.role === 'principal' ? 'Principal Investigator' : 'Research Fellow';
+
   return (
     <>
       <div className="member-detail-modal-overlay">
@@ -62,15 +65,15 @@ const MemberDetailModal: FC<MemberDetailModalProps> = ({ member, onClose }) => {
           </button>
           <div className="member-detail-content">
             <div className="member-detail-image">
-              <img 
-                src={member.imageUrl} 
-                alt={`${member.firstName} ${member.lastName}`} 
+              <img
+                src={member.imageUrl}
+                alt={`${member.firstName} ${member.lastName}`}
               />
             </div>
             <div className="member-detail-info">
               <h2>{member.firstName} {member.lastName}</h2>
               <p className="member-detail-position">
-                {member.workingAt ? 'Researcher' : 'Independent Researcher'}
+                {roleLabel}
               </p>
               <div className="member-detail-metadata">
                 <p>
@@ -96,13 +99,13 @@ const MemberDetailModal: FC<MemberDetailModalProps> = ({ member, onClose }) => {
                 <p>{member.description}</p>
               </div>
               <div className="member-detail-actions">
-                <button 
+                <button
                   className="member-detail-courses-btn"
                   onClick={handleViewCourses}
                 >
-                View Courses
+                  View Courses
                 </button>
-                <button 
+                <button
                   className="member-detail-publications-btn"
                   onClick={handleViewPublications}
                 >
@@ -115,16 +118,16 @@ const MemberDetailModal: FC<MemberDetailModalProps> = ({ member, onClose }) => {
       </div>
 
       {showCoursesModal && (
-        <CoursesModal 
-          member={member} 
-          onClose={handleCloseCoursesModal} 
+        <CoursesModal
+          member={member}
+          onClose={handleCloseCoursesModal}
         />
       )}
 
       {showPublicationsModal && (
-        <PublicationsModal 
+        <PublicationsModal
           authorName={`${member.firstName} ${member.lastName}`}
-          onClose={handleClosePublicationsModal} 
+          onClose={handleClosePublicationsModal}
         />
       )}
     </>

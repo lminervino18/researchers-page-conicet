@@ -293,6 +293,14 @@
   animation: spin 1s linear infinite;
 }
 
+.char-counter {
+  font-size: var(--font-size-small);
+  color: var(--text-light);
+  margin-top: var(--spacing-xs);
+  text-align: right;
+}
+
+
 @keyframes spin {
   to {
     transform: rotate(360deg);

@@ -8,17 +8,23 @@ interface MemberGridItemProps {
 }
 
 const MemberGridItem: FC<MemberGridItemProps> = ({ member, onClick }) => {
+  const roleLabel =
+    member.role === 'principal' ? 'Principal Investigator' : 'Research Fellow';
+
   return (
-    <div className="member-grid-item" onClick={onClick}>
+    <div
+      className={`member-grid-item ${member.role === 'fellow' ? 'fellow-size' : 'principal-size'}`}
+      onClick={onClick}
+    >
       <div className="member-grid-item-image">
-        <img 
-          src={member.imageUrl} 
-          alt={`${member.firstName} ${member.lastName}`} 
+        <img
+          src={member.imageUrl}
+          alt={`${member.firstName} ${member.lastName}`}
         />
       </div>
       <div className="member-grid-item-info">
         <h3>{member.firstName} {member.lastName}</h3>
-        <p>{member.workingAt ? 'Researcher' : 'Independent Researcher'}</p>
+        <p>{roleLabel}</p>
       </div>
     </div>
   );

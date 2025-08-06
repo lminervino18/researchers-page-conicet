@@ -37,7 +37,12 @@
   color: var(--text-color);
   line-height: var(--line-height-base);
   margin-bottom: var(--spacing-sm);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
+
+
 
 .publication-authors {
   font-size: var(--font-size-small);

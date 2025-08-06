@@ -203,7 +203,9 @@ const AnalogiesListItem: React.FC<AnalogiesListItemProps> = React.memo(
   }) => (
     <div className="admin-analogy-card">
       <div className="analogy-info">
-        <p className="analogy-admin-title">{analogy.title}</p>
+        <p className="analogy-admin-title">
+          {analogy.title.length > 100 ? analogy.title.slice(0, 100) + "..." : analogy.title}
+        </p>
         <p className="analogy-authors">Authors: {analogy.authors.join(", ")}</p>
         {analogy.links.length > 0 && (
           <p className="analogy-links">Links: {analogy.links.length}</p>

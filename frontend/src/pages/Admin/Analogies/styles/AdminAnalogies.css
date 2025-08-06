@@ -29,12 +29,16 @@
 }
 
 .analogy-admin-title {
-    color: var(--text-color);
-    margin-bottom: var(--spacing-sm);
-    font-size: var(--font-size-base);
-    line-height: var(--line-height-base);
-    font-weight: bold;
+  color: var(--text-color);
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  font-weight: bold;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
+
 
 .analogy-authors {
     color: var(--text-light);
