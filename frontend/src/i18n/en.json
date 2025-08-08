@@ -1,0 +1,23 @@
+{
+  "hero": {
+    "title": "Welcome to Analogy Research Group",
+    "subtitle": "Exploring the cognitive processes of analogy and their applications in psychology"
+  },
+  "featured": {
+    "title": "Our Research Focus",
+    "text": "We investigate how people understand and use analogies in reasoning, learning, and problem-solving. Our work combines cognitive psychology, experimental methods, and innovative approaches to understand these fundamental mental processes."
+  },
+  "about": {
+    "title": "About Our Lab",
+    "text": "Based at the University of Buenos Aires, our research group is dedicated to advancing our understanding of analogical reasoning and its applications..."
+  },
+  "gallery": {
+    "title": "Lab Gallery",
+    "subtitle": "Explore our research environment and team activities",
+    "more": "More",
+    "fullTitle": "Full Gallery"
+  },
+  "loading": "Loading gallery...",
+  "error": "Error loading images",
+  "retry": "Retry"
+}

@@ -1,0 +1,23 @@
+{
+  "hero": {
+    "title": "Bienvenidos al Grupo de Investigación sobre Analogía",
+    "subtitle": "Explorando los procesos cognitivos de la analogía y sus aplicaciones en la psicología"
+  },
+  "featured": {
+    "title": "Nuestra Línea de Investigación",
+    "text": "Investigamos cómo las personas entienden y utilizan analogías en el razonamiento, el aprendizaje y la resolución de problemas..."
+  },
+  "about": {
+    "title": "Sobre Nuestro Laboratorio",
+    "text": "Con base en la Universidad de Buenos Aires, nuestro grupo de investigación se dedica a avanzar en la comprensión del razonamiento analógico..."
+  },
+  "gallery": {
+    "title": "Galería del Laboratorio",
+    "subtitle": "Explorá nuestro entorno de investigación y actividades del equipo",
+    "more": "Más",
+    "fullTitle": "Galería Completa"
+  },
+  "loading": "Cargando galería...",
+  "error": "Error al cargar las imágenes",
+  "retry": "Reintentar"
+}
