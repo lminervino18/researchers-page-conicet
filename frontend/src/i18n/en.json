@@ -1,23 +1,217 @@
 {
-  "hero": {
-    "title": "Welcome to Analogy Research Group",
-    "subtitle": "Exploring the cognitive processes of analogy and their applications in psychology"
+  "main_layout": {
+    "rights": "All rights reserved.",
+    "uba_psychology": "Department of Psychology - University of Buenos Aires"
   },
-  "featured": {
-    "title": "Our Research Focus",
-    "text": "We investigate how people understand and use analogies in reasoning, learning, and problem-solving. Our work combines cognitive psychology, experimental methods, and innovative approaches to understand these fundamental mental processes."
+  "home": {
+    "hero": {
+      "title": "Welcome to Analogy Research Group",
+      "subtitle": "Exploring the cognitive processes of analogy and their applications in psychology"
+    },
+    "featured": {
+      "title": "Our Research Focus",
+      "text": "We investigate how people understand and use analogies in reasoning, learning, and problem-solving. Our work combines cognitive psychology, experimental methods, and innovative approaches to understand these fundamental mental processes."
+    },
+    "about": {
+      "title": "About Our Lab",
+      "text": "Based at the University of Buenos Aires, our research group is dedicated to advancing our understanding of analogical reasoning and its applications..."
+    },
+    "gallery": {
+      "title": "Lab Gallery",
+      "subtitle": "Explore our research environment and team activities",
+      "more": "More",
+      "fullTitle": "Full Gallery"
+    },
+    "loading": "Loading gallery...",
+    "error": "Error loading images",
+    "retry": "Retry"
   },
-  "about": {
-    "title": "About Our Lab",
-    "text": "Based at the University of Buenos Aires, our research group is dedicated to advancing our understanding of analogical reasoning and its applications..."
+  "lab": {
+    "hero": {
+      "title": "Research Laboratory",
+      "subtitle": "Advancing our understanding of human cognition through innovative research"
+    },
+    "areas": {
+      "title": "Our Research Areas",
+      "analogical": {
+        "title": "Analogical Learning",
+        "short": "Exploring how humans learn through analogical comparisons and transfers",
+        "full": "Analogical learning is a fundamental cognitive process where new information is understood by comparing it to familiar concepts. Our research explores how people identify relevant similarities between situations and use them to solve new problems or acquire new knowledge."
+      },
+      "memory": {
+        "title": "Memory",
+        "short": "Investigating the mechanisms of human memory and retention",
+        "full": "Memory research in our lab focuses on how information is encoded, stored, and retrieved. We study both short-term and long-term memory processes, with particular emphasis on how analogical thinking influences memory formation and recall."
+      },
+      "cognitive": {
+        "title": "Cognitive Psychology",
+        "short": "Studying mental processes including thinking, learning, and problem-solving",
+        "full": "Our cognitive psychology research examines the fundamental mental processes that underlie human thought and behavior. We investigate how people perceive, process, store, and use information, with a special focus on analogical reasoning and decision-making."
+      }
+    },
+    "methodology": {
+      "title": "Our Methodology",
+      "text": "We employ a combination of experimental and theoretical approaches, using both behavioral studies and computational modeling to understand cognitive processes in depth."
+    }
   },
-  "gallery": {
-    "title": "Lab Gallery",
-    "subtitle": "Explore our research environment and team activities",
-    "more": "More",
-    "fullTitle": "Full Gallery"
+  "members": {
+    "hero": {
+      "title": "Our Team",
+      "subtitle": "Meet our researchers specialized in Cognitive Psychology."
+    },
+    "grid": {
+      "principals": "Principals",
+      "fellows": "Fellows"
+    },
+    "authors": {
+      "1": {
+        "description": "Renowned cognitive psychology researcher with over 30 years of experience in studying mental processes, decision-making, and cognitive mechanisms. Specialized in experimental cognitive psychology, with a focus on perception, memory, and reasoning. Pioneered multiple research initiatives exploring the intricate relationships between cognitive functions and neural networks."
+      },
+      "2": {
+        "description": "Innovative cognitive psychology researcher specializing in computational approaches to understanding mental processes. Expert in developing advanced cognitive models, exploring artificial intelligence applications in psychological research, and investigating the intersection of technology and cognitive science. Passionate about unraveling the complex mechanisms of human cognition through interdisciplinary research."
+      },
+      "3": {
+        "description": "Fellow researcher focusing on neurocognitive development in children, with a particular interest in early language acquisition and memory processes. Currently collaborating on experimental design and data analysis within the lab."
+      },
+      "4": {
+        "description": "Fellow researcher working on cognitive-behavioral correlations and applying advanced statistical techniques to analyze complex experimental data in behavioral neuroscience."
+      }
+    },
+    "courses": {
+      "cognitive_psychology_foundations": "Cognitive Psychology Foundations",
+      "neuropsychological_research_methods": "Neuropsychological Research Methods",
+      "advanced_cognitive_neuroscience": "Advanced Cognitive Neuroscience",
+      "cognitive_neuroscience": "Cognitive Neuroscience",
+      "computational_models_of_cognition": "Computational Models of Cognition",
+      "cognitive_assessment_and_intervention": "Cognitive Assessment and Intervention",
+      "neurocognitive_development": "Neurocognitive Development",
+      "experimental_psychology_methods": "Experimental Psychology Methods",
+      "behavioral_neuroscience": "Behavioral Neuroscience",
+      "statistical_analysis_for_psychology": "Statistical Analysis for Psychology"
+    },
+    "roles": {
+      "principal": "Principal Researcher",
+      "fellow": "Fellow Researcher"
+    },
+    "detail": {
+      "graduate": "Graduate from:",
+      "work": "Work at:",
+      "age": "Age:",
+      "email": "Email:",
+      "about": "About",
+      "view_courses": "View Courses",
+      "view_publications": "View Publications",
+      "courses_modal": {
+        "teaching": "Teaching",
+        "institution": "Institution:",
+        "no_courses": "No courses available"
+      }
+    }
   },
-  "loading": "Loading gallery...",
-  "error": "Error loading images",
-  "retry": "Retry"
+  "publications": {
+    "title": "Research Publications",
+    "of": "Publications of",
+    "loading": "Loading publications...",
+    "error": "Error loading publications",
+    "download_error": "Failed to download PDF",
+    "pdf_unavailable": "No PDF available for this publication",
+    "search": "Search publications...",
+    "list": {
+      "no_publications": "No publications available",
+      "view_pdf": "View PDF",
+      "no_pdf": "No PDF available",
+      "download_pdf": "Download PDF",
+      "view_sources": "View Sources",
+      "no_sources": "No sources available"
+    }
+  },
+  "participation": {
+    "title": "Research Studies Participation",
+    "subtitle": "Join our research studies and contribute to the advancement of cognitive psychology",
+    "current_studies": "Current Studies",
+    "current_studies_text": "Our research studies are currently under development. Soon you'll be able to participate in various experiments focused on analogical reasoning and cognitive processes.",
+    "who_can_participate": "Who Can Participate",
+    "who_can_participate_text": "We welcome participants from diverse backgrounds. Our studies are designed to be inclusive and accessible. Specific eligibility criteria will be provided for each study.",
+    "how_to_get_involved": "How to Get Involved",
+    "how_to_get_involved_text": "While our participation platform is being developed, you can express your interest in future studies by staying connected through our research group's updates.",
+    "coming_soon": "Coming Soon",
+    "coming_soon_text": "We're working on creating an interactive platform where you can:",
+    "browse": "Browse available studies",
+    "check": "Check eligibility criteria",
+    "sign_up": "Sign up for participation",
+    "track": "Track your contribution"
+  },
+  "inbox": {
+    "title": "Analogy Inbox",
+    "loading": "Loading analogies...",
+    "error": "Error loading analogies",
+    "search": "Search analogies...",
+    "list": {
+      "preview": "Preview",
+      "warning_mkv": ".mkv format not supported for preview",
+      "download_mkv": "Download .mkv",
+      "comment": "Comment"
+    }
+  },
+  "analogies": {
+    "no_analogy": "No analogy found",
+    "loading": "Loading analogy details...",
+    "error": "Failed to load analogy"
+  },
+  "login": {
+    "login": "Login",
+    "email_unauthorized": "This email is not authorized to comment or support",
+    "verification_error": "An error ocurred during email verification",
+    "username_error": "Username cannot be empty",
+    "saving_error": "Error saving username",
+    "confirmation": "🎉 You're logged in!",
+    "welcome": "Welcome, <1>{{username}}</1>! You can now comment and support.",
+    "verification_hint": {
+      "set_username": "Your email is authorized but you need to set your username.<1/>This can only be done <2>once</2> and cannot be changed later.",
+      "check_email": "Check if your email is allowed to comment or support!"
+    },
+    "label_username": "Username (one-time set)",
+    "choose_username": "Choose your username",
+    "save_username": "Save username",
+    "verify_access": "Verify your access",
+    "enter_email": "Enter your email"
+  },
+  "logout": {
+    "logout": "Logout",
+    "confirmation": {
+      "title": "Confirm Logout",
+      "asking": "Are you sure you want to log out?",
+      "confirm": "Yes, log out"
+    }
+  },
+  "comment": {
+    "comments": "Comments",
+    "reply": "Reply",
+    "write_comment": "Write a comment...",
+    "write_reply": "Write a reply...",
+    "log_in": "Please log in",
+    "no_comments": "No comments yet",
+    "load_more": "Load more comments",
+    "confirm_delete": "Are you sure you want to delete this comment?"
+  },
+  "news": {
+    "news": "News",
+    "error": "Error loading news",
+    "search": "Search news...",
+    "loading": "Loading news...",
+    "detail": {
+      "error": "Failed to load news",
+      "no_news": "No news found",
+      "related_links": "Related Links"
+    }
+  },
+  "confirm": "Confirm",
+  "back": "Back",
+  "continue": "Continue",
+  "cancel": "Cancel",
+  "verify": "Verify",
+  "submit": "Submit",
+  "loading": "Loading...",
+  "go_back": "Go Back",
+  "unexpected_error": "An unexpected error occurred"
 }

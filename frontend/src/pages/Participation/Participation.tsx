@@ -1,63 +1,53 @@
 // src/pages/Participation/Participation.tsx
-import { FC } from 'react';
-import MainLayout from '../../layouts/MainLayout';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFlask, faUsers, faClipboardCheck } from '@fortawesome/free-solid-svg-icons';
-import './styles/Participation.css';
+import { FC } from "react";
+import MainLayout from "../../layouts/MainLayout";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faFlask,
+  faUsers,
+  faClipboardCheck,
+} from "@fortawesome/free-solid-svg-icons";
+import "./styles/Participation.css";
+import { useTranslation } from "react-i18next";
 
 const Participation: FC = () => {
+  const { t } = useTranslation();
   return (
     <MainLayout>
       <div className="participation-container">
         <section className="participation-hero">
-          <h1>Research Studies Participation</h1>
-          <p className="hero-subtitle">
-            Join our research studies and contribute to the advancement of cognitive psychology
-          </p>
+          <h1>{t("participation.title")}</h1>
+          <p className="hero-subtitle">{t("participation.subtitle")}</p>
         </section>
 
         <section className="info-section">
           <div className="info-card">
             <FontAwesomeIcon icon={faFlask} className="info-icon" />
-            <h2>Current Studies</h2>
-            <p>
-              Our research studies are currently under development. Soon you'll be able 
-              to participate in various experiments focused on analogical reasoning and 
-              cognitive processes.
-            </p>
+            <h2>{t("participation.current_studies")}</h2>
+            <p>{t("participation.current_studies_text")}</p>
           </div>
 
           <div className="info-card">
             <FontAwesomeIcon icon={faUsers} className="info-icon" />
-            <h2>Who Can Participate</h2>
-            <p>
-              We welcome participants from diverse backgrounds. Our studies are designed 
-              to be inclusive and accessible. Specific eligibility criteria will be 
-              provided for each study.
-            </p>
+            <h2>{t("participation.who_can_participate")}</h2>
+            <p>{t("participation.who_can_participate_text")}</p>
           </div>
 
           <div className="info-card">
             <FontAwesomeIcon icon={faClipboardCheck} className="info-icon" />
-            <h2>How to Get Involved</h2>
-            <p>
-              While our participation platform is being developed, you can express your 
-              interest in future studies by staying connected through our research group's 
-              updates.
-            </p>
+            <h2>{t("participation.how_to_get_involved")}</h2>
+            <p>{t("participation.how_to_get_involved_text")}</p>
           </div>
         </section>
 
         <section className="coming-soon">
-          <h2>Coming Soon</h2>
-          <p>
-            We're working on creating an interactive platform where you can:
-          </p>
+          <h2>{t("participation.coming_soon")}</h2>
+          <p>{t("participation.coming_soon_text")}</p>
           <ul>
-            <li>Browse available studies</li>
-            <li>Check eligibility criteria</li>
-            <li>Sign up for participation</li>
-            <li>Track your contribution</li>
+            <li>{t("participation.browse")}</li>
+            <li>{t("participation.check")}</li>
+            <li>{t("participation.sign_up")}</li>
+            <li>{t("participation.track")}</li>
           </ul>
         </section>
       </div>

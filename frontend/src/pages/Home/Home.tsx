@@ -53,7 +53,7 @@ const Home: FC = () => {
         setIsLoading(false);
       } catch (err) {
         console.error("Error fetching gallery images:", err);
-        setError(t("error"));
+        setError(t("home.error"));
         setIsLoading(false);
       }
     };
@@ -71,7 +71,7 @@ const Home: FC = () => {
       <MainLayout>
         <div className="loading-container">
           <div className="spinner"></div>
-          <p>{t("loading")}</p>
+          <p>{t("home.loading")}</p>
         </div>
       </MainLayout>
     );
@@ -82,7 +82,9 @@ const Home: FC = () => {
       <MainLayout>
         <div className="error-container">
           <p>{error}</p>
-          <button onClick={() => window.location.reload()}>{t("retry")}</button>
+          <button onClick={() => window.location.reload()}>
+            {t("home.retry")}
+          </button>
         </div>
       </MainLayout>
     );
@@ -95,8 +97,8 @@ const Home: FC = () => {
         <section className="hero-section">
           <div className="hero-content">
             <div className="hero-text">
-              <h1>{t("hero.title")}</h1>
-              <p className="hero-subtitle">{t("hero.subtitle")}</p>
+              <h1>{t("home.hero.title")}</h1>
+              <p className="hero-subtitle">{t("home.hero.subtitle")}</p>
             </div>
             <div className="hero-image">
               <img src={landingImage} alt="Research laboratory visualization" />
@@ -107,24 +109,24 @@ const Home: FC = () => {
         {/* Featured Research */}
         <section className="featured-section">
           <div className="featured-content">
-            <h2>{t("featured.title")}</h2>
-            <p>{t("featured.text")}</p>
+            <h2>{t("home.featured.title")}</h2>
+            <p>{t("home.featured.text")}</p>
           </div>
         </section>
 
         {/* About Section */}
         <section className="about-section">
           <div className="about-content">
-            <h2>{t("about.title")}</h2>
-            <p>{t("about.text")}</p>
+            <h2>{t("home.about.title")}</h2>
+            <p>{t("home.about.text")}</p>
           </div>
         </section>
 
         {/* Gallery Section */}
         <section className="gallery-section">
           <div className="gallery-content">
-            <h2>{t("gallery.title")}</h2>
-            <p>{t("gallery.subtitle")}</p>
+            <h2>{t("home.gallery.title")}</h2>
+            <p>{t("home.gallery.subtitle")}</p>
             <div className="gallery-preview-container">
               <div className="gallery-preview">
                 <Masonry
@@ -148,7 +150,7 @@ const Home: FC = () => {
                   onClick={() => setShowFullGallery(true)}
                   aria-label="View more"
                 >
-                  <span>{t("gallery.more")}</span>
+                  <span>{t("home.gallery.more")}</span>
                   <svg
                     width="24"
                     height="24"
@@ -185,7 +187,7 @@ const Home: FC = () => {
             >
               ×
             </button>
-            <h2>{t("gallery.fullTitle")}</h2>
+            <h2>{t("home.gallery.fullTitle")}</h2>
             <div className="gallery-modal-scroll">
               <Masonry
                 breakpointCols={breakpointColumns}

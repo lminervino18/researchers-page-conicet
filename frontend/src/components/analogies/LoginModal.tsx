@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { checkEmailRegistration, updateUserName } from '../../api/emailVerification'; 
-import './styles/LoginModal.css';
+import React, { useState, useEffect } from "react";
+import {
+  checkEmailRegistration,
+  updateUserName,
+} from "../../api/emailVerification";
+import "./styles/LoginModal.css";
+import { Trans, useTranslation } from "react-i18next";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -8,38 +12,43 @@ interface LoginModalProps {
   onLogin: (username: string, email: string) => void;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
+const LoginModal: React.FC<LoginModalProps> = ({
+  isOpen,
+  onClose,
+  onLogin,
+}) => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const [emailExists, setEmailExists] = useState<boolean | null>(null);
   const [usernameRequired, setUsernameRequired] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [finalUsername, setFinalUsername] = useState('');
+  const [finalUsername, setFinalUsername] = useState("");
+
+  const { t } = useTranslation();
 
   useEffect(() => {
-  if (!isOpen && !showSuccess) {
-    setUsername('');
-    setEmail('');
-    setError('');
-    setEmailExists(null);
-    setUsernameRequired(false);
-    setLoading(false);
-    setFinalUsername('');
-  }
-}, [isOpen, showSuccess]);
-
+    if (!isOpen && !showSuccess) {
+      setUsername("");
+      setEmail("");
+      setError("");
+      setEmailExists(null);
+      setUsernameRequired(false);
+      setLoading(false);
+      setFinalUsername("");
+    }
+  }, [isOpen, showSuccess]);
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setEmailExists(null);
 
     if (!emailRegex.test(email)) {
-      setError('Invalid email format');
+      setError("Invalid email format");
       return;
     }
 
@@ -49,7 +58,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
       const userData = await checkEmailRegistration(email);
 
       if (!userData.registered) {
-        setError('This email is not authorized to comment or support');
+        setError(t("login.email_unauthorized"));
         setEmailExists(false);
         setLoading(false);
         return;
@@ -69,22 +78,20 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
       setLoading(false);
       setShowSuccess(true);
       setLoading(false);
-
-
     } catch (err) {
-      setError('An error occurred during email verification');
+      setError(t("login.verification_error"));
       setLoading(false);
     }
   };
 
   const handleSetUsername = async () => {
     if (!username.trim()) {
-      setError('Username cannot be empty');
+      setError(t("login.username_error"));
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       await updateUserName(email, username.trim());
@@ -98,7 +105,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
         onClose();
       }, 2000);
     } catch (err) {
-      setError('Error saving username');
+      setError(t("login.saving_error"));
       setLoading(false);
     }
   };
@@ -108,17 +115,33 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
   return (
     <div className="login-modal-overlay">
       <div className="login-modal">
-        <button className="close-button" onClick={onClose}>&times;</button>
-        <div className={`login-modal-content ${showSuccess ? 'success-message' : ''}`}>
+        <button className="close-button" onClick={onClose}>
+          &times;
+        </button>
+        <div
+          className={`login-modal-content ${
+            showSuccess ? "success-message" : ""
+          }`}
+        >
           {showSuccess ? (
             <>
-              <h2>🎉 You're logged in!</h2>
-              <p style={{ textAlign: 'center', fontSize: '1rem', marginBottom: '1rem' }}>
-                Welcome, <strong>{finalUsername || 'User'}</strong>! You can now comment and support.
+              <h2>{t("login.confirmation")}</h2>
+              <p
+                style={{
+                  textAlign: "center",
+                  fontSize: "1rem",
+                  marginBottom: "1rem",
+                }}
+              >
+                <Trans
+                  i18nKey="login.welcome"
+                  values={{ username: finalUsername || "User" }}
+                  components={[<strong />]}
+                />
               </p>
               <div className="modal-actions">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn btn-primary"
                   onClick={() => {
                     setShowSuccess(false);
@@ -129,34 +152,35 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
                 </button>
               </div>
             </>
-
           ) : usernameRequired ? (
             <>
               <p className="verification-hint">
-                Your email is authorized but you need to set your username.<br/>
-                This can only be done <strong>once</strong> and cannot be changed later.
+                <Trans
+                  i18nKey="login.verification_hint.set_username"
+                  components={[<br />, <strong />]}
+                />
               </p>
               <div className="form-group">
-                <label htmlFor="username">Username (one-time set)</label>
+                <label htmlFor="username">{t("login.label_username")}</label>
                 <input
                   id="username"
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Choose your username"
+                  placeholder={t("login.choose_username")}
                   required
                   disabled={loading}
                 />
               </div>
               {error && <p className="error-message">{error}</p>}
               <div className="modal-actions">
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
+                <button
+                  type="button"
+                  className="btn btn-secondary"
                   onClick={onClose}
                   disabled={loading}
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button
                   type="button"
@@ -164,50 +188,52 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
                   onClick={handleSetUsername}
                   disabled={loading}
                 >
-                  Save Username
+                  {t("login.save_username")}
                 </button>
               </div>
             </>
           ) : (
             <>
-              <h2>Verify Your Access</h2>
+              <h2>{t("login.verify_access")}</h2>
               <p className="verification-hint">
-                Check if your email is allowed to comment or support!
+                {t("login.verification_hint.check_email")}
               </p>
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
                   <label htmlFor="email">Email</label>
                   {emailExists === false && (
                     <p className="error-message">
-                      This email is not authorized to comment or support
+                      {t("login.email_unauthorized")}
                     </p>
                   )}
-                  <input 
+                  <input
                     id="email"
-                    type="email" 
+                    type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    required 
+                    placeholder={t("login.enter_email")}
+                    required
                     disabled={loading}
                   />
                 </div>
-                {error && emailExists !== false && <p className="error-message">{error}</p>}
+                {error && emailExists !== false && (
+                  <p className="error-message">{error}</p>
+                )}
                 <div className="modal-actions">
-                  <button 
-                    type="button" 
-                    className="btn btn-secondary" 
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
                     onClick={onClose}
                     disabled={loading}
                   >
-                    Cancel
+                    {t("cancel")}
                   </button>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="btn btn-primary"
                     disabled={loading}
                   >
-                    Verify
+                    {t("verify")}
                   </button>
                 </div>
               </form>
