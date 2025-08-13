@@ -3,6 +3,14 @@
     "rights": "Todos los derechos reservados.",
     "uba_psychology": "Departamento de Psicología - Universidad de Buenos Aires"
   },
+  "nav": {
+    "lab": "Lineamientos de Investigación",
+    "members": "Miembros",
+    "publications": "Publicaciones",
+    "news": "Noticias",
+    "participation": "Participación en Experimentos",
+    "inbox": "Buzón de Analogías"
+  },
   "home": {
     "hero": {
       "title": "Bienvenidos al Grupo de Investigación sobre Analogía",

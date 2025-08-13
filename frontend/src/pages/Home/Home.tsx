@@ -200,13 +200,9 @@ const Home: FC = () => {
                     className="masonry-item clickable"
                     onClick={() => handleImageClick(index)}
                   >
-                    <img
-                      src={image.src}
-                      alt={image.alt || `Photo ${index + 1}`}
-                      loading="lazy"
-                    />
+                    <img src={image.src} alt={image.alt || ""} loading="lazy" />
                     <div className="image-overlay">
-                      <p>{image.alt || `Photo ${index + 1}`}</p>
+                      <p>{image.alt || ""}</p>
                     </div>
                   </div>
                 ))}

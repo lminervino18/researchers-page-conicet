@@ -5,21 +5,23 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import "./styles/Navbar.css";
 import LanguageSelector from "./LanguageSelector";
+import { useTranslation } from "react-i18next";
 
 const Navbar: FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const sections = [
-    { id: "lab", title: "Research Lines", path: "/lab" },
-    { id: "members", title: "Members", path: "/members" },
-    { id: "publications", title: "Publications", path: "/publications" },
-    { id: "news", title: "News", path: "/news" },
+    { id: "lab", title: t("nav.lab"), path: "/lab" },
+    { id: "members", title: t("nav.members"), path: "/members" },
+    { id: "publications", title: t("nav.publications"), path: "/publications" },
+    { id: "news", title: t("nav.news"), path: "/news" },
     {
       id: "participation",
-      title: "Experiment Participations",
+      title: t("nav.participation"),
       path: "/participation",
     },
-    { id: "inbox", title: "Analogy Inbox", path: "/inbox" },
+    { id: "inbox", title: t("nav.inbox"), path: "/inbox" },
   ];
 
   return (

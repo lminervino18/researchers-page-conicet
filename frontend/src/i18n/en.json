@@ -3,6 +3,14 @@
     "rights": "All rights reserved.",
     "uba_psychology": "Department of Psychology - University of Buenos Aires"
   },
+  "nav": {
+    "lab": "Research Lines",
+    "members": "Members",
+    "publications": "Publications",
+    "news": "News",
+    "participation": "Experiment Participations",
+    "inbox": "Analogy Inbox"
+  },
   "home": {
     "hero": {
       "title": "Welcome to Analogy Research Group",
