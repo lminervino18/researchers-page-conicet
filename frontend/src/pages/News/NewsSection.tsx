@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faNewspaper } from "@fortawesome/free-solid-svg-icons";
 import { authors as authorsList } from "../../api/authors";
 import "./styles/NewsSection.css";
+import { useTranslation } from "react-i18next";
 
 const NewsSection: FC = () => {
   const navigate = useNavigate();
@@ -14,6 +15,8 @@ const NewsSection: FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const { t } = useTranslation();
 
   const loadNews = async () => {
     try {
@@ -23,7 +26,7 @@ const NewsSection: FC = () => {
       setError(null);
     } catch (err) {
       console.error(err);
-      setError("Error loading news");
+      setError(t("news.error"));
     } finally {
       setLoading(false);
     }
@@ -51,23 +54,26 @@ const NewsSection: FC = () => {
     <MainLayout>
       <div className="news-section-container">
         <div className="news-section-header">
-          <h1>News</h1>
+          <h1>{t("news.news")}</h1>
           <div className="news-section-actions">
             <div className="news-section-search-container">
               <input
                 type="text"
-                placeholder="Search news..."
+                placeholder={t("news.search")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="news-section-search-input"
               />
-              <FontAwesomeIcon icon={faSearch} className="news-section-search-icon" />
+              <FontAwesomeIcon
+                icon={faSearch}
+                className="news-section-search-icon"
+              />
             </div>
           </div>
         </div>
 
         {loading ? (
-          <div className="news-section-loading">Loading news...</div>
+          <div className="news-section-loading">{t("news.loading")}</div>
         ) : error ? (
           <div className="news-section-error">{error}</div>
         ) : (
@@ -89,7 +95,10 @@ const NewsSection: FC = () => {
                         className="news-section-author-avatar"
                       />
                     ) : (
-                      <div key={name} className="news-section-author-placeholder">
+                      <div
+                        key={name}
+                        className="news-section-author-placeholder"
+                      >
                         {name[0]}
                       </div>
                     );

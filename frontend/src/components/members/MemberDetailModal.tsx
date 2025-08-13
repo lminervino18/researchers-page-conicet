@@ -1,8 +1,9 @@
-import { FC, useEffect, useState } from 'react';
-import { Author, calculateAge } from '../../api/authors';
-import CoursesModal from './CoursesModal';
-import PublicationsModal from './PublicationsModal';
-import './styles/MemberDetailModal.css';
+import { FC, useEffect, useState } from "react";
+import { Author, calculateAge } from "../../api/authors";
+import CoursesModal from "./CoursesModal";
+import PublicationsModal from "./PublicationsModal";
+import "./styles/MemberDetailModal.css";
+import { useTranslation } from "react-i18next";
 
 interface MemberDetailModalProps {
   member: Author;
@@ -13,27 +14,37 @@ const MemberDetailModal: FC<MemberDetailModalProps> = ({ member, onClose }) => {
   const [showCoursesModal, setShowCoursesModal] = useState(false);
   const [showPublicationsModal, setShowPublicationsModal] = useState(false);
 
+  const { t } = useTranslation();
+
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && !showCoursesModal && !showPublicationsModal) {
+      if (
+        event.key === "Escape" &&
+        !showCoursesModal &&
+        !showPublicationsModal
+      ) {
         onClose();
       }
     };
 
     const handleClickOutside = (event: MouseEvent) => {
-      const modal = document.querySelector('.member-detail-modal');
-      if (modal && !modal.contains(event.target as Node) &&
-          !showCoursesModal && !showPublicationsModal) {
+      const modal = document.querySelector(".member-detail-modal");
+      if (
+        modal &&
+        !modal.contains(event.target as Node) &&
+        !showCoursesModal &&
+        !showPublicationsModal
+      ) {
         onClose();
       }
     };
 
-    document.addEventListener('keydown', handleEscapeKey);
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("keydown", handleEscapeKey);
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener('keydown', handleEscapeKey);
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("keydown", handleEscapeKey);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [onClose, showCoursesModal, showPublicationsModal]);
 
@@ -54,7 +65,7 @@ const MemberDetailModal: FC<MemberDetailModalProps> = ({ member, onClose }) => {
   };
 
   const roleLabel =
-    member.role === 'principal' ? 'Principal Investigator' : 'Research Fellow';
+    member.role === "principal" ? "Principal Investigator" : "Research Fellow";
 
   return (
     <>
@@ -71,45 +82,48 @@ const MemberDetailModal: FC<MemberDetailModalProps> = ({ member, onClose }) => {
               />
             </div>
             <div className="member-detail-info">
-              <h2>{member.firstName} {member.lastName}</h2>
-              <p className="member-detail-position">
-                {roleLabel}
-              </p>
+              <h2>
+                {member.firstName} {member.lastName}
+              </h2>
+              <p className="member-detail-position">{roleLabel}</p>
               <div className="member-detail-metadata">
                 <p>
-                  <strong>Graduated from:</strong> {member.graduatedFrom}
+                  <strong>{t("members.detail.graduate")}</strong>{" "}
+                  {member.graduatedFrom}
                 </p>
                 {member.workingAt && (
                   <p>
-                    <strong>Works at:</strong> {member.workingAt}
+                    <strong>{t("members.detail.work")}</strong>{" "}
+                    {member.workingAt}
                   </p>
                 )}
                 <p>
-                  <strong>Age:</strong> {calculateAge(member.birthDate)}
+                  <strong>{t("members.detail.age")}</strong>{" "}
+                  {calculateAge(member.birthDate)}
                 </p>
                 {member.email && (
                   <p>
-                    <strong>Email:</strong>{' '}
+                    <strong>{t("members.detail.email")}</strong>{" "}
                     <a href={`mailto:${member.email}`}>{member.email}</a>
                   </p>
                 )}
               </div>
               <div className="member-detail-description">
-                <h3>About</h3>
-                <p>{member.description}</p>
+                <h3>{t("members.detail.about")}</h3>
+                <p>{t(member.description)}</p>
               </div>
               <div className="member-detail-actions">
                 <button
                   className="member-detail-courses-btn"
                   onClick={handleViewCourses}
                 >
-                  View Courses
+                  {t("members.detail.view_courses")}
                 </button>
                 <button
                   className="member-detail-publications-btn"
                   onClick={handleViewPublications}
                 >
-                  View Publications
+                  {t("members.detail.view_publications")}
                 </button>
               </div>
             </div>
@@ -118,10 +132,7 @@ const MemberDetailModal: FC<MemberDetailModalProps> = ({ member, onClose }) => {
       </div>
 
       {showCoursesModal && (
-        <CoursesModal
-          member={member}
-          onClose={handleCloseCoursesModal}
-        />
+        <CoursesModal member={member} onClose={handleCloseCoursesModal} />
       )}
 
       {showPublicationsModal && (

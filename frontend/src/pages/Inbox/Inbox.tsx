@@ -1,34 +1,37 @@
-import { FC, useState, useEffect } from 'react';
-import MainLayout from '../../layouts/MainLayout';
-import AnalogiesList from '../../components/analogies/AnalogiesList';
-import { Analogy, PaginatedResponse } from '../../types';
-import { getAllAnalogies } from '../../api/analogy';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import './styles/Inbox.css';
+import { FC, useState, useEffect } from "react";
+import MainLayout from "../../layouts/MainLayout";
+import AnalogiesList from "../../components/analogies/AnalogiesList";
+import { Analogy, PaginatedResponse } from "../../types";
+import { getAllAnalogies } from "../../api/analogy";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import "./styles/Inbox.css";
+import { useTranslation } from "react-i18next";
 
 const Inbox: FC = () => {
   const [analogies, setAnalogies] = useState<Analogy[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const { t } = useTranslation();
 
   const loadAnalogies = async () => {
     try {
       setLoading(true);
       const response: PaginatedResponse<Analogy[]> = await getAllAnalogies();
-      
+
       // Flatten the array if needed
       const extractedAnalogies = Array.isArray(response.content)
         ? response.content.flat()
         : Array.isArray(response.data)
-          ? response.data.flat()
-          : [];
-  
+        ? response.data.flat()
+        : [];
+
       setAnalogies(extractedAnalogies);
       setError(null);
     } catch (err) {
-      setError('Error loading analogies');
+      setError(t("inbox.error"));
       console.error(err);
     } finally {
       setLoading(false);
@@ -39,21 +42,24 @@ const Inbox: FC = () => {
     loadAnalogies();
   }, []);
 
-  const filteredAnalogies = analogies.filter(analogy => 
-    analogy.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    analogy.authors.some(author => author.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredAnalogies = analogies.filter(
+    (analogy) =>
+      analogy.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      analogy.authors.some((author) =>
+        author.toLowerCase().includes(searchQuery.toLowerCase())
+      )
   );
 
   return (
     <MainLayout>
       <div className="inbox-container">
         <div className="inbox-header">
-          <h1>Analogy Inbox</h1>
+          <h1>{t("inbox.title")}</h1>
           <div className="header-actions">
             <div className="search-container">
               <input
                 type="text"
-                placeholder="Search analogies..."
+                placeholder={t("inbox.search")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="search-input"
@@ -64,7 +70,7 @@ const Inbox: FC = () => {
         </div>
 
         {loading ? (
-          <div className="loading-state">Loading analogies...</div>
+          <div className="loading-state">{t("inbox.loading")}</div>
         ) : error ? (
           <div className="error-state">{error}</div>
         ) : (

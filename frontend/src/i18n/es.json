@@ -1,0 +1,225 @@
+{
+  "main_layout": {
+    "rights": "Todos los derechos reservados.",
+    "uba_psychology": "Departamento de Psicología - Universidad de Buenos Aires"
+  },
+  "nav": {
+    "lab": "Lineamientos de Investigación",
+    "members": "Miembros",
+    "publications": "Publicaciones",
+    "news": "Noticias",
+    "participation": "Participación en Experimentos",
+    "inbox": "Buzón de Analogías"
+  },
+  "home": {
+    "hero": {
+      "title": "Bienvenidos al Grupo de Investigación sobre Analogía",
+      "subtitle": "Explorando los procesos cognitivos de la analogía y sus aplicaciones en la psicología"
+    },
+    "featured": {
+      "title": "Nuestra Línea de Investigación",
+      "text": "Investigamos cómo las personas entienden y utilizan analogías en el razonamiento, el aprendizaje y la resolución de problemas..."
+    },
+    "about": {
+      "title": "Sobre Nuestro Laboratorio",
+      "text": "Con base en la Universidad de Buenos Aires, nuestro grupo de investigación se dedica a avanzar en la comprensión del razonamiento analógico..."
+    },
+    "gallery": {
+      "title": "Galería del Laboratorio",
+      "subtitle": "Explorá nuestro entorno de investigación y actividades del equipo",
+      "more": "Más",
+      "fullTitle": "Galería Completa"
+    },
+    "loading": "Cargando galería...",
+    "error": "Error al cargar las imágenes",
+    "retry": "Reintentar"
+  },
+  "lab": {
+    "hero": {
+      "title": "Laboratorio de Investigación",
+      "subtitle": "Avanzando en nuestra comprensión de la cognición humana a través de la investigación innovadora"
+    },
+    "areas": {
+      "title": "Nuestras Áreas de Investigación",
+      "analogical": {
+        "title": "Aprendizaje Analógico",
+        "short": "Explorando cómo los humanos aprenden mediante comparaciones y transferencias analógicas",
+        "full": "El aprendizaje analógico es un proceso cognitivo fundamental en el que la información nueva se comprende comparándola con conceptos familiares. Nuestra investigación explora cómo las personas identifican similitudes relevantes entre situaciones y las utilizan para resolver nuevos problemas o adquirir nuevos conocimientos."
+      },
+      "memory": {
+        "title": "Memoria",
+        "short": "Investigando los mecanismos de la memoria humana y la retención",
+        "full": "La investigación sobre memoria en nuestro laboratorio se centra en cómo la información se codifica, almacena y recupera. Estudiamos tanto los procesos de memoria a corto como a largo plazo, con especial énfasis en cómo el pensamiento analógico influye en la formación y el recuerdo de la memoria."
+      },
+      "cognitive": {
+        "title": "Psicología Cognitiva",
+        "short": "Estudiando los procesos mentales, incluyendo el pensamiento, el aprendizaje y la resolución de problemas",
+        "full": "Nuestra investigación en psicología cognitiva examina los procesos mentales fundamentales que subyacen al pensamiento y el comportamiento humano. Investigamos cómo las personas perciben, procesan, almacenan y usan la información, con un enfoque especial en el razonamiento analógico y la toma de decisiones."
+      }
+    },
+    "methodology": {
+      "title": "Nuestra Metodología",
+      "text": "Empleamos una combinación de enfoques experimentales y teóricos, utilizando tanto estudios conductuales como modelado computacional para comprender en profundidad los procesos cognitivos."
+    }
+  },
+  "members": {
+    "hero": {
+      "title": "Nuestro Equipo",
+      "subtitle": "Conocé a nuestros investigadores especializados en Psicología Cognitiva."
+    },
+    "grid": {
+      "principals": "Principales",
+      "fellows": "Becarios"
+    },
+    "authors": {
+      "1": {
+        "description": "Reconocido investigador en psicología cognitiva con más de 30 años de experiencia en el estudio de los procesos mentales, la toma de decisiones y los mecanismos cognitivos. Especializado en psicología cognitiva experimental, con un enfoque en la percepción, la memoria y el razonamiento. Pionero en múltiples iniciativas de investigación que exploran las complejas relaciones entre las funciones cognitivas y las redes neuronales."
+      },
+      "2": {
+        "description": "Investigador innovador en psicología cognitiva especializado en enfoques computacionales para comprender los procesos mentales. Experto en el desarrollo de modelos cognitivos avanzados, en la exploración de aplicaciones de inteligencia artificial en la investigación psicológica y en la investigación de la intersección entre la tecnología y la ciencia cognitiva. Apasionado por desentrañar los complejos mecanismos de la cognición humana mediante la investigación interdisciplinaria."
+      },
+      "3": {
+        "description": "Investigadora becaria enfocada en el desarrollo neurocognitivo infantil, con especial interés en la adquisición temprana del lenguaje y los procesos de memoria. Actualmente colabora en el diseño experimental y el análisis de datos dentro del laboratorio."
+      },
+      "4": {
+        "description": "Investigador becario que trabaja en correlaciones cognitivo-conductuales y aplica técnicas estadísticas avanzadas para analizar datos experimentales complejos en neurociencia conductual."
+      }
+    },
+    "courses": {
+      "cognitive_psychology_foundations": "Fundamentos de Psicología Cognitiva",
+      "neuropsychological_research_methods": "Métodos de Investigación Neuropsicológica",
+      "advanced_cognitive_neuroscience": "Neurociencia Cognitiva Avanzada",
+      "cognitive_neuroscience": "Neurociencia Cognitiva",
+      "computational_models_of_cognition": "Modelos Computacionales de la Cognición",
+      "cognitive_assessment_and_intervention": "Evaluación e Intervención Cognitiva",
+      "neurocognitive_development": "Desarrollo Neurocognitivo",
+      "experimental_psychology_methods": "Métodos de Psicología Experimental",
+      "behavioral_neuroscience": "Neurociencia Conductual",
+      "statistical_analysis_for_psychology": "Análisis Estadístico para Psicología"
+    },
+    "roles": {
+      "principal": "Investigador Principal",
+      "fellow": "Investigador Becario"
+    },
+    "detail": {
+      "graduate": "Graduado de:",
+      "work": "Trabaja en:",
+      "age": "Edad:",
+      "email": "Correo electrónico:",
+      "about": "Acerca de",
+      "view_courses": "Ver cursos",
+      "view_publications": "Ver publicaciones",
+      "courses_modal": {
+        "teaching": "Docencia",
+        "institution": "Institución:",
+        "no_courses": "No hay cursos disponibles"
+      }
+    }
+  },
+  "publications": {
+    "title": "Publicaciones de Investigaciones",
+    "of": "Publicaciones de",
+    "loading": "Cargando publicaciones...",
+    "error": "Error al cargar las publicaciones",
+    "download_error": "Error al descargar el PDF",
+    "pdf_unavailable": "No hay PDF disponible para esta publicación",
+    "search": "Buscar publicaciones...",
+    "list": {
+      "no_publications": "No hay publicaciones disponibles",
+      "view_pdf": "Abrir PDF",
+      "no_pdf": "No hay PDF disponible",
+      "download_pdf": "Descargar PDF",
+      "view_sources": "Abrir fuentes",
+      "no_sources": "No hay fuentes disponibles"
+    }
+  },
+  "participation": {
+    "title": "Participación en Estudios de Investigación",
+    "subtitle": "Únete a nuestros estudios de investigación y contribuye al avance de la psicología cognitiva",
+    "current_studies": "Estudios Actuales",
+    "current_studies_text": "Nuestros estudios de investigación están actualmente en desarrollo. Pronto podrás participar en diversos experimentos enfocados en el razonamiento analógico y los procesos cognitivos.",
+    "who_can_participate": "Quién Puede Participar",
+    "who_can_participate_text": "Damos la bienvenida a participantes de diversos orígenes. Nuestros estudios están diseñados para ser inclusivos y accesibles. Se proporcionarán criterios de elegibilidad específicos para cada estudio.",
+    "how_to_get_involved": "Cómo Participar",
+    "how_to_get_involved_text": "Mientras desarrollamos nuestra plataforma de participación, puedes expresar tu interés en futuros estudios manteniéndote conectado a través de las actualizaciones de nuestro grupo de investigación.",
+    "coming_soon": "Próximamente",
+    "coming_soon_text": "Estamos trabajando en la creación de una plataforma interactiva donde podrás:",
+    "browse": "Explorar los estudios disponibles",
+    "check": "Revisar los criterios de elegibilidad",
+    "sign_up": "Registrarte para participar",
+    "track": "Seguir tu contribución"
+  },
+  "inbox": {
+    "title": "Buzón de Analogías",
+    "loading": "Cargando analogías...",
+    "error": "Error al cargar analogías",
+    "search": "Buscar analogías...",
+    "list": {
+      "preview": "Previsualización",
+      "warning_mkv": "Previsualización no soporta formato .mkv",
+      "download_mkv": "Descargar .mkv",
+      "comment": "Comentar"
+    }
+  },
+  "analogies": {
+    "no_analogy": "No se encontraron analogías",
+    "loading": "Cargando el detalle de la analogía...",
+    "error": "Error al cargar la analogía"
+  },
+  "login": {
+    "login": "Registrarse",
+    "email_unauthorized": "Email no autorizado a comentar o dar apoyo.",
+    "verification_error": "Error al verificar el email.",
+    "username_error": "Se necesita nombre de usuario.",
+    "saving_error": "Error al guardar nombre de usuario.",
+    "confirmation": "¡Estás inscripto! 🎉",
+    "welcome": "¡Bienvenido, <1>{{username}}</1>! Ahora podes comentar y dar apoyo.",
+    "verification_hint": {
+      "set_username": "Tu email está autorizado pero necesitas configurar un nombre de usuario.<1/>Esto puede hacerse una <2>única vez</2> y no se podrá cambiar.",
+      "check_email": "Verifique que su email tenga permitido comentar o dar apoyo."
+    },
+    "label_username": "Nombre de usuario (configuración por única vez)",
+    "choose_username": "Elija su nombre de usuario",
+    "save_username": "Guardar nombre de usuario",
+    "verify_access": "Verifique su acceso",
+    "enter_email": "Ingrese su email"
+  },
+  "logout": {
+    "logout": "Salir de la sesión",
+    "confirmation": {
+      "title": "Confirmar salida",
+      "asking": "¿Está seguro que quiere salirse de la sesión?",
+      "confirm": "Si, salir"
+    }
+  },
+  "comment": {
+    "comments": "Comentarios",
+    "reply": "Responder",
+    "write_comment": "Escriba un comentario...",
+    "write_reply": "Escriba una respuesta...",
+    "log_in": "Por favor, registrarse",
+    "no_comments": "No hay comentarios",
+    "load_more": "Cargar más comentarios",
+    "confirm_delete": "¿Está seguro que quiere eliminar este comentario?"
+  },
+  "news": {
+    "news": "Noticias",
+    "error": "Error al cargar las noticias",
+    "search": "Buscar noticias...",
+    "loading": "Cargando noticias...",
+    "detail": {
+      "error": "Error al cargar la noticia",
+      "no_news": "No se encontro la noticia",
+      "related_links": "Sitios relacionados"
+    }
+  },
+  "confirm": "Confirmar",
+  "back": "Atrás",
+  "continue": "Continuar",
+  "cancel": "Cancelar",
+  "verify": "Verificar",
+  "submit": "Publicar",
+  "loading": "Cargando...",
+  "go_back": "Volver",
+  "unexpected_error": "Error desconocido"
+}

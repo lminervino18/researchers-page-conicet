@@ -1,5 +1,6 @@
-import React from 'react';
-import './styles/ConfirmationModal.css';
+import React from "react";
+import "./styles/ConfirmationModal.css";
+import { useTranslation } from "react-i18next";
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -8,7 +9,13 @@ interface ConfirmationModalProps {
   message: string;
 }
 
-const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ isOpen, onClose, onConfirm, message }) => {
+const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  message,
+}) => {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   return (
@@ -16,8 +23,12 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ isOpen, onClose, 
       <div className="modal-content">
         <p>{message}</p>
         <div className="modal-actions">
-          <button onClick={onConfirm} className="confirm-btn">Confirm</button>
-          <button onClick={onClose} className="cancel-btn">Cancel</button>
+          <button onClick={onConfirm} className="confirm-btn">
+            {t("confirm")}
+          </button>
+          <button onClick={onClose} className="cancel-btn">
+            {t("cancel")}
+          </button>
         </div>
       </div>
     </div>

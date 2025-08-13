@@ -1,8 +1,8 @@
 // frontend/src/api/authors.tsx
-import RicardoMinervinoImg from '../assets/members/RicardoMinervino.jpg';
-import MaximoTrenchImg from '../assets/members/MaximoTrench.jpg';
-import SofiaMartinezImg from '../assets/members/SofiaMartinez.jpg';
-import JuanPerezImg from '../assets/members/JuanPerez.jpg';
+import RicardoMinervinoImg from "../assets/members/RicardoMinervino.jpg";
+import MaximoTrenchImg from "../assets/members/MaximoTrench.jpg";
+import SofiaMartinezImg from "../assets/members/SofiaMartinez.jpg";
+import JuanPerezImg from "../assets/members/JuanPerez.jpg";
 
 export interface Course {
   id: number;
@@ -11,7 +11,7 @@ export interface Course {
   year: number;
 }
 
-export type AuthorRole = 'principal' | 'fellow';
+export type AuthorRole = "principal" | "fellow";
 
 export interface Author {
   id: number;
@@ -40,25 +40,25 @@ export const authors: Author[] = [
     courses: [
       {
         id: 1,
-        name: "Cognitive Psychology Foundations",
+        name: "members.courses.cognitive_psychology_foundations",
         institution: "UBA",
-        year: 1990
+        year: 1990,
       },
       {
         id: 2,
-        name: "Neuropsychological Research Methods",
+        name: "members.courses.neuropsychological_research_methods",
         institution: "UNCO",
-        year: 2000
+        year: 2000,
       },
       {
         id: 3,
-        name: "Advanced Cognitive Neuroscience",
+        name: "members.courses.advanced_cognitive_neuroscience",
         institution: "Harvard University",
-        year: 2005
-      }
+        year: 2005,
+      },
     ],
-    description: "Renowned cognitive psychology researcher with over 30 years of experience in studying mental processes, decision-making, and cognitive mechanisms. Specialized in experimental cognitive psychology, with a focus on perception, memory, and reasoning. Pioneered multiple research initiatives exploring the intricate relationships between cognitive functions and neural networks.",
-    role: "principal"
+    description: "members.authors.1.description",
+    role: "principal",
   },
   {
     id: 2,
@@ -71,25 +71,25 @@ export const authors: Author[] = [
     courses: [
       {
         id: 1,
-        name: "Cognitive Neuroscience",
+        name: "members.courses.cognitive_neuroscience",
         institution: "UBA",
-        year: 2010
+        year: 2010,
       },
       {
         id: 2,
-        name: "Computational Models of Cognition",
+        name: "members.courses.computational_models_of_cognition",
         institution: "MIT Online",
-        year: 2015
+        year: 2015,
       },
       {
         id: 3,
-        name: "Cognitive Assessment and Intervention",
+        name: "members.courses.cognitive_assessment_and_intervention",
         institution: "Stanford University",
-        year: 2018
-      }
+        year: 2018,
+      },
     ],
-    description: "Innovative cognitive psychology researcher specializing in computational approaches to understanding mental processes. Expert in developing advanced cognitive models, exploring artificial intelligence applications in psychological research, and investigating the intersection of technology and cognitive science. Passionate about unraveling the complex mechanisms of human cognition through interdisciplinary research.",
-    role: "principal"
+    description: "members.authors.2.description",
+    role: "principal",
   },
   {
     id: 3,
@@ -103,19 +103,19 @@ export const authors: Author[] = [
     courses: [
       {
         id: 1,
-        name: "Neurocognitive Development",
+        name: "members.courses.neurocognitive_development",
         institution: "UNLP",
-        year: 2018
+        year: 2018,
       },
       {
         id: 2,
-        name: "Experimental Psychology Methods",
+        name: "members.courses.experimental_psychology_methods",
         institution: "UBA",
-        year: 2020
-      }
+        year: 2020,
+      },
     ],
-    description: "Fellow researcher focusing on neurocognitive development in children, with a particular interest in early language acquisition and memory processes. Currently collaborating on experimental design and data analysis within the lab.",
-    role: "fellow"
+    description: "members.authors.3.description",
+    role: "fellow",
   },
   {
     id: 4,
@@ -129,20 +129,20 @@ export const authors: Author[] = [
     courses: [
       {
         id: 1,
-        name: "Behavioral Neuroscience",
+        name: "members.courses.behavioral_neuroscience",
         institution: "UNC",
-        year: 2017
+        year: 2017,
       },
       {
         id: 2,
-        name: "Statistical Analysis for Psychology",
+        name: "members.courses.statistical_analysis_for_psychology",
         institution: "UBA",
-        year: 2019
-      }
+        year: 2019,
+      },
     ],
-    description: "Fellow researcher working on cognitive-behavioral correlations and applying advanced statistical techniques to analyze complex experimental data in behavioral neuroscience.",
-    role: "fellow"
-  }
+    description: "members.authors.4.description",
+    role: "fellow",
+  },
 ];
 
 export const calculateAge = (birthDate: string): number => {

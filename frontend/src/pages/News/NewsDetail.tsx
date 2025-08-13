@@ -10,6 +10,7 @@ import { faArrowLeft, faNewspaper } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import FullScreenImageModal from "../../components/common/FullScreenImageModal";
 import "./styles/NewsDetail.css";
+import { useTranslation } from "react-i18next";
 
 const NewsDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +21,8 @@ const NewsDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [fullscreenMedia, setFullscreenMedia] = useState<string | null>(null);
   const [isImageLoading, setIsImageLoading] = useState(false);
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,10 +42,10 @@ const NewsDetail: React.FC = () => {
           setError(
             error.response?.data?.message ||
               error.message ||
-              "Failed to load news"
+              t("news.detail.error")
           );
         } else {
-          setError("An unexpected error occurred");
+          setError(t("unexpected_error"));
         }
       } finally {
         setLoading(false);
@@ -72,7 +75,7 @@ const NewsDetail: React.FC = () => {
     return (
       <div className="loading-container">
         <div className="spinner"></div>
-        <p>Loading news...</p>
+        <p>{t("news.loading")}</p>
       </div>
     );
   }
@@ -81,7 +84,7 @@ const NewsDetail: React.FC = () => {
     return (
       <div className="error-container">
         <p>{error}</p>
-        <button onClick={() => navigate("/")}>Go Back</button>
+        <button onClick={() => navigate("/")}>{t("go_back")}</button>
       </div>
     );
   }
@@ -89,8 +92,8 @@ const NewsDetail: React.FC = () => {
   if (!news) {
     return (
       <div className="error-container">
-        <p>No news found</p>
-        <button onClick={() => navigate("/")}>Go Back</button>
+        <p>{t("news.detail.no_news")}</p>
+        <button onClick={() => navigate("/")}>{t("go_back")}</button>
       </div>
     );
   }
@@ -112,7 +115,7 @@ const NewsDetail: React.FC = () => {
 
       <div className="news-detail-page">
         <button className="back-button" onClick={() => navigate(-1)}>
-          <FontAwesomeIcon icon={faArrowLeft} /> Back
+          <FontAwesomeIcon icon={faArrowLeft} /> {t("back")}
         </button>
 
         {/* Authors & date */}
@@ -155,7 +158,10 @@ const NewsDetail: React.FC = () => {
             />
           ) : (
             <div className="news-placeholder-cover">
-              <FontAwesomeIcon icon={faNewspaper} className="news-placeholder-icon" />
+              <FontAwesomeIcon
+                icon={faNewspaper}
+                className="news-placeholder-icon"
+              />
             </div>
           )}
           <div className="news-cover-overlay">
@@ -168,37 +174,38 @@ const NewsDetail: React.FC = () => {
 
         {/* Gallery */}
         {galleryMedia.length > 0 && (
-        <div className="news-media-gallery">
+          <div className="news-media-gallery">
             {galleryMedia.map((media, index) => (
-            <div
+              <div
                 key={index}
                 className="media-item"
                 onClick={
-                media.mediaType.includes("video")
+                  media.mediaType.includes("video")
                     ? undefined // No abrir modal para videos
                     : () => openMediaFullscreen(media.url)
                 }
                 style={{
-                cursor: media.mediaType.includes("video") ? "default" : "pointer"
+                  cursor: media.mediaType.includes("video")
+                    ? "default"
+                    : "pointer",
                 }}
-            >
+              >
                 {media.mediaType.includes("video") ? (
-                <video controls>
+                  <video controls>
                     <source src={media.url} />
-                </video>
+                  </video>
                 ) : (
-                <img src={media.url} alt={`media-${index}`} />
+                  <img src={media.url} alt={`media-${index}`} />
                 )}
-            </div>
+              </div>
             ))}
-        </div>
+          </div>
         )}
-
 
         {/* Links */}
         {news.links.length > 0 && (
           <div className="news-links">
-            <h3>Related Links</h3>
+            <h3>{t("news.detail.related_links")}</h3>
             {news.links.map((link, index) => (
               <a
                 key={index}

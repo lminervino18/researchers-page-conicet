@@ -14,6 +14,7 @@ import { useAuth } from "../../hooks/useAuth";
 import FullScreenImageModal from "../../components/common/FullScreenImageModal"; // Import modal component
 import SupportAnalogyButton from "../../components/analogies/SupportAnalogyButton";
 import "./styles/AnalogiesDetail.css";
+import { useTranslation } from "react-i18next";
 
 const AnalogiesDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,12 +25,19 @@ const AnalogiesDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [fullscreenMedia, setFullscreenMedia] = useState<string | null>(null); // For full-screen media
-  const [isImageLoading, setIsImageLoading] = useState(false); 
+  const [isImageLoading, setIsImageLoading] = useState(false);
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-  const [loginPurpose, setLoginPurpose] = useState<"support" | "comment" | null>(null);
-  const [pendingComment, setPendingComment] = useState<{ content: string; parentId?: number } | null>(null);
+  const [loginPurpose, setLoginPurpose] = useState<
+    "support" | "comment" | null
+  >(null);
+  const [pendingComment, setPendingComment] = useState<{
+    content: string;
+    parentId?: number;
+  } | null>(null);
+
+  const { t } = useTranslation();
 
   const commentsSectionRef = useRef<HTMLDivElement>(null);
 
@@ -49,10 +57,12 @@ const AnalogiesDetail: React.FC = () => {
         console.error("Error fetching data:", error);
         if (axios.isAxiosError(error)) {
           setError(
-            error.response?.data?.message || error.message || "Failed to load analogy"
+            error.response?.data?.message ||
+              error.message ||
+              t("analogies.error")
           );
         } else {
-          setError("An unexpected error occurred");
+          setError(t("unexpected_error"));
         }
       } finally {
         setLoading(false);
@@ -98,7 +108,7 @@ const AnalogiesDetail: React.FC = () => {
     return (
       <div className="loading-container">
         <div className="spinner"></div>
-        <p>Loading analogy details...</p>
+        <p>{t("analogies.loading")}</p>
       </div>
     );
   }
@@ -107,7 +117,7 @@ const AnalogiesDetail: React.FC = () => {
     return (
       <div className="error-container">
         <p>{error}</p>
-        <button onClick={() => navigate("/")}>Go Back</button>
+        <button onClick={() => navigate("/")}>{t("go_back")}</button>
       </div>
     );
   }
@@ -115,8 +125,8 @@ const AnalogiesDetail: React.FC = () => {
   if (!analogy) {
     return (
       <div className="error-container">
-        <p>No analogy found</p>
-        <button onClick={() => navigate("/")}>Go Back</button>
+        <p>{t("analogies.no_analogy")}</p>
+        <button onClick={() => navigate("/")}>{t("go_back")}</button>
       </div>
     );
   }
@@ -139,7 +149,7 @@ const AnalogiesDetail: React.FC = () => {
 
       <div className="analogy-detail-page">
         <button className="back-button" onClick={() => navigate(-1)}>
-          <FontAwesomeIcon icon={faArrowLeft} /> Back
+          <FontAwesomeIcon icon={faArrowLeft} /> {t("back")}
         </button>
 
         <div className="analogy-content">
@@ -260,7 +270,7 @@ const AnalogiesDetail: React.FC = () => {
                       className="logout-button"
                       onClick={() => setIsLogoutModalOpen(true)}
                     >
-                      Logout
+                      {t("logout.logout")}
                     </button>
                     <LogoutConfirmModal
                       isOpen={isLogoutModalOpen}
@@ -279,7 +289,7 @@ const AnalogiesDetail: React.FC = () => {
                       setIsLoginModalOpen(true);
                     }}
                   >
-                    Login
+                    {t("login.login")}
                   </button>
                 )}
               </div>
