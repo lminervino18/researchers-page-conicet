@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import "./styles/Dashboard.css";
-import LanguageSelector from "../../components/common/LanguageSelector";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -14,7 +13,6 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>Administration Panel</h1>
-        <LanguageSelector />
         <button onClick={handleLogout} className="logout-button">
           Logout
         </button>
