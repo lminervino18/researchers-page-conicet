@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { authors, Author } from "../../api/authors";
-import { uploadFile } from "../../api/firebaseUploader";
+import { uploadFile, deleteFileByUrl } from "../../api/firebaseFileManager";
 import "./styles/AnalogyForm.css";
 
 interface AnalogyFormProps {
@@ -97,7 +97,7 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setIsLoading(true);
@@ -112,13 +112,30 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
 
     try {
       const uploadedLinks: MediaLink[] = await Promise.all(
-        mediaFiles.map(async (file) => ({
-          url: await uploadFile(file),
-          mediaType: file.type.startsWith("video") ? "video" : "image",
-        }))
+        mediaFiles.map(async (file) => {
+          const { url } = await uploadFile(file); 
+          return {
+            url,
+            mediaType: file.type.startsWith("video") ? "video" : "image",
+          };
+        })
       );
 
-      const allMediaLinks = [...formData.mediaLinks, ...uploadedLinks];
+      const allMediaLinks: MediaLink[] = [...formData.mediaLinks, ...uploadedLinks];
+
+      if (isEditing && initialData) {
+        const initiallyExisting = initialData.mediaLinks ?? [];
+        const remainingUrls = new Set(allMediaLinks.map((m) => m.url));
+
+        const removed = initiallyExisting.filter((m) => !remainingUrls.has(m.url));
+
+        if (removed.length > 0) {
+          await Promise.allSettled(
+            removed.map((m) => deleteFileByUrl(m.url))
+          );
+        
+        }
+      }
 
       await onSubmit(
         { ...formData, mediaLinks: allMediaLinks },
@@ -134,6 +151,7 @@ const AnalogyForm: FC<AnalogyFormProps> = ({
       setIsLoading(false);
     }
   };
+
 
   const handleCancel = () => {
     navigate(-1);

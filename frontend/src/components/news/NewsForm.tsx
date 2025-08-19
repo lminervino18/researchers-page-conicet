@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authors, Author } from '../../api/authors';
-import { uploadFile } from '../../api/firebaseUploader';
+import { uploadFile, deleteFileByUrl } from '../../api/firebaseFileManager';
 import './styles/NewsForm.css';
 
 interface NewsFormProps {
@@ -152,16 +152,31 @@ const NewsForm: FC<NewsFormProps> = ({
 
     try {
       const uploadedLinks: MediaLink[] = await Promise.all(
-        mediaFiles.map(async (file) => ({
-          url: await uploadFile(file),
-          mediaType: file.type.startsWith('video') ? 'video' : 'image'
-        }))
+        mediaFiles.map(async (file) => {
+          const { url } = await uploadFile(file);
+          return {
+            url,
+            mediaType: file.type.startsWith('video') ? 'video' : 'image'
+          };
+        })
       );
 
-      const allMediaLinks = [...formData.mediaLinks, ...uploadedLinks];
-      const previewImageUrl = selectedPreviewIndex !== null
-        ? allMediaLinks[selectedPreviewIndex]?.url || ''
-        : formData.previewImage;
+      const allMediaLinks: MediaLink[] = [...formData.mediaLinks, ...uploadedLinks];
+
+      const previewImageUrl =
+        selectedPreviewIndex !== null
+          ? allMediaLinks[selectedPreviewIndex]?.url || ''
+          : formData.previewImage;
+
+      if (isEditing && initialData) {
+        const initiallyExisting = initialData.mediaLinks ?? [];
+        const remainingUrls = new Set(allMediaLinks.map(m => m.url));
+        const removed = initiallyExisting.filter(m => !remainingUrls.has(m.url));
+
+        if (removed.length > 0) {
+          await Promise.allSettled(removed.map(m => deleteFileByUrl(m.url)));
+        }
+      }
 
       await onSubmit(
         {
@@ -195,7 +210,6 @@ const NewsForm: FC<NewsFormProps> = ({
       <form onSubmit={handleSubmit} className="news-form">
         {error && <div className="error-message">{error}</div>}
 
-        {/* Título */}
         <div className="form-group">
           <label>Title <span className="required">*</span></label>
           <input
@@ -212,7 +226,6 @@ const NewsForm: FC<NewsFormProps> = ({
           )}
         </div>
 
-        {/* Contenido */}
         <div className="form-group">
           <label>Content <span className="optional">(optional)</span></label>
           <textarea
@@ -223,7 +236,6 @@ const NewsForm: FC<NewsFormProps> = ({
           />
         </div>
 
-        {/* Autores */}
         <div className="form-group">
           <label>Authors <span className="required">*</span></label>
           <div className="author-selector">
@@ -243,7 +255,6 @@ const NewsForm: FC<NewsFormProps> = ({
           )}
         </div>
 
-        {/* Links */}
         <div className="form-group">
           <label>Links <span className="optional">(optional)</span></label>
           <div className="input-with-button">
@@ -259,18 +270,22 @@ const NewsForm: FC<NewsFormProps> = ({
             {formData.links.map((link, idx) => (
               <span key={idx} className="tag">
                 {link}
-                <button type="button" onClick={() =>
-                  setFormData(prev => ({
-                    ...prev,
-                    links: prev.links.filter((_, i) => i !== idx)
-                  }))
-                }>×</button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFormData(prev => ({
+                      ...prev,
+                      links: prev.links.filter((_, i) => i !== idx)
+                    }))
+                  }
+                >
+                  ×
+                </button>
               </span>
             ))}
           </div>
         </div>
 
-        {/* Media */}
         <div className="form-group">
           <label>Media (images/videos) <span className="optional">(optional)</span></label>
           <input
@@ -300,17 +315,13 @@ const NewsForm: FC<NewsFormProps> = ({
                     className={selectedPreviewIndex === i ? 'selected-preview' : ''}
                     onClick={() => {
                       if (selectedPreviewIndex === i) {
-                        // Deselecciona si ya está seleccionada
                         setSelectedPreviewIndex(null);
                         setFormData(prev => ({ ...prev, previewImage: '' }));
                       } else {
-                        // Selecciona nueva preview
                         setSelectedPreviewIndex(i);
-                        setFormData(prev => ({ ...prev, previewImage: formData.mediaLinks[i]?.url || '' }));
                       }
                     }}
-/>
-
+                  />
                 )}
                 <button type="button" className="remove-tag" onClick={() => handleRemoveMedia(i)}>×</button>
               </div>
@@ -323,7 +334,6 @@ const NewsForm: FC<NewsFormProps> = ({
           )}
         </div>
 
-        {/* Botones */}
         <div className="form-actions">
           <button type="submit" className="submit-btn" disabled={isSubmitting || isLoading}>
             {isSubmitting ? 'Submitting...' : (isEditing ? 'Update News' : 'Submit News')}

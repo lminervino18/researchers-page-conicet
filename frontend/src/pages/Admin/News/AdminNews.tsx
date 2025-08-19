@@ -5,6 +5,7 @@ import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 import { getAllNews, deleteNews } from '../../../api/news';
 import { News } from '../../../types';
+import { deleteFileByUrl } from '../../../api/firebaseFileManager';
 import './styles/AdminNews.css';
 
 const AdminNews: React.FC = () => {
@@ -21,18 +22,16 @@ const AdminNews: React.FC = () => {
       setError(null);
 
       const response = await getAllNews(0, 100);
-      
+
       const extractNews = (data: any): News[] => {
         if (Array.isArray(data)) return data;
         if (Array.isArray(data?.content)) return data.content;
         if (Array.isArray(data?.data)) return data.data;
         if (Array.isArray(data?.data?.content)) return data.data.content;
         return [];
-        };
+      };
 
-        setNewsList(extractNews(response));
-
-
+      setNewsList(extractNews(response));
     } catch (err) {
       console.error('Error loading news:', err);
       setError('Failed to load news. Please try again.');
@@ -47,14 +46,31 @@ const AdminNews: React.FC = () => {
 
   const handleDelete = useCallback(async (id: number) => {
     try {
+      const target = newsList.find(n => n.id === id);
+
+      const urlsToDelete = new Set<string>();
+      if (target?.mediaLinks?.length) {
+        target.mediaLinks.forEach(m => m?.url && urlsToDelete.add(m.url));
+      }
+      if (target?.previewImage) {
+        urlsToDelete.add(target.previewImage);
+      }
+
       await deleteNews(id);
+
       setNewsList(prev => prev.filter(item => item.id !== id));
       setDeleteConfirm(null);
+
+      if (urlsToDelete.size > 0) {
+        await Promise.allSettled(
+          Array.from(urlsToDelete).map(u => deleteFileByUrl(u))
+        );
+      }
     } catch (err) {
       console.error('Error deleting news:', err);
       setError('Failed to delete news. Please try again.');
     }
-  }, []);
+  }, [newsList]);
 
   const renderNewsList = () => {
     if (loading) return <div className="loading">Loading news...</div>;

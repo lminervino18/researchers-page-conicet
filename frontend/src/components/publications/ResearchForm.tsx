@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ResearchDTO, Research } from '../../types';
 import { authors as authorsList } from '../../api/authors';
-import { uploadFile } from '../../api/firebaseUploader';
+import { uploadFile, deleteFileByUrl } from '../../api/firebaseFileManager';
 import './styles/ResearchForm.css';
 
 interface ResearchFormProps {
@@ -53,24 +53,13 @@ const ResearchForm: FC<ResearchFormProps> = ({
       });
 
       if (initialData.pdfPath) {
-        const fakeFile = new File([''], initialData.pdfPath.split('/').pop() || 'existing.pdf', {
-          type: 'application/pdf'
-        });
+        const fakeName = initialData.pdfPath.split('/').pop() || 'existing.pdf';
+        const fakeFile = new File([''], fakeName, { type: 'application/pdf' });
         setSelectedFile(fakeFile);
       }
     }
   }, [initialData]);
 
-  const handleAddLink = () => {
-    if (linkInput.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        links: [...prev.links, linkInput.trim()]
-      }));
-      setLinkInput('');
-      setTouched(prev => ({ ...prev, links: true }));
-    }
-  };
 
   const toggleAuthorSelection = (authorFullName: string) => {
     setFormData(prev => ({
@@ -83,54 +72,69 @@ const ResearchForm: FC<ResearchFormProps> = ({
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  setIsLoading(true);
-  setInternalError(null);
-  setTouched({ abstract: true, authors: true, links: true, file: true });
+    setIsLoading(true);
+    setInternalError(null);
+    setTouched({ abstract: true, authors: true, links: true, file: true });
 
-  if (!formData.researchAbstract.trim()) {
-    setInternalError('Abstract is required');
-    setIsLoading(false);
-    return;
-  }
-
-  if (formData.authors.length === 0) {
-    setInternalError('At least one author is required');
-    setIsLoading(false);
-    return;
-  }
-
-  if (!isEditing && !selectedFile && formData.links.length === 0) {
-    setInternalError('Either a PDF file or at least one link is required');
-    setIsLoading(false);
-    return;
-  }
-
-  try {
-    let pdfPath: string | undefined;
-
-    if (selectedFile && (!initialData || selectedFile.name !== initialData.pdfPath?.split('/').pop())) {
-      try {
-        pdfPath = await uploadFile(selectedFile);
-      } catch (firebaseError) {
-        console.error('Firebase upload failed:', firebaseError);
-        setInternalError('Failed to upload PDF to storage. Please try again later.');
-        setIsLoading(false);
-        return;
-      }
-    } else if (initialData?.pdfPath) {
-      pdfPath = initialData.pdfPath;
+    if (!formData.researchAbstract.trim()) {
+      setInternalError('Abstract is required');
+      setIsLoading(false);
+      return;
     }
 
-    await onSubmit({ ...formData, pdfPath }, initialData?.id);
-    setIsLoading(false);
-  } catch (err) {
-    setInternalError(err instanceof Error ? err.message : 'An error occurred');
-    setIsLoading(false);
-  }
-};
+    if (formData.authors.length === 0) {
+      setInternalError('At least one author is required');
+      setIsLoading(false);
+      return;
+    }
 
+    if (!isEditing && !selectedFile && formData.links.length === 0) {
+      setInternalError('Either a PDF file or at least one link is required');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const previousPdfUrl = initialData?.pdfPath || undefined;
+      let nextPdfUrl: string | undefined = undefined;
+
+      const userSelectedNewFile =
+        selectedFile &&
+        (!initialData ||
+          selectedFile.name !== initialData.pdfPath?.split('/').pop());
+
+      if (userSelectedNewFile && selectedFile) {
+        try {
+          const { url } = await uploadFile(selectedFile);
+          nextPdfUrl = url;
+        } catch (firebaseError) {
+          console.error('Firebase upload failed:', firebaseError);
+          setInternalError('Failed to upload PDF to storage. Please try again later.');
+          setIsLoading(false);
+          return;
+        }
+      } else if (initialData?.pdfPath) {
+        nextPdfUrl = initialData.pdfPath;
+      }
+
+      await onSubmit({ ...formData, pdfPath: nextPdfUrl }, initialData?.id);
+
+      if (isEditing) {
+        const replacedOrRemoved =
+          previousPdfUrl && previousPdfUrl !== nextPdfUrl;
+        if (replacedOrRemoved) {
+          await Promise.allSettled([deleteFileByUrl(previousPdfUrl)]);
+        }
+      }
+
+      setIsLoading(false);
+    } catch (err) {
+      setInternalError(err instanceof Error ? err.message : 'An error occurred');
+      setIsLoading(false);
+    }
+  };
 
   const handleCancel = () => navigate(-1);
 
@@ -156,7 +160,7 @@ const ResearchForm: FC<ResearchFormProps> = ({
             name="abstract"
             value={formData.researchAbstract}
             onChange={(e) => {
-              if (e.target.value.length <= 1000) { // Limite de 1000 caracteres
+              if (e.target.value.length <= 1000) {
                 setFormData(prev => ({ ...prev, researchAbstract: e.target.value }));
                 setTouched(prev => ({ ...prev, abstract: true }));
               }
@@ -168,7 +172,6 @@ const ResearchForm: FC<ResearchFormProps> = ({
           <div className="char-counter">
             {formData.researchAbstract.length} / 1000 characters
           </div>
-
 
           {touched.abstract && !formData.researchAbstract.trim() && (
             <div className="validation-message">Abstract is required</div>
@@ -215,7 +218,16 @@ const ResearchForm: FC<ResearchFormProps> = ({
               placeholder="https://"
               disabled={isSubmitting}
             />
-            <button type="button" onClick={handleAddLink} disabled={isSubmitting || !linkInput.trim()} className="add-button">
+            <button type="button" onClick={() => {
+              if (linkInput.trim()) {
+                setFormData(prev => ({
+                  ...prev,
+                  links: [...prev.links, linkInput.trim()]
+                }));
+                setLinkInput('');
+                setTouched(prev => ({ ...prev, links: true }));
+              }
+            }} disabled={isSubmitting || !linkInput.trim()} className="add-button">
               Add
             </button>
           </div>

@@ -5,6 +5,7 @@ import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 import { Analogy } from "../../../types";
 import { getAllAnalogies, deleteAnalogy } from "../../../api/analogy";
+import { deleteFileByUrl } from "../../../api/firebaseFileManager";
 import "./styles/AdminAnalogies.css";
 
 const AdminAnalogys: React.FC = () => {
@@ -22,13 +23,8 @@ const AdminAnalogys: React.FC = () => {
 
       const response = await getAllAnalogies(0, 100);
 
-      // Robust data extraction with type guards
-      // TODO: check this logic, isn’t data always a PaginatedResponse?
-      //       In that case, could it ever be an array?
       const extractAnalogies = (data: unknown): Analogy[] => {
-        // Handle array of analogies
         if (Array.isArray(data)) {
-          // Check if it's an array of analogies
           return data.every(
             (item) =>
               item &&
@@ -39,14 +35,9 @@ const AdminAnalogys: React.FC = () => {
             ? (data as Analogy[])
             : [];
         }
-
-        // Handle object with content
         if (data && typeof data === "object") {
-          // Check for content property
           if ("content" in data) {
             const content = (data as { content?: unknown }).content;
-
-            // Validate content is an array of analogies
             if (
               Array.isArray(content) &&
               content.every(
@@ -60,12 +51,8 @@ const AdminAnalogys: React.FC = () => {
               return content as Analogy[];
             }
           }
-
-          // Check for data property
           if ("data" in data) {
             const innerData = (data as { data?: unknown }).data;
-
-            // Validate inner data is an array of analogies
             if (
               Array.isArray(innerData) &&
               innerData.every(
@@ -80,22 +67,17 @@ const AdminAnalogys: React.FC = () => {
             }
           }
         }
-
-        // Fallback to empty array
         return [];
       };
 
-      // Extract and set analogies
       const extractedAnalogies = extractAnalogies(response);
       setAnalogies(extractedAnalogies);
     } catch (error) {
       console.error("Error loading analogies:", error);
-
       const errorMessage =
         error instanceof Error
           ? error.message
           : "Failed to load analogies. Please try again.";
-
       setError(errorMessage);
       setAnalogies([]);
     } finally {
@@ -103,47 +85,43 @@ const AdminAnalogys: React.FC = () => {
     }
   }, []);
 
-  // Trigger initial data load
   useEffect(() => {
     loadAnalogies();
   }, [loadAnalogies]);
 
-  // Memoized delete handler to prevent unnecessary re-renders
   const handleDelete = useCallback(async (id: number) => {
     try {
+      // Grab the target analogy to know which media to delete
+      const target = analogies.find((a) => a.id === id);
+      const mediaUrls: string[] =
+        (target?.mediaLinks ?? []).map((m: any) => m.url).filter(Boolean);
+
+      // Delete from backend first
       await deleteAnalogy(id);
 
-      // Use functional update for state to ensure latest state
-      setAnalogies((prevAnalogies) =>
-        prevAnalogies.filter((analogy) => analogy.id !== id)
-      );
-
+      // Optimistically update UI
+      setAnalogies((prev) => prev.filter((analogy) => analogy.id !== id));
       setDeleteConfirm(null);
+
+      // Delete files from Firebase Storage (ignore individual failures)
+      if (mediaUrls.length > 0) {
+        await Promise.allSettled(mediaUrls.map((u) => deleteFileByUrl(u)));
+      }
     } catch (error) {
       console.error("Error deleting analogy:", error);
-
       const errorMessage =
         error instanceof Error
           ? error.message
           : "Failed to delete analogy. Please try again.";
-
       setError(errorMessage);
     }
-  }, []);
+  }, [analogies]);
 
-  // Render methods
   const renderAnalogiesList = () => {
-    if (loading) {
-      return <div className="loading">Loading analogies...</div>;
-    }
-
-    if (error) {
-      return <div className="error-message">{error}</div>;
-    }
-
-    if (analogies.length === 0) {
+    if (loading) return <div className="loading">Loading analogies...</div>;
+    if (error) return <div className="error-message">{error}</div>;
+    if (analogies.length === 0)
       return <div className="no-analogies">No analogies available</div>;
-    }
 
     return analogies.map((analogy) => (
       <AnalogiesListItem
@@ -184,7 +162,6 @@ const AdminAnalogys: React.FC = () => {
   );
 };
 
-// Separate component for list item to improve performance and readability
 interface AnalogiesListItemProps {
   analogy: Analogy;
   deleteConfirm: number | null;

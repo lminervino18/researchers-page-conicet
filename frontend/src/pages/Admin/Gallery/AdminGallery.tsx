@@ -12,7 +12,7 @@ import {
   deleteGalleryImage,
 } from "../../../api/gallery";
 import { Photo } from "react-photo-album";
-import { uploadFile } from "../../../api/firebaseUploader";
+import { uploadFile, deleteFileByUrl } from "../../../api/firebaseFileManager";
 import { GalleryImageRequestDTO } from "../../../types";
 
 const breakpointColumns = {
@@ -31,7 +31,6 @@ const AdminGallery: FC = () => {
   const [editMode, setEditMode] = useState(false);
   const [newAlt, setNewAlt] = useState("");
 
-  // Upload image modal states
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [caption, setCaption] = useState("");
@@ -52,23 +51,16 @@ const AdminGallery: FC = () => {
         setSelectedImage(null);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [editMode]);
 
   const loadGallery = async () => {
     try {
-      console.debug("fetching all gallery images");
-      const images = await getAllGalleryImages(); // will be used later
-      setImages(
-        images.map((image) => ({ src: image.src, alt: image.alt } as Photo))
-      );
-    } catch (error) {
-      console.error("Error loading images:", error);
+      const imgs = await getAllGalleryImages();
+      setImages(imgs.map((image) => ({ src: image.src, alt: image.alt } as Photo)));
+    } catch (err) {
+      console.error("Error loading images:", err);
       setError("Failed to load images");
     } finally {
       setLoading(false);
@@ -88,7 +80,6 @@ const AdminGallery: FC = () => {
   };
 
   const handleFileUpload = async () => {
-    console.debug("Uploading new image!");
     if (!selectedFile) {
       setUploadError("Please select an image");
       return;
@@ -98,34 +89,23 @@ const AdminGallery: FC = () => {
     setUploadError(null);
 
     try {
-      const url: string = await uploadFile(selectedFile);
-      const galleryImageRequest: GalleryImageRequestDTO = {
-        url,
-        caption,
-      };
+      const { url } = await uploadFile(selectedFile);
+      const galleryImageRequest: GalleryImageRequestDTO = { url, caption };
 
-      // Call backend and firbase apis to store the new image
-      console.debug("Creating the new GalleryImage!");
       const uploadedImage = await createGalleryImage(galleryImageRequest);
-      // TODO: print message warning image wasn’t uploaded?
+
       if (uploadedImage) {
-        // Add image to gallery
         setImages((prev) => [
           ...prev,
-          {
-            src: uploadedImage.src,
-            alt: uploadedImage.alt,
-          } as Photo,
+          { src: uploadedImage.src, alt: uploadedImage.alt } as Photo,
         ]);
-        console.debug("Image uploaded");
       }
 
-      // Reset states
       setUploadModalOpen(false);
       setSelectedFile(null);
       setCaption("");
-    } catch (error) {
-      console.error("Error uploading image:", error);
+    } catch (err) {
+      console.error("Error uploading image:", err);
       setUploadError("Failed to upload image");
     } finally {
       setUploadLoading(false);
@@ -133,42 +113,43 @@ const AdminGallery: FC = () => {
   };
 
   const handleUpdateAlt = async () => {
-    if (selectedImage) {
-      const updatedPhotos = images.map((image) =>
-        image.src === selectedImage.src ? { ...image, alt: newAlt } : image
-      );
-
-      console.log("Updating alt:", newAlt);
+    if (!selectedImage) return;
+    try {
       await updateGalleryImage(selectedImage.src, newAlt);
-
-      setImages(updatedPhotos);
+      setImages((prev) =>
+        prev.map((img) => (img.src === selectedImage.src ? { ...img, alt: newAlt } : img))
+      );
       setEditMode(false);
       setNewAlt("");
       setSelectedImage(null);
+    } catch (err) {
+      console.error("Error updating alt:", err);
+      setError("Failed to update label");
     }
   };
 
   const handleDeleteImage = async () => {
-    if (selectedImage) {
-      const updatedPhotos = images.filter(
-        (image) => image.src !== selectedImage.src
-      );
+    if (!selectedImage) return;
 
-      console.log("Deleting image:", selectedImage.src);
-      await deleteGalleryImage(selectedImage.src);
+    const urlToDelete = selectedImage.src;
 
-      setImages(updatedPhotos);
-      setSelectedImage(null);
+    setImages((prev) => prev.filter((img) => img.src !== urlToDelete));
+    setSelectedImage(null);
+
+    try {
+      await Promise.allSettled([
+        deleteGalleryImage(urlToDelete),
+        deleteFileByUrl(urlToDelete),
+      ]);
+    } catch (err) {
+      console.error("Error deleting image:", err);
     }
   };
 
   return (
     <div className="admin-page-container">
       <header className="admin-page-header">
-        <button
-          onClick={() => navigate("/admin/dashboard")}
-          className="back-button"
-        >
+        <button onClick={() => navigate("/admin/dashboard")} className="back-button">
           Back to Dashboard
         </button>
         <h1>Gallery Management</h1>
@@ -176,6 +157,7 @@ const AdminGallery: FC = () => {
           Add New Image
         </button>
       </header>
+
       <main className="admin-page-content" ref={galleryRef}>
         {error && <div className="error-message">{error}</div>}
 
@@ -191,9 +173,7 @@ const AdminGallery: FC = () => {
               {images.map((image, index) => (
                 <div
                   key={index}
-                  className={`masonry-item ${
-                    selectedImage?.src === image.src ? "selected" : ""
-                  }`}
+                  className={`masonry-item ${selectedImage?.src === image.src ? "selected" : ""}`}
                   onClick={(e) => handleImageClick(image, e)}
                 >
                   <img src={image.src} alt={image.alt} loading="lazy" />
@@ -229,7 +209,6 @@ const AdminGallery: FC = () => {
           </div>
         )}
 
-        {/* Caption editing modal */}
         {editMode && selectedImage && (
           <div
             className="edit-modal"
@@ -240,10 +219,7 @@ const AdminGallery: FC = () => {
               }
             }}
           >
-            <div
-              className="edit-modal-content"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <div className="edit-modal-content" onClick={(e) => e.stopPropagation()}>
               <h2>Edit Image Label</h2>
               <input
                 type="text"
@@ -267,7 +243,6 @@ const AdminGallery: FC = () => {
         )}
       </main>
 
-      {/* Upload image modal */}
       {uploadModalOpen && (
         <div className="upload-modal" onClick={() => setUploadModalOpen(false)}>
           <div
@@ -284,10 +259,7 @@ const AdminGallery: FC = () => {
                 accept="image/*"
                 style={{ display: "none" }}
               />
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="select-file-btn"
-              >
+              <button onClick={() => fileInputRef.current?.click()} className="select-file-btn">
                 {selectedFile ? selectedFile.name : "Select Image"}
               </button>
             </div>

@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilePdf, faEdit, faDownload, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Research } from '../../../types';
 import { getAllResearches, deleteResearch } from '../../../api/research';
+import { deleteFileByUrl } from '../../../api/firebaseFileManager';
 import './styles/AdminPublications.css';
 
 const AdminPublications = () => {
@@ -33,9 +34,17 @@ const AdminPublications = () => {
 
   const handleDelete = async (id: number) => {
     try {
+      const target = publications.find((p) => p.id === id);
+      const pdfUrl = target?.pdfPath;
+
       await deleteResearch(id);
-      setPublications(publications.filter(pub => pub.id !== id));
+
+      setPublications((prev) => prev.filter((pub) => pub.id !== id));
       setDeleteConfirm(null);
+
+      if (pdfUrl) {
+        await Promise.allSettled([deleteFileByUrl(pdfUrl)]);
+      }
     } catch (error) {
       console.error('Error deleting publication:', error);
       setError(error instanceof Error ? error.message : 'Failed to delete publication');
@@ -43,9 +52,7 @@ const AdminPublications = () => {
   };
 
   const handleViewPdf = (pdfPath: string | undefined) => {
-    if (pdfPath) {
-      window.open(pdfPath, '_blank');
-    }
+    if (pdfPath) window.open(pdfPath, '_blank');
   };
 
   const handleDownloadPdf = async (pdfPath: string | undefined, id: number) => {
@@ -65,9 +72,9 @@ const AdminPublications = () => {
     } catch (err) {
       console.error('Error downloading PDF:', err);
       setError('Failed to download PDF');
-    }finally {
-    setDownloading(null);
-  }
+    } finally {
+      setDownloading(null);
+    }
   };
 
   return (
