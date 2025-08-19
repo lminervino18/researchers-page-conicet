@@ -1,6 +1,7 @@
-import { FC } from 'react';
-import { Author } from '../../api/authors';
-import './styles/MemberGridItem.css';
+import { FC } from "react";
+import { Author } from "../../api/authors";
+import "./styles/MemberGridItem.css";
+import { useTranslation } from "react-i18next";
 
 interface MemberGridItemProps {
   member: Author;
@@ -8,12 +9,13 @@ interface MemberGridItemProps {
 }
 
 const MemberGridItem: FC<MemberGridItemProps> = ({ member, onClick }) => {
-  const roleLabel =
-    member.role === 'principal' ? 'Principal Investigator' : 'Research Fellow';
+  const { t } = useTranslation();
 
   return (
     <div
-      className={`member-grid-item ${member.role === 'fellow' ? 'fellow-size' : 'principal-size'}`}
+      className={`member-grid-item ${
+        member.role === "fellow" ? "fellow-size" : "principal-size"
+      }`}
       onClick={onClick}
     >
       <div className="member-grid-item-image">
@@ -23,8 +25,10 @@ const MemberGridItem: FC<MemberGridItemProps> = ({ member, onClick }) => {
         />
       </div>
       <div className="member-grid-item-info">
-        <h3>{member.firstName} {member.lastName}</h3>
-        <p>{roleLabel}</p>
+        <h3>
+          {member.firstName} {member.lastName}
+        </h3>
+        <p>{t(`members.roles.${member.role}`)}</p>
       </div>
     </div>
   );

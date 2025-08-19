@@ -37,8 +37,8 @@ const Dashboard = () => {
           >
             <span>Experiments</span>
           </button>
-          <button 
-            onClick={() => navigate('/admin/news')} 
+          <button
+            onClick={() => navigate("/admin/news")}
             className="dashboard-button"
           >
             <span>News</span>

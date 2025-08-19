@@ -15,7 +15,7 @@ import "./styles/CommentSection.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { faComment, faTrash, faReply } from "@fortawesome/free-solid-svg-icons";
-
+import { useTranslation } from "react-i18next";
 
 interface User {
   email: string;
@@ -28,7 +28,11 @@ interface CommentSectionProps {
   onRequestLogin?: () => void;
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequestLogin }) => {
+const CommentSection: React.FC<CommentSectionProps> = ({
+  analogyId,
+  user,
+  onRequestLogin,
+}) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -38,14 +42,19 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [supportCounts, setSupportCounts] = useState<Record<number, number>>({});
+  const [supportCounts, setSupportCounts] = useState<Record<number, number>>(
+    {}
+  );
   const [userSupportedIds, setUserSupportedIds] = useState<number[]>([]);
 
   const commentsListRef = useRef<HTMLDivElement | null>(null);
   const loadingRef = useRef(false);
   const MAX_COMMENT_LENGTH = 250;
 
-  const isValidComment = (c: Comment) => typeof c.content === "string" && c.content.length > 0;
+  const { t } = useTranslation();
+
+  const isValidComment = (c: Comment) =>
+    typeof c.content === "string" && c.content.length > 0;
 
   const extractComments = (fetched: Comment[]) => {
     const seen = new Set<number>();
@@ -65,37 +74,35 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
   };
 
   const loadSupportData = async (comments: Comment[]) => {
-  const ids = comments.map((c) => c.id);
-  const counts: Record<number, number> = {};
-  
-  for (const id of ids) {
-    try {
-      counts[id] = await getSupportCountForComment(id); // Get support count for each comment
-    } catch {
-      counts[id] = 0; // Fallback to 0 if there's an error
+    const ids = comments.map((c) => c.id);
+    const counts: Record<number, number> = {};
+
+    for (const id of ids) {
+      try {
+        counts[id] = await getSupportCountForComment(id); // Get support count for each comment
+      } catch {
+        counts[id] = 0; // Fallback to 0 if there's an error
+      }
     }
-  }
 
-  setSupportCounts(counts);
+    setSupportCounts(counts);
 
-  // If user is logged in, load user's supported comments
-  if (user) {
-    try {
-      const ids = await getSupportedCommentsByEmail(user.email);
-      setUserSupportedIds(ids);
-    } catch {
-      setUserSupportedIds([]);
+    // If user is logged in, load user's supported comments
+    if (user) {
+      try {
+        const ids = await getSupportedCommentsByEmail(user.email);
+        setUserSupportedIds(ids);
+      } catch {
+        setUserSupportedIds([]);
+      }
     }
-  }
-};
-
+  };
 
   const loadSupportedIds = async () => {
     if (!user) return;
     try {
       const ids = await getSupportedCommentsByEmail(user.email);
       setUserSupportedIds(ids);
-      
     } catch {
       setUserSupportedIds([]);
     }
@@ -123,7 +130,6 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
       if (commentsRaw.length === 0) {
         setHasMore(false);
       }
-
     } catch (error) {
       console.error("Error loading comments:", error);
     } finally {
@@ -152,82 +158,90 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
 
   useEffect(() => {
     if (comments.length === 0) {
-      loadComments()
+      loadComments();
     }
-  }, [comments]); 
+  }, [comments]);
 
   const handleSubmit = async (content: string, parentId?: number) => {
-  if (!user) {
-    if (onRequestLogin) onRequestLogin();
-    return;
-  }
-
-  const commentData = {
-    content,
-    userName: user.username,
-    email: user.email,
-    parentId: parentId ?? undefined,
-  };
-
-  try {
-    await createComment(analogyId, commentData);
-
-    reloadAll();
-    setMainComment("");
-    setReplyComment("");
-    setReplyingTo(null);
-
-    await loadComments();
-    await loadSupportedIds();
-  } catch (e) {
-    console.error("Error posting comment:", e);
-  }
-};
-
-
-  const handleDelete = async (id: number) => {
-  try {
-    await deleteComment(id);
-    reloadAll();
-    await loadComments();
-  } catch (e) {
-    console.error("Error deleting:", e);
-  }
-};
-
-
-  const toggleSupport = async (commentId: number) => {
-  if (!user) {
-    if (onRequestLogin) onRequestLogin();
-    return;
-  }
-
-  try {
-    if (userSupportedIds.includes(commentId)) {
-      await removeSupportFromComment(commentId, user.email);
-    } else {
-      await addSupportToComment(commentId, user.email);
+    if (!user) {
+      if (onRequestLogin) onRequestLogin();
+      return;
     }
 
-    const updated = await getSupportCountForComment(commentId); // Update support count after toggling
-    setSupportCounts((prev) => ({ ...prev, [commentId]: updated }));
-    
-    await loadSupportedIds(); // Reload the user's supported comments
-  } catch (e) {
-    console.error("Error toggling support:", e);
-  }
-};
+    const commentData = {
+      content,
+      userName: user.username,
+      email: user.email,
+      parentId: parentId ?? undefined,
+    };
 
+    try {
+      await createComment(analogyId, commentData);
 
-  const flatten = (c: Comment): Comment[] => [c, ...(c.replies?.flatMap(flatten) || [])];
+      reloadAll();
+      setMainComment("");
+      setReplyComment("");
+      setReplyingTo(null);
+
+      await loadComments();
+      await loadSupportedIds();
+    } catch (e) {
+      console.error("Error posting comment:", e);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteComment(id);
+      reloadAll();
+      await loadComments();
+    } catch (e) {
+      console.error("Error deleting:", e);
+    }
+  };
+
+  const toggleSupport = async (commentId: number) => {
+    if (!user) {
+      if (onRequestLogin) onRequestLogin();
+      return;
+    }
+
+    try {
+      if (userSupportedIds.includes(commentId)) {
+        await removeSupportFromComment(commentId, user.email);
+      } else {
+        await addSupportToComment(commentId, user.email);
+      }
+
+      const updated = await getSupportCountForComment(commentId); // Update support count after toggling
+      setSupportCounts((prev) => ({ ...prev, [commentId]: updated }));
+
+      await loadSupportedIds(); // Reload the user's supported comments
+    } catch (e) {
+      console.error("Error toggling support:", e);
+    }
+  };
+
+  const flatten = (c: Comment): Comment[] => [
+    c,
+    ...(c.replies?.flatMap(flatten) || []),
+  ];
 
   const renderTree = (nodes: Comment[], depth = 0) =>
     nodes.map((comment) => (
-      
-      
-      <div key={comment.id} className={`comment depth-${depth}`} style={{ marginLeft: depth * 20 }}>
+      <div
+        key={comment.id}
+        className={`comment depth-${depth}`}
+        style={{ marginLeft: depth * 20 }}
+      >
         <div className="comment-content">
-          <div className="user-avatar" style={{ backgroundColor: getColorForName(comment.userName), color: "white" }}>
+          <div
+            className="user-avatar"
+            style={{
+              backgroundColor: getColorForName(comment.userName),
+              color: "white",
+            }}
+          >
             {getInitials(comment.userName)}
           </div>
           <div className="comment-body">
@@ -236,20 +250,28 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
               <span>{comment.userName}</span>
               <span>{new Date(comment.createdAt).toLocaleString()}</span>
               <button
-              className={`comment-support-button ${userSupportedIds.includes(comment.id) ? "supported" : ""}`}
-              onClick={() => toggleSupport(comment.id)}
-            >
-              <FontAwesomeIcon icon={faThumbsUp} /> {supportCounts[comment.id] ?? 0}
-            </button>
+                className={`comment-support-button ${
+                  userSupportedIds.includes(comment.id) ? "supported" : ""
+                }`}
+                onClick={() => toggleSupport(comment.id)}
+              >
+                <FontAwesomeIcon icon={faThumbsUp} />{" "}
+                {supportCounts[comment.id] ?? 0}
+              </button>
 
               {user?.email === comment.email && (
-                <button onClick={() => { setCommentToDelete(comment.id); setIsModalOpen(true); }}>
+                <button
+                  onClick={() => {
+                    setCommentToDelete(comment.id);
+                    setIsModalOpen(true);
+                  }}
+                >
                   <FontAwesomeIcon icon={faTrash} />
                 </button>
               )}
               {depth < 3 && (
                 <button onClick={() => setReplyingTo(comment.id)}>
-                  <FontAwesomeIcon icon={faReply} /> Reply
+                  <FontAwesomeIcon icon={faReply} /> {t("comment.reply")}
                 </button>
               )}
             </div>
@@ -261,14 +283,21 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
             <textarea
               value={replyComment}
               onChange={(e) => setReplyComment(e.target.value)}
-              placeholder={user ? "Write a reply..." : "Please log in"}
+              placeholder={
+                user ? t("comment.write_reply") : t("comment.log_in")
+              }
               disabled={!user}
               maxLength={MAX_COMMENT_LENGTH}
             />
             <div className="comment-input-footer">
-              <span>{replyComment.length}/{MAX_COMMENT_LENGTH}</span>
-              <button disabled={!replyComment.trim()} onClick={() => handleSubmit(replyComment, comment.id)}>
-                <FontAwesomeIcon icon={faComment} /> Submit
+              <span>
+                {replyComment.length}/{MAX_COMMENT_LENGTH}
+              </span>
+              <button
+                disabled={!replyComment.trim()}
+                onClick={() => handleSubmit(replyComment, comment.id)}
+              >
+                <FontAwesomeIcon icon={faComment} /> {t("submit")}
               </button>
             </div>
           </div>
@@ -280,27 +309,32 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
 
   return (
     <div className="comments-section">
-      <h2>Comments</h2>
+      <h2>{t("comment.comments")}</h2>
 
       <div className="comment-input">
         <textarea
           value={mainComment}
           onChange={(e) => setMainComment(e.target.value)}
-          placeholder={user ? "Write a comment..." : "Please log in"}
+          placeholder={user ? t("comment.write_comment") : t("comment.log_in")}
           disabled={!user}
           maxLength={MAX_COMMENT_LENGTH}
         />
         <div className="comment-input-footer">
-          <span>{mainComment.length}/{MAX_COMMENT_LENGTH}</span>
-          <button disabled={!mainComment.trim()} onClick={() => handleSubmit(mainComment)}>
-            <FontAwesomeIcon icon={faComment} /> Submit
+          <span>
+            {mainComment.length}/{MAX_COMMENT_LENGTH}
+          </span>
+          <button
+            disabled={!mainComment.trim()}
+            onClick={() => handleSubmit(mainComment)}
+          >
+            <FontAwesomeIcon icon={faComment} /> {t("submit")}
           </button>
         </div>
       </div>
 
       <div className="comments-list" ref={commentsListRef}>
         {comments.length === 0 ? (
-          <div>{loading ? "Loading..." : "No comments yet"}</div>
+          <div>{loading ? t("loading") : t("comment.no_comments")}</div>
         ) : (
           renderTree(comments)
         )}
@@ -308,15 +342,18 @@ const CommentSection: React.FC<CommentSectionProps> = ({ analogyId, user, onRequ
 
       {hasMore && (
         <button onClick={() => setPage((prev) => prev + 1)} disabled={loading}>
-          {loading ? "Loading..." : "Load More Comments"}
+          {loading ? t("loading") : t("comment.load_more")}
         </button>
       )}
 
       <ConfirmationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onConfirm={() => { if (commentToDelete !== null) handleDelete(commentToDelete); setIsModalOpen(false); }}
-        message="Are you sure you want to delete this comment?"
+        onConfirm={() => {
+          if (commentToDelete !== null) handleDelete(commentToDelete);
+          setIsModalOpen(false);
+        }}
+        message={t("comment.confirm_delete")}
       />
     </div>
   );

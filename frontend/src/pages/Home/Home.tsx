@@ -13,6 +13,7 @@ import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
+import { useTranslation } from "react-i18next";
 
 const breakpointColumns = {
   default: 4,
@@ -28,6 +29,8 @@ const Home: FC = () => {
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (showFullGallery) {
@@ -50,7 +53,7 @@ const Home: FC = () => {
         setIsLoading(false);
       } catch (err) {
         console.error("Error fetching gallery images:", err);
-        setError("Error loading images");
+        setError(t("home.error"));
         setIsLoading(false);
       }
     };
@@ -68,7 +71,7 @@ const Home: FC = () => {
       <MainLayout>
         <div className="loading-container">
           <div className="spinner"></div>
-          <p>Loading gallery...</p>
+          <p>{t("home.loading")}</p>
         </div>
       </MainLayout>
     );
@@ -79,7 +82,9 @@ const Home: FC = () => {
       <MainLayout>
         <div className="error-container">
           <p>{error}</p>
-          <button onClick={() => window.location.reload()}>Retry</button>
+          <button onClick={() => window.location.reload()}>
+            {t("home.retry")}
+          </button>
         </div>
       </MainLayout>
     );
@@ -92,11 +97,8 @@ const Home: FC = () => {
         <section className="hero-section">
           <div className="hero-content">
             <div className="hero-text">
-              <h1>Welcome to Analogy Research Group</h1>
-              <p className="hero-subtitle">
-                Exploring the cognitive processes of analogy and their
-                applications in psychology
-              </p>
+              <h1>{t("home.hero.title")}</h1>
+              <p className="hero-subtitle">{t("home.hero.subtitle")}</p>
             </div>
             <div className="hero-image">
               <img src={landingImage} alt="Research laboratory visualization" />
@@ -107,35 +109,24 @@ const Home: FC = () => {
         {/* Featured Research */}
         <section className="featured-section">
           <div className="featured-content">
-            <h2>Our Research Focus</h2>
-            <p>
-              We investigate how people understand and use analogies in
-              reasoning, learning, and problem-solving. Our work combines
-              cognitive psychology, experimental methods, and innovative
-              approaches to understand these fundamental mental processes.
-            </p>
+            <h2>{t("home.featured.title")}</h2>
+            <p>{t("home.featured.text")}</p>
           </div>
         </section>
 
         {/* About Section */}
         <section className="about-section">
           <div className="about-content">
-            <h2>About Our Lab</h2>
-            <p>
-              Based at the University of Buenos Aires, our research group is
-              dedicated to advancing our understanding of analogical reasoning
-              and its applications. Through rigorous research and innovative
-              methodologies, we aim to contribute to both theoretical knowledge
-              and practical applications in cognitive psychology.
-            </p>
+            <h2>{t("home.about.title")}</h2>
+            <p>{t("home.about.text")}</p>
           </div>
         </section>
 
         {/* Gallery Section */}
         <section className="gallery-section">
           <div className="gallery-content">
-            <h2>Lab Gallery</h2>
-            <p>Explore our research environment and team activities</p>
+            <h2>{t("home.gallery.title")}</h2>
+            <p>{t("home.gallery.subtitle")}</p>
             <div className="gallery-preview-container">
               <div className="gallery-preview">
                 <Masonry
@@ -159,7 +150,7 @@ const Home: FC = () => {
                   onClick={() => setShowFullGallery(true)}
                   aria-label="View more"
                 >
-                  <span>More</span>
+                  <span>{t("home.gallery.more")}</span>
                   <svg
                     width="24"
                     height="24"
@@ -196,7 +187,7 @@ const Home: FC = () => {
             >
               ×
             </button>
-            <h2>Full Gallery</h2>
+            <h2>{t("home.gallery.fullTitle")}</h2>
             <div className="gallery-modal-scroll">
               <Masonry
                 breakpointCols={breakpointColumns}
@@ -209,13 +200,9 @@ const Home: FC = () => {
                     className="masonry-item clickable"
                     onClick={() => handleImageClick(index)}
                   >
-                    <img
-                      src={image.src}
-                      alt={image.alt || `Photo ${index + 1}`}
-                      loading="lazy"
-                    />
+                    <img src={image.src} alt={image.alt || ""} loading="lazy" />
                     <div className="image-overlay">
-                      <p>{image.alt || `Photo ${index + 1}`}</p>
+                      <p>{image.alt || ""}</p>
                     </div>
                   </div>
                 ))}

@@ -1,8 +1,9 @@
-import { FC, useState } from 'react';
-import { Author } from '../../api/authors';
-import MemberGridItem from './MemberGridItem';
-import MemberDetailModal from './MemberDetailModal';
-import './styles/MemberGrid.css';
+import { FC, useState } from "react";
+import { Author } from "../../api/authors";
+import MemberGridItem from "./MemberGridItem";
+import MemberDetailModal from "./MemberDetailModal";
+import "./styles/MemberGrid.css";
+import { useTranslation } from "react-i18next";
 
 interface MemberGridProps {
   members: Author[];
@@ -10,6 +11,8 @@ interface MemberGridProps {
 
 const MemberGrid: FC<MemberGridProps> = ({ members }) => {
   const [selectedMember, setSelectedMember] = useState<Author | null>(null);
+
+  const { t } = useTranslation();
 
   const handleMemberClick = (member: Author) => {
     setSelectedMember(member);
@@ -20,13 +23,15 @@ const MemberGrid: FC<MemberGridProps> = ({ members }) => {
   };
 
   // Separate members by role
-  const principals = members.filter((m) => m.role === 'principal');
-  const fellows = members.filter((m) => m.role === 'fellow');
+  const principals = members.filter((m) => m.role === "principal");
+  const fellows = members.filter((m) => m.role === "fellow");
 
   return (
     <div className="member-grid-container">
       {/* Principals */}
-      <h2 className="member-section-title centered">Principals</h2>
+      <h2 className="member-section-title centered">
+        {t("members.grid.principals")}
+      </h2>
       <div className="member-grid centered-grid">
         {principals.map((member) => (
           <MemberGridItem
@@ -40,7 +45,9 @@ const MemberGrid: FC<MemberGridProps> = ({ members }) => {
       {/* Fellows */}
       {fellows.length > 0 && (
         <>
-          <h2 className="member-section-title centered">Fellows</h2>
+          <h2 className="member-section-title centered">
+            {t("members.grid.fellows")}
+          </h2>
           <div className="fellows-list centered-list">
             {fellows.map((member) => (
               <MemberGridItem
@@ -55,10 +62,7 @@ const MemberGrid: FC<MemberGridProps> = ({ members }) => {
 
       {/* Modal */}
       {selectedMember && (
-        <MemberDetailModal
-          member={selectedMember}
-          onClose={handleCloseModal}
-        />
+        <MemberDetailModal member={selectedMember} onClose={handleCloseModal} />
       )}
     </div>
   );
