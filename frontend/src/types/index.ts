@@ -262,6 +262,7 @@ export interface NewsDTO {
   previewImage: string;
 }
 
+
 /**
  * Utility type for nullable values
  * @type Nullable
@@ -358,3 +359,4 @@ export class ApiResponseHandler<T> {
       : this.response.message ?? "Unknown error occurred";
   }
 }
+
