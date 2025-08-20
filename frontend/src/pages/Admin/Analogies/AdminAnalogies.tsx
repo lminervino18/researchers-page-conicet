@@ -23,6 +23,8 @@ const AdminAnalogys: React.FC = () => {
 
       const response = await getAllAnalogies(0, 100);
 
+      // TODO: check this logic, isn’t data always a PaginatedResponse?
+      //       In that case, could it ever be an array?
       const extractAnalogies = (data: unknown): Analogy[] => {
         if (Array.isArray(data)) {
           return data.every(
@@ -89,33 +91,37 @@ const AdminAnalogys: React.FC = () => {
     loadAnalogies();
   }, [loadAnalogies]);
 
-  const handleDelete = useCallback(async (id: number) => {
-    try {
-      // Grab the target analogy to know which media to delete
-      const target = analogies.find((a) => a.id === id);
-      const mediaUrls: string[] =
-        (target?.mediaLinks ?? []).map((m: any) => m.url).filter(Boolean);
+  const handleDelete = useCallback(
+    async (id: number) => {
+      try {
+        // Grab the target analogy to know which media to delete
+        const target = analogies.find((a) => a.id === id);
+        const mediaUrls: string[] = (target?.mediaLinks ?? [])
+          .map((m: any) => m.url)
+          .filter(Boolean);
 
-      // Delete from backend first
-      await deleteAnalogy(id);
+        // Delete from backend first
+        await deleteAnalogy(id);
 
-      // Optimistically update UI
-      setAnalogies((prev) => prev.filter((analogy) => analogy.id !== id));
-      setDeleteConfirm(null);
+        // Optimistically update UI
+        setAnalogies((prev) => prev.filter((analogy) => analogy.id !== id));
+        setDeleteConfirm(null);
 
-      // Delete files from Firebase Storage (ignore individual failures)
-      if (mediaUrls.length > 0) {
-        await Promise.allSettled(mediaUrls.map((u) => deleteFileByUrl(u)));
+        // Delete files from Firebase Storage (ignore individual failures)
+        if (mediaUrls.length > 0) {
+          await Promise.allSettled(mediaUrls.map((u) => deleteFileByUrl(u)));
+        }
+      } catch (error) {
+        console.error("Error deleting analogy:", error);
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Failed to delete analogy. Please try again.";
+        setError(errorMessage);
       }
-    } catch (error) {
-      console.error("Error deleting analogy:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to delete analogy. Please try again.";
-      setError(errorMessage);
-    }
-  }, [analogies]);
+    },
+    [analogies]
+  );
 
   const renderAnalogiesList = () => {
     if (loading) return <div className="loading">Loading analogies...</div>;
@@ -181,7 +187,9 @@ const AnalogiesListItem: React.FC<AnalogiesListItemProps> = React.memo(
     <div className="admin-analogy-card">
       <div className="analogy-info">
         <p className="analogy-admin-title">
-          {analogy.title.length > 100 ? analogy.title.slice(0, 100) + "..." : analogy.title}
+          {analogy.title.length > 100
+            ? analogy.title.slice(0, 100) + "..."
+            : analogy.title}
         </p>
         <p className="analogy-authors">Authors: {analogy.authors.join(", ")}</p>
         {analogy.links.length > 0 && (

@@ -58,7 +58,9 @@ const AdminGallery: FC = () => {
   const loadGallery = async () => {
     try {
       const imgs = await getAllGalleryImages();
-      setImages(imgs.map((image) => ({ src: image.src, alt: image.alt } as Photo)));
+      setImages(
+        imgs.map((image) => ({ src: image.src, alt: image.alt } as Photo))
+      );
     } catch (err) {
       console.error("Error loading images:", err);
       setError("Failed to load images");
@@ -94,6 +96,7 @@ const AdminGallery: FC = () => {
 
       const uploadedImage = await createGalleryImage(galleryImageRequest);
 
+      // TODO: print message warning image wasn’t uploaded?
       if (uploadedImage) {
         setImages((prev) => [
           ...prev,
@@ -117,7 +120,9 @@ const AdminGallery: FC = () => {
     try {
       await updateGalleryImage(selectedImage.src, newAlt);
       setImages((prev) =>
-        prev.map((img) => (img.src === selectedImage.src ? { ...img, alt: newAlt } : img))
+        prev.map((img) =>
+          img.src === selectedImage.src ? { ...img, alt: newAlt } : img
+        )
       );
       setEditMode(false);
       setNewAlt("");
@@ -149,7 +154,10 @@ const AdminGallery: FC = () => {
   return (
     <div className="admin-page-container">
       <header className="admin-page-header">
-        <button onClick={() => navigate("/admin/dashboard")} className="back-button">
+        <button
+          onClick={() => navigate("/admin/dashboard")}
+          className="back-button"
+        >
           Back to Dashboard
         </button>
         <h1>Gallery Management</h1>
@@ -173,7 +181,9 @@ const AdminGallery: FC = () => {
               {images.map((image, index) => (
                 <div
                   key={index}
-                  className={`masonry-item ${selectedImage?.src === image.src ? "selected" : ""}`}
+                  className={`masonry-item ${
+                    selectedImage?.src === image.src ? "selected" : ""
+                  }`}
                   onClick={(e) => handleImageClick(image, e)}
                 >
                   <img src={image.src} alt={image.alt} loading="lazy" />
@@ -219,7 +229,10 @@ const AdminGallery: FC = () => {
               }
             }}
           >
-            <div className="edit-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="edit-modal-content"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h2>Edit Image Label</h2>
               <input
                 type="text"
@@ -259,7 +272,10 @@ const AdminGallery: FC = () => {
                 accept="image/*"
                 style={{ display: "none" }}
               />
-              <button onClick={() => fileInputRef.current?.click()} className="select-file-btn">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="select-file-btn"
+              >
                 {selectedFile ? selectedFile.name : "Select Image"}
               </button>
             </div>
